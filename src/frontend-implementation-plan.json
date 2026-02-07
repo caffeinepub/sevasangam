@@ -1,0 +1,45 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Expose Admin Login entry point in header (desktop + mobile)",
+  "requirements": [
+    {
+      "id": "REQ-18",
+      "summary": "Show an \"Admin Login\" header action next to the existing Internet Identity \"Login\" action on desktop and in the mobile menu when admin is not authenticated.",
+      "acceptanceCriteria": [
+        "On desktop (md and up), when the admin session is NOT authenticated, the header shows an \"Admin Login\" button next to the existing Internet Identity \"Login\" button.",
+        "On mobile, when the admin session is NOT authenticated, the mobile menu shows an \"Admin Login\" button in the same action area as the existing Internet Identity \"Login\" button.",
+        "User-facing button text is exactly \"Admin Login\" (English).",
+        "The \"Admin Login\" button uses the same visual styling system as other header buttons (Shadcn/Tailwind Button component)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/layout/Header.tsx",
+          "operation": "modify",
+          "description": "Add a visible \"Admin Login\" action rendered when the admin session is not authenticated, placing it adjacent to the existing Internet Identity LoginButton on desktop header actions and adding it into the same mobile-menu action area. Use the existing shadcn/ui Button component styling system for consistency. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-19",
+      "summary": "Navigate to /admin-login from the new \"Admin Login\" header action while preserving existing admin guard/redirect behavior and authenticated header state.",
+      "acceptanceCriteria": [
+        "Clicking the \"Admin Login\" button takes the user to the admin login page route (\"/admin-login\").",
+        "If a user manually visits \"/admin\" without an authenticated admin session, they are redirected to \"/admin-login\" (no change/regression to existing guard behavior).",
+        "When the admin session IS authenticated, the header continues to show \"Admin Logout\" (and does not show the \"Admin Login\" button)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/layout/Header.tsx",
+          "operation": "modify",
+          "description": "Wire the new \"Admin Login\" Button onClick to route navigation to \"/admin-login\" using the existing TanStack Router navigate utility. Keep the existing conditional rendering so authenticated admin sessions continue to show only \"Admin Logout\" and hide \"Admin Login\". Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/guards/RequireAdmin.tsx",
+          "operation": "modify",
+          "description": "Confirm the existing unauthenticated admin redirect behavior remains intact (redirect to \"/admin-login\" when not authenticated) and make any minimal adjustments needed to avoid regressions while keeping behavior unchanged."
+        }
+      ]
+    }
+  ]
+}

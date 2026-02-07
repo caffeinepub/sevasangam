@@ -1,0 +1,71 @@
+{
+  "kind": "build_request",
+  "title": "Add visible Admin Login button next to the existing Login button in the header",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-18",
+      "text": "Add a visible \"Admin Login\" button in the site header, placed next to the existing Internet Identity \"Login\" button, and ensure it is available in both desktop header actions and the mobile menu.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-6",
+          "msg-7"
+        ],
+        "quotes": [
+          "Yes, place the admin login button somewhere visible in the UI.  i think next to the login button",
+          "yes, go ahead"
+        ]
+      },
+      "acceptanceCriteria": [
+        "On desktop (md and up), when the admin session is NOT authenticated, the header shows an \"Admin Login\" button next to the existing Internet Identity \"Login\" button.",
+        "On mobile, when the admin session is NOT authenticated, the mobile menu shows an \"Admin Login\" button in the same action area as the existing Internet Identity \"Login\" button.",
+        "User-facing button text is exactly \"Admin Login\" (English).",
+        "The \"Admin Login\" button uses the same visual styling system as other header buttons (Shadcn/Tailwind Button component)."
+      ]
+    },
+    {
+      "id": "REQ-19",
+      "text": "Wire the new \"Admin Login\" button to navigate to the admin login screen and keep existing admin-session behavior unchanged (admin dashboard remains protected by admin session and redirects to the admin login screen when unauthenticated).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-6",
+          "msg-7"
+        ],
+        "quotes": [
+          "Yes, place the admin login button somewhere visible in the UI.  i think next to the login button",
+          "yes, go ahead"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Clicking the \"Admin Login\" button takes the user to the admin login page route (\"/admin-login\").",
+        "If a user manually visits \"/admin\" without an authenticated admin session, they are redirected to \"/admin-login\" (no change/regression to existing guard behavior).",
+        "When the admin session IS authenticated, the header continues to show \"Admin Logout\" (and does not show the \"Admin Login\" button)."
+      ]
+    }
+  ],
+  "constraints": [
+    "Frontend immutable paths must not be edited: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui.",
+    "Do not change the admin authentication mechanism or backend behavior; this change is UI navigation only."
+  ],
+  "nonGoals": [
+    "Do not add or change admin credentials.",
+    "Do not add third-party authentication providers.",
+    "Do not redesign the admin login page UI beyond what is necessary to add the header entry point."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
+  }
+}

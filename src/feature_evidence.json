@@ -1,0 +1,47 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-add-a-visible-admin-login-button-in-the-site-header-placed-next-to-the-existing-internet-identity-login-button-and-ensure-it-is-available-in-both-desktop-header-actions-and-the-mobile-menu",
+      "featureTitle": "Add a visible \"Admin Login\" button in the site header, placed next to the existing Internet Identity \"Login\" button, and ensure it is available in both desktop header actions and the mobile menu.",
+      "files": [
+        "frontend/src/components/layout/Header.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "user-approval@3.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-18"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-wire-the-new-admin-login-button-to-navigate-to-the-admin-login-screen-and-keep-existing-admin-session-behavior-unchanged-admin-dashboard-remains-protected-by-admin-session-and-redirects-to-the-admin-login-screen-when-unauthenticated",
+      "featureTitle": "Wire the new \"Admin Login\" button to navigate to the admin login screen and keep existing admin-session behavior unchanged (admin dashboard remains protected by admin session and redirects to the admin login screen when unauthenticated).",
+      "files": [
+        "frontend/src/components/layout/Header.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "user-approval@3.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-19"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

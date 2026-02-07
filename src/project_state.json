@@ -1,0 +1,243 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 7,
+  "summary": "Build SevaSangam, a modern mobile-first service marketplace website that lets the public browse service categories and approved local worker profiles without login, while workers register/login via Internet Identity and await admin approval. Admin access is via a separate custom username/password login (single admin account initially), with the Admin Dashboard fully hidden from non-admin users; admins manage workers/categories/inquiries. Branding is trilingual (English/Hindi/Assamese).",
+  "architectural_notes": [
+    "Trust model: admin approval is the verification layer; only approved workers are publicly visible.",
+    "Notifications: no external push/email/SMS; show approval/status messages inside worker dashboard only.",
+    "WhatsApp contact: use standard wa.me link based on worker phone number; no WhatsApp API integration.",
+    "Auth change: workers continue using Internet Identity; admin uses a separate custom username/password login (single admin account initially).",
+    "Authorization: Admin Dashboard routes/UI and admin-only backend mutations (approve/reject/remove/edit/manage) must be accessible only to authenticated admin; completely hidden/blocked for workers.",
+    "UI change: expose an \"Admin Login\" link/button in the public header (next to the existing login button) that routes to /admin; keep admin-only pages/actions protected behind admin auth/authorization."
+  ],
+  "known_issues": [
+    "Admin Dashboard shows worker list but no action buttons because user is logged in as worker and there is no functioning admin authentication/authorization flow yet."
+  ],
+  "isFixRequest": false,
+  "existing_features": [
+    {
+      "id": "feature-implement-global-trilingual-branding-and-footer-display-the-product-name-in-english-sevasangam-hindi-and-assamese-everywhere-branding-appears-e-g-header-nav-auth-cta-areas-page-titles-where-applicable-and-render-the-footer-text-exactly-as-2026-crafted-with-care",
+      "title": "Implement global trilingual branding and footer: display the product name in English (\"SevaSangam\"), Hindi (\"सेवा संगम\"), and Assamese (\"সেৱা সংগম\") everywhere branding appears (e.g., header/nav, auth/CTA areas, page titles where applicable), and render the footer text exactly as \"@2026 – Crafted with care\".",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-coherent-clean-trust-focused-mobile-first-visual-theme-for-sevasangam-colors-typography-spacing-buttons-card-styles-and-apply-it-consistently-across-all-pages-and-states-public-browsing-worker-dashboard-admin-dashboard-avoid-default-unstyled-layouts",
+      "title": "Create a coherent, clean, trust-focused, mobile-first visual theme for SevaSangam (colors, typography, spacing, buttons, card styles) and apply it consistently across all pages and states (public browsing, worker dashboard, admin dashboard). Avoid default/unstyled layouts.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-the-home-page-with-1-hero-headline-sevasangam-a-meeting-point-where-people-and-trusted-local-service-workers-come-together-plus-short-subtext-emphasizing-stress-free-fast-access-to-local-services-2-a-search-discovery-area-with-filters-for-service-category-location-city-area-and-availability-3-service-category-icon-cards-for-plumber-electrician-mason-house-cleaner-garden-backyard-cleaner-carpenter-painter-mechanic-other-daily-household-services-and-4-primary-ctas-find-a-worker-and-join-as-a-worker",
+      "title": "Build the Home page with: (1) hero headline \"SevaSangam – a meeting point where people and trusted local service workers come together\" plus short subtext emphasizing stress-free, fast access to local services, (2) a search/discovery area with filters for service category, location (city/area), and availability, (3) service category icon/cards for: Plumber, Electrician, Mason, House Cleaner, Garden / Backyard Cleaner, Carpenter, Painter, Mechanic, Other daily household services, and (4) primary CTAs: “Find a Worker” and “Join as a Worker”.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-public-browsing-without-login-users-can-browse-service-categories-view-category-pages-view-worker-profiles-and-contact-workers-only-workers-with-status-approved-are-visible-in-any-public-list-or-profile-route",
+      "title": "Implement public browsing without login: users can browse service categories, view category pages, view worker profiles, and contact workers. Only workers with status “Approved” are visible in any public list or profile route.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-separate-service-category-pages-one-per-category-that-display-a-list-of-approved-workers-with-name-profile-photo-years-of-experience-optional-rating-display-if-present-location-and-a-contact-button-linking-to-the-worker-profile",
+      "title": "Create separate Service Category pages (one per category) that display a list of approved workers with: name, profile photo, years of experience, optional rating display (if present), location, and a contact button linking to the worker profile.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-worker-profile-page-that-displays-full-name-single-service-category-years-of-experience-service-location-city-area-optional-pricing-availability-full-time-part-time-optional-customer-reviews-section-read-only-if-present-and-provides-contact-actions-click-to-call-tel-and-whatsapp-contact-via-a-standard-wa-me-link-using-the-worker-s-phone-number-no-api-integration",
+      "title": "Implement Worker Profile page that displays: full name, single service category, years of experience, service location (city/area), optional pricing, availability (full-time/part-time), optional customer reviews section (read-only if present), and provides contact actions: click-to-call (tel:) and WhatsApp contact via a standard wa.me link using the worker’s phone number (no API integration).",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-worker-authentication-and-registration-using-internet-identity-only-no-email-otp-sms-workers-can-sign-in-complete-a-mobile-friendly-registration-form-and-submit-a-worker-profile-stored-in-the-backend-with-status-set-to-pending-approval-pending-profiles-must-not-be-publicly-visible",
+      "title": "Implement worker authentication and registration using Internet Identity only (no email/OTP/SMS): workers can sign in, complete a mobile-friendly registration form, and submit a worker profile stored in the backend with status set to “Pending Approval”. Pending profiles must not be publicly visible.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-worker-dashboard-authenticated-via-internet-identity-where-workers-can-view-current-approval-status-pending-approved-rejected-view-and-edit-their-profile-details-and-see-status-updates-only-within-the-dashboard-ui-no-external-notifications-service-category-changes-must-require-admin-approval-major-edits-should-trigger-re-approval-status-returns-to-pending-based-on-defined-rules",
+      "title": "Create a Worker Dashboard (authenticated via Internet Identity) where workers can: view current approval status (Pending/Approved/Rejected), view and edit their profile details, and see status updates only within the dashboard UI (no external notifications). Service category changes must require admin approval; major edits should trigger re-approval (status returns to Pending) based on defined rules.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-an-admin-dashboard-authenticated-authorized-that-allows-admins-to-view-all-registered-workers-including-pending-approved-rejected-approve-reject-remove-worker-profiles-edit-worker-details-manage-service-categories-and-manage-user-inquiries",
+      "title": "Implement an Admin Dashboard (authenticated/authorized) that allows admins to: view all registered workers (including Pending/Approved/Rejected), approve/reject/remove worker profiles, edit worker details, manage service categories, and manage user inquiries.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-end-to-end-search-and-filtering-ux-the-home-page-filters-category-location-availability-should-drive-results-shown-on-category-pages-and-or-a-dedicated-search-results-view-with-clear-empty-states-and-the-ability-to-reset-filters",
+      "title": "Implement end-to-end search and filtering UX: the Home page filters (category, location, availability) should drive results shown on category pages and/or a dedicated search results view, with clear empty states and the ability to reset filters.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-navigation-structure-for-public-pages-and-authenticated-areas-public-nav-for-home-and-categories-and-authenticated-nav-entries-for-worker-dashboard-and-admin-dashboard-visible-only-when-appropriate",
+      "title": "Add navigation structure for public pages and authenticated areas: public nav for Home and Categories, and authenticated nav entries for Worker Dashboard and Admin Dashboard (visible only when appropriate).",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-include-static-generated-image-assets-in-the-frontend-build-add-the-generated-logo-and-category-icons-illustrations-as-static-files-under-frontend-public-assets-generated-and-use-them-in-the-ui-logo-in-header-hero-icons-on-category-cards",
+      "title": "Include static generated image assets in the frontend build: add the generated logo and category icons/illustrations as static files under frontend/public/assets/generated and use them in the UI (logo in header/hero; icons on category cards).",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-dedicated-admin-login-ui-flow-in-the-frontend-separate-from-internet-identity-that-lets-the-admin-sign-in-using-the-provided-username-password-stores-the-resulting-admin-session-credential-securely-on-the-client-and-supports-logging-out",
+      "title": "Add a dedicated Admin Login UI flow in the frontend (separate from Internet Identity) that lets the admin sign in using the provided username/password, stores the resulting admin session credential securely on the client, and supports logging out.",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-admin-authorization-checks-and-admin-dashboard-visibility-so-workers-internet-identity-users-never-see-admin-ui-and-the-admin-dashboard-including-approve-reject-remove-buttons-is-visible-and-functional-only-when-the-custom-admin-session-is-authenticated",
+      "title": "Update admin authorization checks and Admin Dashboard visibility so workers (Internet Identity users) never see admin UI, and the Admin Dashboard (including Approve/Reject/Remove buttons) is visible and functional only when the custom admin session is authenticated.",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-wire-the-admin-dashboard-data-fetching-and-mutations-to-use-the-admin-session-credential-for-authorization-when-calling-backend-admin-methods",
+      "title": "Wire the Admin Dashboard data fetching and mutations to use the admin session credential for authorization when calling backend admin methods.",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-visible-admin-login-button-in-the-site-header-placed-next-to-the-existing-internet-identity-login-button-and-ensure-it-is-available-in-both-desktop-header-actions-and-the-mobile-menu",
+      "title": "Add a visible \"Admin Login\" button in the site header, placed next to the existing Internet Identity \"Login\" button, and ensure it is available in both desktop header actions and the mobile menu.",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-wire-the-new-admin-login-button-to-navigate-to-the-admin-login-screen-and-keep-existing-admin-session-behavior-unchanged-admin-dashboard-remains-protected-by-admin-session-and-redirects-to-the-admin-login-screen-when-unauthenticated",
+      "title": "Wire the new \"Admin Login\" button to navigate to the admin login screen and keep existing admin-session behavior unchanged (admin dashboard remains protected by admin session and redirects to the admin login screen when unauthenticated).",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Implement trilingual branding (English: SevaSangam, Hindi: सेवा संगम, Assamese: সেৱা সংগম) displayed everywhere branding appears; ensure mobile-first clean trustworthy UI and footer '@2026 – Crafted with care'.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Home page: hero headline/subtext, trilingual name display, search with filters (category, location, availability), category icon/cards (Plumber, Electrician, Mason, House Cleaner, Garden/Backyard Cleaner, Carpenter, Painter, Mechanic, Other), and CTAs 'Find a Worker' and 'Join as a Worker'.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Service category pages: separate page per category listing approved workers with name, photo, years of experience, (optional) rating, location, and contact button.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Worker profile page: show full name, single service category, experience, location, (optional) pricing, availability, (optional) reviews; provide click-to-call and WhatsApp contact via wa.me link (no API).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Worker registration/login via Internet Identity only (no email/OTP/SMS); mobile-friendly registration form saves worker profile as 'Pending Approval' and hides it publicly until admin approves.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Worker dashboard/profile management: workers can edit details; service category changes require admin approval; major edits trigger re-approval; status updates shown inside dashboard (pending/approved).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Admin dashboard: view all registered workers; approve/reject/remove; edit worker details; manage service categories; manage user inquiries.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Database layer for worker profiles with approval status; only approved workers publicly visible; support filtering by category and location; schema designed for future expansion (ratings/reviews, booking history).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Optional enhancements: ratings & reviews, location-based matching, booking request system, and full trilingual support across site content.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-19",
+      "summary": "Implement the backend data model and persistence for workers, categories, and inquiries in the single Motoko main actor, including: worker fields (full name, phone number, category, years experience, location, pricing, availability, optional photo, approval status), admin-only mutation methods, and public query methods that support filtering by category and location. Design the schema to allow future expansion for ratings/reviews and booking history.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-20",
+      "summary": "Implement a separate custom admin authentication system (username/password) for exactly one admin account initially; restrict Admin Dashboard visibility and all approve/reject/remove actions to authenticated admin only (workers must not see admin UI or action buttons).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-21",
+      "summary": "Implement a custom admin authentication mechanism in the Motoko backend for exactly one admin account with username \"akash7711\" and password \"Incorrect9978#*\", and use it to authorize all admin-only operations (approve/reject/remove workers, manage categories, manage inquiries, and manage approvals) even when the caller is not an Internet Identity admin principal.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-22",
+      "summary": "Add a visible \"Admin Login\" button in the site header, placed next to the existing login button, linking to /admin (admin session still required for access).",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "SevaSangam",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}
