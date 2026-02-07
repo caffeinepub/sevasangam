@@ -146,13 +146,25 @@ export interface _SERVICE {
     Array<Inquiry>
   >,
   'getAllWorkers' : ActorMethod<[], Array<WorkerProfile>>,
+  'getAllWorkersAdmin' : ActorMethod<
+    [[] | [string], [] | [string]],
+    Array<WorkerProfile>
+  >,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getCategory' : ActorMethod<[string], [] | [Category]>,
   'getMyWorkerProfile' : ActorMethod<[], [] | [WorkerProfile]>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'getWorkerInquiries' : ActorMethod<[string], Array<Inquiry>>,
+  'getWorkerInquiriesAdmin' : ActorMethod<
+    [[] | [string], [] | [string], string],
+    Array<Inquiry>
+  >,
   'getWorkerProfile' : ActorMethod<[string], [] | [WorkerProfile]>,
+  'getWorkerProfileAdmin' : ActorMethod<
+    [[] | [string], [] | [string], string],
+    [] | [WorkerProfile]
+  >,
   'getWorkersByCategory' : ActorMethod<[string], Array<WorkerProfile>>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'isCallerApproved' : ActorMethod<[], boolean>,

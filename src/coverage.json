@@ -1,46 +1,70 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-07T14:06:22.919Z",
+  "generatedAt": "2026-02-07T15:10:51.611Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 2,
+    "total": 3,
     "implemented": 2,
     "items": [
       {
-        "id": "REQ-18",
-        "summary": "Add a visible \"Admin Login\" button in the site header, placed next to the existing Internet Identity \"Login\" button, and ensure it is available in both desktop header actions and the mobile menu.",
+        "id": "REQ-27",
+        "summary": "Persist workers, categories, inquiries, and userProfiles across canister upgrades/deploys so that production deployments do not reset data and cause approved workers to disappear from public pages and pending workers to disappear from the Admin Dashboard.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-28",
+        "summary": "Ensure the Admin Dashboard worker list reliably shows Pending workers in production by (a) making the admin worker fetch return real data (not an empty list caused by backend state reset) and (b) adding explicit error UI when the admin worker query fails (network/unauthorized) instead of silently showing an empty state.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/layout/Header.tsx"
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/admin/WorkersAdminPanel.tsx",
+          "frontend/src/utils/adminApiErrorHandling.ts"
         ],
         "matchedFiles": [
-          "frontend/src/components/layout/Header.tsx"
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/admin/WorkersAdminPanel.tsx",
+          "frontend/src/utils/adminApiErrorHandling.ts"
         ]
       },
       {
-        "id": "REQ-19",
-        "summary": "Wire the new \"Admin Login\" button to navigate to the admin login screen and keep existing admin-session behavior unchanged (admin dashboard remains protected by admin session and redirects to the admin login screen when unauthenticated).",
+        "id": "REQ-29",
+        "summary": "Ensure approved workers reliably appear on public category pages and search results in production by surfacing query errors (instead of silently treating actor/unreachable errors as an empty list) and by ensuring public worker queries refetch successfully after deployment and after admin approval actions.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/layout/Header.tsx",
-          "frontend/src/components/guards/RequireAdmin.tsx"
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/pages/CategoryPage.tsx",
+          "frontend/src/pages/SearchResultsPage.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/layout/Header.tsx"
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/pages/CategoryPage.tsx",
+          "frontend/src/pages/SearchResultsPage.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/layout/Header.tsx",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/admin/WorkersAdminPanel.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/CategoryPage.tsx",
+    "frontend/src/pages/SearchResultsPage.tsx",
+    "frontend/src/utils/adminApiErrorHandling.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

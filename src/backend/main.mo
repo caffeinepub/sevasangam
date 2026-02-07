@@ -8,7 +8,9 @@ import AccessControl "authorization/access-control";
 import BlobStorage "blob-storage/Storage";
 import MixinStorage "blob-storage/Mixin";
 import UserApproval "user-approval/approval";
+import Migration "migration";
 
+(with migration = Migration.run)
 actor {
   include MixinStorage();
 
@@ -129,15 +131,36 @@ actor {
   // State
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
+
   let approvalState = UserApproval.initState(accessControlState);
-  let categoryMap = Map.empty<Text, Category.Category>();
-  let workerMap = Map.empty<Text, Worker.WorkerProfile>();
-  let inquiryMap = Map.empty<Text, Inquiry.Inquiry>();
-  let userProfiles = Map.empty<Principal, UserProfile>();
+
+  // Persisted stores
+  var categoryMap = Map.empty<Text, Category.Category>();
+  var workerMap = Map.empty<Text, Worker.WorkerProfile>();
+  var inquiryMap = Map.empty<Text, Inquiry.Inquiry>();
+  var userProfiles = Map.empty<Principal, UserProfile>();
 
   // Hardcoded credentials for custom admin
   let adminUsername = "akash7711";
   let adminPassword = "Incorrect9978#*";
+
+  // Helper function to check admin authorization
+  // Return true when:
+  // 1. Caller is anonymous AND credentials match the hardcoded admin credentials
+  // 2. Otherwise: Use regular principal authentication fallback
+  func isAuthorizedAdmin(caller : Principal, username : ?Text, password : ?Text) : Bool {
+    // Check for hardcoded admin credentials when caller is anonymous
+    if (caller.isAnonymous()) {
+      switch (username, password) {
+        case (?u, ?p) {
+          return u == adminUsername and p == adminPassword;
+        };
+        case (_) { return false };
+      };
+    };
+    // Regular principal-based authentication fallback
+    AccessControl.isAdmin(accessControlState, caller);
+  };
 
   // User approval functions (required by system)
   public query ({ caller }) func isCallerApproved() : async Bool {
@@ -149,14 +172,14 @@ actor {
   };
 
   public shared ({ caller }) func setApproval(user : Principal, status : UserApproval.ApprovalStatus) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
       Runtime.trap("Unauthorized: Only admins can perform this action");
     };
     UserApproval.setApproval(approvalState, user, status);
   };
 
   public query ({ caller }) func listApprovals() : async [UserApproval.UserApprovalInfo] {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
       Runtime.trap("Unauthorized: Only admins can perform this action");
     };
     UserApproval.listApprovals(approvalState);
@@ -311,7 +334,7 @@ actor {
     switch (worker) {
       case null { null };
       case (?w) {
-        // Admins can see all profiles
+        // Admins (principal-based only for query) can see all profiles
         if (AccessControl.isAdmin(accessControlState, caller)) {
           return ?w;
         };
@@ -328,7 +351,17 @@ actor {
     };
   };
 
+  // Get worker profile by ID with admin credentials - supports custom admin auth
+  public shared ({ caller }) func getWorkerProfileAdmin(username : ?Text, password : ?Text, workerId : Text) : async ?Worker.WorkerProfile {
+    if (not isAuthorizedAdmin(caller, username, password)) {
+      Runtime.trap("Unauthorized: Only admins can access worker profiles with credentials");
+    };
+    workerMap.get(workerId);
+  };
+
   // Get all workers - public but filtered by status for non-admins
+  // Note: This query function only supports principal-based admin auth
+  // For custom credential admin auth, use getAllWorkersAdmin instead
   public query ({ caller }) func getAllWorkers() : async [Worker.WorkerProfile] {
     let isAdmin = AccessControl.isAdmin(accessControlState, caller);
 
@@ -343,6 +376,14 @@ actor {
         }
       );
     };
+  };
+
+  // Admin-authorized fetch of all workers (supports custom credentials for admin dashboard)
+  public shared ({ caller }) func getAllWorkersAdmin(username : ?Text, password : ?Text) : async [Worker.WorkerProfile] {
+    if (not isAuthorizedAdmin(caller, username, password)) {
+      Runtime.trap("Unauthorized: Only admins can access all workers");
+    };
+    workerMap.values().toArray();
   };
 
   // Get workers by category - public but only approved
@@ -480,31 +521,16 @@ actor {
     };
   };
 
-  // Helper function to check admin authorization
-  // Caller must be authenticated (not anonymous) AND either:
-  // 1. Be an admin principal via AccessControl, OR
-  // 2. Provide valid custom admin credentials
-  func isAuthorizedAdmin(caller : Principal, username : ?Text, password : ?Text) : Bool {
-    // First check if caller is authenticated (not anonymous)
-    if (caller.isAnonymous()) {
-      return false;
+  // Admin: Get inquiries for a specific worker with admin credentials
+  public shared ({ caller }) func getWorkerInquiriesAdmin(username : ?Text, password : ?Text, workerId : Text) : async [Inquiry.Inquiry] {
+    if (not isAuthorizedAdmin(caller, username, password)) {
+      Runtime.trap("Unauthorized: Only admins can view worker inquiries with credentials");
     };
 
-    // Check if caller is an admin via AccessControl
-    if (AccessControl.isAdmin(accessControlState, caller)) {
-      return true;
-    };
-
-    // Check custom admin credentials
-    switch (username, password) {
-      case (?u, ?p) {
-        // Caller must be at least a user (authenticated) to use custom credentials
-        if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-          return false;
-        };
-        u == adminUsername and p == adminPassword;
-      };
-      case (_) { false };
-    };
+    inquiryMap.values().toArray().filter<Inquiry.Inquiry>(
+      func(inq : Inquiry.Inquiry) : Bool {
+        inq.worker_id == workerId;
+      }
+    );
   };
 };

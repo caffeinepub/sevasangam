@@ -122,13 +122,16 @@ export interface backendInterface {
     getAllCategories(): Promise<Array<Category>>;
     getAllInquiries(username: string | null, password: string | null): Promise<Array<Inquiry>>;
     getAllWorkers(): Promise<Array<WorkerProfile>>;
+    getAllWorkersAdmin(username: string | null, password: string | null): Promise<Array<WorkerProfile>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getCategory(categoryId: string): Promise<Category | null>;
     getMyWorkerProfile(): Promise<WorkerProfile | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     getWorkerInquiries(workerId: string): Promise<Array<Inquiry>>;
+    getWorkerInquiriesAdmin(username: string | null, password: string | null, workerId: string): Promise<Array<Inquiry>>;
     getWorkerProfile(workerId: string): Promise<WorkerProfile | null>;
+    getWorkerProfileAdmin(username: string | null, password: string | null, workerId: string): Promise<WorkerProfile | null>;
     getWorkersByCategory(categoryId: string): Promise<Array<WorkerProfile>>;
     isCallerAdmin(): Promise<boolean>;
     isCallerApproved(): Promise<boolean>;

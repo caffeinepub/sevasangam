@@ -2,10 +2,12 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-a-visible-admin-login-button-in-the-site-header-placed-next-to-the-existing-internet-identity-login-button-and-ensure-it-is-available-in-both-desktop-header-actions-and-the-mobile-menu",
-      "featureTitle": "Add a visible \"Admin Login\" button in the site header, placed next to the existing Internet Identity \"Login\" button, and ensure it is available in both desktop header actions and the mobile menu.",
+      "featureId": "feature-ensure-the-admin-dashboard-worker-list-reliably-shows-pending-workers-in-production-by-a-making-the-admin-worker-fetch-return-real-data-not-an-empty-list-caused-by-backend-state-reset-and-b-adding-explicit-error-ui-when-the-admin-worker-query-fails-network-unauthorized-instead-of-silently-showing-an-empty-state",
+      "featureTitle": "Ensure the Admin Dashboard worker list reliably shows Pending workers in production by (a) making the admin worker fetch return real data (not an empty list caused by backend state reset) and (b) adding explicit error UI when the admin worker query fails (network/unauthorized) instead of silently showing an empty state.",
       "files": [
-        "frontend/src/components/layout/Header.tsx"
+        "frontend/src/components/admin/WorkersAdminPanel.tsx",
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/utils/adminApiErrorHandling.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -18,15 +20,17 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-18"
+        "REQ-28"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-wire-the-new-admin-login-button-to-navigate-to-the-admin-login-screen-and-keep-existing-admin-session-behavior-unchanged-admin-dashboard-remains-protected-by-admin-session-and-redirects-to-the-admin-login-screen-when-unauthenticated",
-      "featureTitle": "Wire the new \"Admin Login\" button to navigate to the admin login screen and keep existing admin-session behavior unchanged (admin dashboard remains protected by admin session and redirects to the admin login screen when unauthenticated).",
+      "featureId": "feature-ensure-approved-workers-reliably-appear-on-public-category-pages-and-search-results-in-production-by-surfacing-query-errors-instead-of-silently-treating-actor-unreachable-errors-as-an-empty-list-and-by-ensuring-public-worker-queries-refetch-successfully-after-deployment-and-after-admin-approval-actions",
+      "featureTitle": "Ensure approved workers reliably appear on public category pages and search results in production by surfacing query errors (instead of silently treating actor/unreachable errors as an empty list) and by ensuring public worker queries refetch successfully after deployment and after admin approval actions.",
       "files": [
-        "frontend/src/components/layout/Header.tsx"
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/CategoryPage.tsx",
+        "frontend/src/pages/SearchResultsPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -39,7 +43,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-19"
+        "REQ-29"
       ],
       "confidence": "high"
     }

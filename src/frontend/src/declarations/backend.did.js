@@ -173,6 +173,11 @@ export const idlService = IDL.Service({
       [],
     ),
   'getAllWorkers' : IDL.Func([], [IDL.Vec(WorkerProfile)], ['query']),
+  'getAllWorkersAdmin' : IDL.Func(
+      [IDL.Opt(IDL.Text), IDL.Opt(IDL.Text)],
+      [IDL.Vec(WorkerProfile)],
+      [],
+    ),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getCategory' : IDL.Func([IDL.Text], [IDL.Opt(Category)], ['query']),
@@ -183,10 +188,20 @@ export const idlService = IDL.Service({
       ['query'],
     ),
   'getWorkerInquiries' : IDL.Func([IDL.Text], [IDL.Vec(Inquiry)], ['query']),
+  'getWorkerInquiriesAdmin' : IDL.Func(
+      [IDL.Opt(IDL.Text), IDL.Opt(IDL.Text), IDL.Text],
+      [IDL.Vec(Inquiry)],
+      [],
+    ),
   'getWorkerProfile' : IDL.Func(
       [IDL.Text],
       [IDL.Opt(WorkerProfile)],
       ['query'],
+    ),
+  'getWorkerProfileAdmin' : IDL.Func(
+      [IDL.Opt(IDL.Text), IDL.Opt(IDL.Text), IDL.Text],
+      [IDL.Opt(WorkerProfile)],
+      [],
     ),
   'getWorkersByCategory' : IDL.Func(
       [IDL.Text],
@@ -391,6 +406,11 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'getAllWorkers' : IDL.Func([], [IDL.Vec(WorkerProfile)], ['query']),
+    'getAllWorkersAdmin' : IDL.Func(
+        [IDL.Opt(IDL.Text), IDL.Opt(IDL.Text)],
+        [IDL.Vec(WorkerProfile)],
+        [],
+      ),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getCategory' : IDL.Func([IDL.Text], [IDL.Opt(Category)], ['query']),
@@ -401,10 +421,20 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'getWorkerInquiries' : IDL.Func([IDL.Text], [IDL.Vec(Inquiry)], ['query']),
+    'getWorkerInquiriesAdmin' : IDL.Func(
+        [IDL.Opt(IDL.Text), IDL.Opt(IDL.Text), IDL.Text],
+        [IDL.Vec(Inquiry)],
+        [],
+      ),
     'getWorkerProfile' : IDL.Func(
         [IDL.Text],
         [IDL.Opt(WorkerProfile)],
         ['query'],
+      ),
+    'getWorkerProfileAdmin' : IDL.Func(
+        [IDL.Opt(IDL.Text), IDL.Opt(IDL.Text), IDL.Text],
+        [IDL.Opt(WorkerProfile)],
+        [],
       ),
     'getWorkersByCategory' : IDL.Func(
         [IDL.Text],

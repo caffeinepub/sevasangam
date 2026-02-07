@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useAdminSession } from '../hooks/useAdminSession';
 import { Button } from '../components/ui/button';
@@ -10,32 +10,44 @@ import { AlertCircle, Loader2, Lock } from 'lucide-react';
 
 export default function AdminLoginPage() {
   const navigate = useNavigate();
-  const { login, isAdminAuthenticated } = useAdminSession();
+  const { login, isAdminAuthenticated, actorReady } = useAdminSession();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-  // Redirect if already logged in
-  if (isAdminAuthenticated) {
-    navigate({ to: '/admin' });
-    return null;
-  }
+  // Redirect if already logged in (using effect instead of render-time)
+  useEffect(() => {
+    if (isAdminAuthenticated) {
+      navigate({ to: '/admin' });
+    }
+  }, [isAdminAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    
+    // Guard against actor not ready
+    if (!actorReady) {
+      setError('Connection not ready. Please wait a moment and try again.');
+      return;
+    }
+    
     setIsLoggingIn(true);
 
     try {
       await login(username, password);
-      navigate({ to: '/admin' });
+      // Navigation will happen via the useEffect above
     } catch (err: any) {
       setError(err.message || 'Login failed. Please check your credentials.');
     } finally {
       setIsLoggingIn(false);
     }
   };
+
+  // Show loading state while actor is initializing
+  const isActorLoading = !actorReady && !error;
+  const isSubmitDisabled = isLoggingIn || !actorReady;
 
   return (
     <div className="container max-w-md mx-auto px-4 py-16">
@@ -60,6 +72,13 @@ export default function AdminLoginPage() {
               </Alert>
             )}
 
+            {isActorLoading && (
+              <Alert>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <AlertDescription>Connecting to server...</AlertDescription>
+              </Alert>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
               <Input
@@ -69,7 +88,7 @@ export default function AdminLoginPage() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
-                disabled={isLoggingIn}
+                disabled={isSubmitDisabled}
                 autoComplete="username"
               />
             </div>
@@ -83,16 +102,21 @@ export default function AdminLoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                disabled={isLoggingIn}
+                disabled={isSubmitDisabled}
                 autoComplete="current-password"
               />
             </div>
 
-            <Button type="submit" className="w-full" disabled={isLoggingIn}>
+            <Button type="submit" className="w-full" disabled={isSubmitDisabled}>
               {isLoggingIn ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Logging in...
+                </>
+              ) : isActorLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Connecting...
                 </>
               ) : (
                 'Login'

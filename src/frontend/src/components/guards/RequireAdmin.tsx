@@ -30,7 +30,7 @@ export default function RequireAdmin({ children }: { children: ReactNode }) {
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Access Denied</AlertTitle>
           <AlertDescription>
-            You must be logged in as an admin to access this page.
+            You must be logged in as an admin to access this page. Redirecting to login...
           </AlertDescription>
         </Alert>
       </div>

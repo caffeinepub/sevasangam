@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useGetAllWorkers, useApproveWorker, useRejectWorker, useRemoveWorker } from '../../hooks/useQueries';
+import { useGetAllWorkersAdmin, useApproveWorker, useRejectWorker, useRemoveWorker } from '../../hooks/useQueries';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { CheckCircle, XCircle, Trash2, Loader2 } from 'lucide-react';
+import { CheckCircle, XCircle, Trash2, Loader2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import type { WorkerProfile } from '../../backend';
 import { CATEGORY_NAMES } from '../../utils/categories';
@@ -18,9 +18,20 @@ function EmptyState({ title, description }: { title: string; description?: strin
   );
 }
 
+function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+      <AlertCircle className="h-12 w-12 text-destructive mb-4" />
+      <h3 className="text-lg font-semibold mb-2">Connection Problem</h3>
+      <p className="text-sm text-muted-foreground mb-6 max-w-md">{message}</p>
+      <Button onClick={onRetry}>Try Again</Button>
+    </div>
+  );
+}
+
 export default function WorkersAdminPanel() {
-  const { data: workers = [], isLoading } = useGetAllWorkers();
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const { data: workers = [], isLoading, isError, error, refetch } = useGetAllWorkersAdmin();
+  const [statusFilter, setStatusFilter] = useState<string>('pending');
   const approveWorker = useApproveWorker();
   const rejectWorker = useRejectWorker();
   const removeWorker = useRemoveWorker();
@@ -35,7 +46,7 @@ export default function WorkersAdminPanel() {
       await approveWorker.mutateAsync(workerId);
       toast.success('Worker approved successfully');
     } catch (error) {
-      toast.error('Failed to approve worker');
+      // Error already handled by mutation hook
     }
   };
 
@@ -44,7 +55,7 @@ export default function WorkersAdminPanel() {
       await rejectWorker.mutateAsync(workerId);
       toast.success('Worker rejected');
     } catch (error) {
-      toast.error('Failed to reject worker');
+      // Error already handled by mutation hook
     }
   };
 
@@ -54,7 +65,7 @@ export default function WorkersAdminPanel() {
       await removeWorker.mutateAsync(workerId);
       toast.success('Worker removed');
     } catch (error) {
-      toast.error('Failed to remove worker');
+      // Error already handled by mutation hook
     }
   };
 
@@ -73,6 +84,16 @@ export default function WorkersAdminPanel() {
       <div className="flex justify-center py-8">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
+    );
+  }
+
+  if (isError) {
+    const errorMessage = error?.message || 'Unable to load workers. Please try again.';
+    return (
+      <ErrorState 
+        message={errorMessage.includes('session') ? 'Your session has expired. Redirecting to login...' : 'Connection problem. Please try again.'}
+        onRetry={() => refetch()}
+      />
     );
   }
 
@@ -111,70 +132,113 @@ export default function WorkersAdminPanel() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2 text-sm mb-4">
-                  <p>
-                    <strong>Phone:</strong> {worker.phone_number}
-                  </p>
-                  <p>
-                    <strong>Location:</strong> {[worker.location.city, worker.location.district].filter(Boolean).join(', ')}
-                  </p>
-                  <p>
-                    <strong>Experience:</strong> {Number(worker.years_experience)} years
-                  </p>
-                </div>
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-muted-foreground">Phone:</span>
+                      <p className="font-medium">{worker.phone_number}</p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Experience:</span>
+                      <p className="font-medium">{worker.years_experience} years</p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Location:</span>
+                      <p className="font-medium">
+                        {worker.location.city || worker.location.district || 'Not specified'}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Availability:</span>
+                      <p className="font-medium">
+                        {worker.availability.available_days.length === 7 ? 'Full-time' : 'Part-time'}
+                      </p>
+                    </div>
+                  </div>
 
-                <div className="flex gap-2">
-                  {worker.status === 'pending' && (
-                    <>
+                  <div className="flex gap-2 pt-2">
+                    {worker.status === 'pending' && (
+                      <>
+                        <Button
+                          size="sm"
+                          onClick={() => handleApprove(worker.id)}
+                          disabled={approveWorker.isPending}
+                        >
+                          {approveWorker.isPending ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <>
+                              <CheckCircle className="mr-2 h-4 w-4" />
+                              Approve
+                            </>
+                          )}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleReject(worker.id)}
+                          disabled={rejectWorker.isPending}
+                        >
+                          {rejectWorker.isPending ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <>
+                              <XCircle className="mr-2 h-4 w-4" />
+                              Reject
+                            </>
+                          )}
+                        </Button>
+                      </>
+                    )}
+                    {worker.status === 'approved' && (
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleReject(worker.id)}
+                        disabled={rejectWorker.isPending}
+                      >
+                        {rejectWorker.isPending ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <>
+                            <XCircle className="mr-2 h-4 w-4" />
+                            Reject
+                          </>
+                        )}
+                      </Button>
+                    )}
+                    {worker.status === 'rejected' && (
                       <Button
                         size="sm"
                         onClick={() => handleApprove(worker.id)}
                         disabled={approveWorker.isPending}
                       >
-                        <CheckCircle className="mr-2 h-4 w-4" />
-                        Approve
+                        {approveWorker.isPending ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <>
+                            <CheckCircle className="mr-2 h-4 w-4" />
+                            Approve
+                          </>
+                        )}
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleReject(worker.id)}
-                        disabled={rejectWorker.isPending}
-                      >
-                        <XCircle className="mr-2 h-4 w-4" />
-                        Reject
-                      </Button>
-                    </>
-                  )}
-                  {worker.status === 'rejected' && (
-                    <Button
-                      size="sm"
-                      onClick={() => handleApprove(worker.id)}
-                      disabled={approveWorker.isPending}
-                    >
-                      <CheckCircle className="mr-2 h-4 w-4" />
-                      Approve
-                    </Button>
-                  )}
-                  {worker.status === 'approved' && (
+                    )}
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => handleReject(worker.id)}
-                      disabled={rejectWorker.isPending}
+                      onClick={() => handleRemove(worker.id)}
+                      disabled={removeWorker.isPending}
                     >
-                      <XCircle className="mr-2 h-4 w-4" />
-                      Reject
+                      {removeWorker.isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <>
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Remove
+                        </>
+                      )}
                     </Button>
-                  )}
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => handleRemove(worker.id)}
-                    disabled={removeWorker.isPending}
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Remove
-                  </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>

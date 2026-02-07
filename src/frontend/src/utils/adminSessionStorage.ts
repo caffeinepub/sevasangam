@@ -2,12 +2,14 @@ const ADMIN_SESSION_KEY = 'sevasangam_admin_session';
 
 export interface AdminSession {
   username: string;
+  password: string;
   timestamp: number;
 }
 
-export function saveAdminSession(username: string): void {
+export function saveAdminSession(username: string, password: string): void {
   const session: AdminSession = {
     username,
+    password,
     timestamp: Date.now(),
   };
   sessionStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(session));

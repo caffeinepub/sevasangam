@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 7,
+  "projectStateVersion": 13,
   "summary": "Build SevaSangam, a modern mobile-first service marketplace website that lets the public browse service categories and approved local worker profiles without login, while workers register/login via Internet Identity and await admin approval. Admin access is via a separate custom username/password login (single admin account initially), with the Admin Dashboard fully hidden from non-admin users; admins manage workers/categories/inquiries. Branding is trilingual (English/Hindi/Assamese).",
   "architectural_notes": [
     "Trust model: admin approval is the verification layer; only approved workers are publicly visible.",
@@ -8,12 +8,18 @@
     "WhatsApp contact: use standard wa.me link based on worker phone number; no WhatsApp API integration.",
     "Auth change: workers continue using Internet Identity; admin uses a separate custom username/password login (single admin account initially).",
     "Authorization: Admin Dashboard routes/UI and admin-only backend mutations (approve/reject/remove/edit/manage) must be accessible only to authenticated admin; completely hidden/blocked for workers.",
-    "UI change: expose an \"Admin Login\" link/button in the public header (next to the existing login button) that routes to /admin; keep admin-only pages/actions protected behind admin auth/authorization."
+    "UI change: expose an \"Admin Login\" link/button in the public header (next to the existing login button) that routes to /admin; keep admin-only pages/actions protected behind admin auth/authorization.",
+    "Admin Dashboard Pending list must query all workers with status == Pending (no time-based filtering) and update UI state live after approve/reject/remove mutations.",
+    "After admin approval, public category pages must reflect the updated worker visibility immediately (no delay), showing newly approved workers under their selected category."
   ],
   "known_issues": [
-    "Admin Dashboard shows worker list but no action buttons because user is logged in as worker and there is no functioning admin authentication/authorization flow yet."
+    "Admin Dashboard shows worker list but no action buttons because user is logged in as worker and there is no functioning admin authentication/authorization flow yet.",
+    "Admin login failing: user reports \"invalid username or password\" even when entering correct credentials; earlier also saw \"actor not available\" during credential submission (backend actor/canister call unreachable).",
+    "Admin Dashboard Pending section does not show newly registered worker profiles (pending workers missing shortly after registration).",
+    "Approving/rejecting/removing a worker does not update the Pending list live and approved workers are not immediately visible on public category pages.",
+    "Production (Version 5) regression: after going live, approved workers are not visible on public category pages and Admin Dashboard does not show pending workers."
   ],
-  "isFixRequest": false,
+  "isFixRequest": true,
   "existing_features": [
     {
       "id": "feature-implement-global-trilingual-branding-and-footer-display-the-product-name-in-english-sevasangam-hindi-and-assamese-everywhere-branding-appears-e-g-header-nav-auth-cta-areas-page-titles-where-applicable-and-render-the-footer-text-exactly-as-2026-crafted-with-care",
@@ -150,6 +156,62 @@
         "REQ-19"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-make-the-frontend-admin-login-flow-robust-to-actor-initialization-timing-and-network-failures-prevent-submissions-when-the-backend-actor-is-not-ready-and-replace-the-generic-invalid-username-or-password-error-with-accurate-user-facing-errors-for-a-actor-not-ready-b-network-canister-unreachable-and-c-truly-invalid-credentials",
+      "title": "Make the frontend admin login flow robust to actor initialization timing and network failures: prevent submissions when the backend actor is not ready and replace the generic \"Invalid username or password\" error with accurate user-facing errors for (a) actor not ready, (b) network/canister unreachable, and (c) truly invalid credentials.",
+      "reqIds": [
+        "REQ-21"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-admin-session-behavior-is-consistent-across-the-app-after-a-successful-admin-login-all-admin-dashboard-queries-mutations-use-the-same-credentials-that-the-admin-entered-not-hardcoded-values-and-unauthorized-admin-api-errors-clear-the-admin-session-and-redirect-to-the-admin-login-page",
+      "title": "Ensure admin session behavior is consistent across the app: after a successful admin login, all admin dashboard queries/mutations use the same credentials that the admin entered (not hardcoded values), and unauthorized admin API errors clear the admin session and redirect to the Admin Login page.",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-admin-dashboard-can-fetch-and-display-all-workers-including-pending-rejected-by-using-an-admin-authorized-backend-api-that-works-with-the-custom-username-password-admin-session-even-when-the-caller-principal-is-anonymous",
+      "title": "Ensure the Admin Dashboard can fetch and display all workers (including Pending/Rejected) by using an admin-authorized backend API that works with the custom username/password admin session (even when the caller principal is anonymous).",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-admin-dashboard-workers-ui-so-the-pending-section-reliably-shows-all-pending-workers-and-updates-live-after-approve-reject-remove-actions",
+      "title": "Fix the Admin Dashboard Workers UI so the Pending section reliably shows all pending workers and updates live after approve/reject/remove actions.",
+      "reqIds": [
+        "REQ-24"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-that-approving-a-worker-makes-them-publicly-visible-immediately-on-their-selected-service-category-page-and-in-search-results-by-correctly-invalidating-refetching-all-relevant-cached-worker-queries-after-admin-mutations",
+      "title": "Ensure that approving a worker makes them publicly visible immediately on their selected service category page and in search results by correctly invalidating/refetching all relevant cached worker queries after admin mutations.",
+      "reqIds": [
+        "REQ-25"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-admin-dashboard-worker-list-reliably-shows-pending-workers-in-production-by-a-making-the-admin-worker-fetch-return-real-data-not-an-empty-list-caused-by-backend-state-reset-and-b-adding-explicit-error-ui-when-the-admin-worker-query-fails-network-unauthorized-instead-of-silently-showing-an-empty-state",
+      "title": "Ensure the Admin Dashboard worker list reliably shows Pending workers in production by (a) making the admin worker fetch return real data (not an empty list caused by backend state reset) and (b) adding explicit error UI when the admin worker query fails (network/unauthorized) instead of silently showing an empty state.",
+      "reqIds": [
+        "REQ-28"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-approved-workers-reliably-appear-on-public-category-pages-and-search-results-in-production-by-surfacing-query-errors-instead-of-silently-treating-actor-unreachable-errors-as-an-empty-list-and-by-ensuring-public-worker-queries-refetch-successfully-after-deployment-and-after-admin-approval-actions",
+      "title": "Ensure approved workers reliably appear on public category pages and search results in production by surfacing query errors (instead of silently treating actor/unreachable errors as an empty list) and by ensuring public worker queries refetch successfully after deployment and after admin approval actions.",
+      "reqIds": [
+        "REQ-29"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -233,6 +295,36 @@
       "id": "AR-22",
       "summary": "Add a visible \"Admin Login\" button in the site header, placed next to the existing login button, linking to /admin (admin session still required for access).",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-23",
+      "summary": "Fix backend custom admin authentication so the admin can log in using only the username/password flow (without requiring Internet Identity) and so admin-only methods can be authorized using the provided credentials even when the caller principal is anonymous.",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-24",
+      "summary": "Fix Admin Dashboard Pending workers view to always show all workers with status Pending (including newly registered), update the Pending list live when approving/rejecting/removing, and ensure newly approved workers become publicly visible immediately on their selected service category pages.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-28",
+      "summary": "Add backend support for admin-authorized worker listing, protected by the existing custom admin credential check, to avoid relying on principal-based admin status for custom admin sessions.",
+      "reqIds": [
+        "REQ-26"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-29",
+      "summary": "Persist workers, categories, inquiries, and userProfiles across canister upgrades/deploys so that production deployments do not reset data and cause approved workers to disappear from public pages and pending workers to disappear from the Admin Dashboard.",
+      "reqIds": [
+        "REQ-27"
+      ],
       "status": "pending"
     }
   ],

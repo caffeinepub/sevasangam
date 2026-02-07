@@ -1,43 +1,58 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Expose Admin Login entry point in header (desktop + mobile)",
+  "title": "Fix worker visibility regression by surfacing admin/public query errors and enabling reliable refetch",
   "requirements": [
     {
-      "id": "REQ-18",
-      "summary": "Show an \"Admin Login\" header action next to the existing Internet Identity \"Login\" action on desktop and in the mobile menu when admin is not authenticated.",
+      "id": "REQ-28",
+      "summary": "Make Admin Dashboard Pending workers list reliable by adding explicit fetch error UI (unauthorized/network) and preventing empty-state flicker before redirect.",
       "acceptanceCriteria": [
-        "On desktop (md and up), when the admin session is NOT authenticated, the header shows an \"Admin Login\" button next to the existing Internet Identity \"Login\" button.",
-        "On mobile, when the admin session is NOT authenticated, the mobile menu shows an \"Admin Login\" button in the same action area as the existing Internet Identity \"Login\" button.",
-        "User-facing button text is exactly \"Admin Login\" (English).",
-        "The \"Admin Login\" button uses the same visual styling system as other header buttons (Shadcn/Tailwind Button component)."
+        "When the backend returns pending workers from getAllWorkersAdmin, the WorkersAdminPanel default filter 'pending' shows them.",
+        "If useGetAllWorkersAdmin fails due to unauthorized, the admin session is cleared and the UI navigates to /admin-login (existing behavior), and the panel does not display a misleading 'No workers found' empty state before redirect.",
+        "If useGetAllWorkersAdmin fails due to a network/connection error, the panel shows an error message in English (e.g., 'Connection problem. Please try again.') with a retry action, and does not present an empty list as if there are no workers.",
+        "The loading state, empty state, and error state are visually distinct in WorkersAdminPanel."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/layout/Header.tsx",
+          "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Add a visible \"Admin Login\" action rendered when the admin session is not authenticated, placing it adjacent to the existing Internet Identity LoginButton on desktop header actions and adding it into the same mobile-menu action area. Use the existing shadcn/ui Button component styling system for consistency. Verify the component's usage instructions before implementing."
+          "description": "Update useGetAllWorkersAdmin to stop returning an empty list on missing/invalid admin session and to propagate failures via React Query error state; ensure unauthorized failures trigger admin-session clearing + navigation to /admin-login without returning misleading empty data."
+        },
+        {
+          "path": "frontend/src/components/admin/WorkersAdminPanel.tsx",
+          "operation": "modify",
+          "description": "Use React Query states from useGetAllWorkersAdmin (isLoading/isError/error/refetch) to render distinct loading vs error vs empty vs success UI; add an English network error message with a retry action; ensure unauthorized errors render a redirecting/blocked state rather than the 'No workers found' empty state. Use existing shadcn-ui components (Button/Card/Badge/Select) to compose the UI (do not edit ui components). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/utils/adminApiErrorHandling.ts",
+          "operation": "modify",
+          "description": "Extend admin error helpers to support WorkersAdminPanel needs: provide a way to classify unauthorized vs network vs generic errors and support immediate redirect behavior for unauthorized cases to avoid empty-state flicker; keep all user-facing text in English."
         }
       ]
     },
     {
-      "id": "REQ-19",
-      "summary": "Navigate to /admin-login from the new \"Admin Login\" header action while preserving existing admin guard/redirect behavior and authenticated header state.",
+      "id": "REQ-29",
+      "summary": "Ensure public Category and Search Results pages surface worker query failures with retry and refetch reliably after deployments and admin approval actions.",
       "acceptanceCriteria": [
-        "Clicking the \"Admin Login\" button takes the user to the admin login page route (\"/admin-login\").",
-        "If a user manually visits \"/admin\" without an authenticated admin session, they are redirected to \"/admin-login\" (no change/regression to existing guard behavior).",
-        "When the admin session IS authenticated, the header continues to show \"Admin Logout\" (and does not show the \"Admin Login\" button)."
+        "If the public worker queries fail due to a network/connection issue, CategoryPage and SearchResultsPage show an error state in English with a retry option (not '0 workers available' as if there are none).",
+        "If public worker queries succeed, CategoryPage counts and renders approved workers correctly for the selected category.",
+        "After a worker is approved in the Admin Dashboard, navigating to the worker’s category page and the Search Results page shows the approved worker without requiring a hard refresh (relies on successful refetch/invalidation and successful backend persistence)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/layout/Header.tsx",
+          "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Wire the new \"Admin Login\" Button onClick to route navigation to \"/admin-login\" using the existing TanStack Router navigate utility. Keep the existing conditional rendering so authenticated admin sessions continue to show only \"Admin Logout\" and hide \"Admin Login\". Verify the component's usage instructions before implementing."
+          "description": "Adjust public worker query hooks (useGetAllWorkers, useGetWorkersByCategory) to avoid silently treating failures as empty lists; ensure errors propagate to components via React Query error state while preserving correct enabled/initial actor behavior and allowing refetch/invalidation to work after deployments and admin approval actions."
         },
         {
-          "path": "frontend/src/components/guards/RequireAdmin.tsx",
+          "path": "frontend/src/pages/CategoryPage.tsx",
           "operation": "modify",
-          "description": "Confirm the existing unauthenticated admin redirect behavior remains intact (redirect to \"/admin-login\" when not authenticated) and make any minimal adjustments needed to avoid regressions while keeping behavior unchanged."
+          "description": "Render distinct loading/empty/error/success states for the category workers query; when the query fails (e.g., network/connection), show an English error message with a retry action that calls refetch, instead of showing 'No workers found' based on empty data. Use existing shadcn-ui Button and existing layout patterns; do not edit ui components. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/SearchResultsPage.tsx",
+          "operation": "modify",
+          "description": "Render distinct loading/empty/error/success states for the all-workers query; when the query fails (e.g., network/connection), show an English error message with a retry action that calls refetch, instead of showing 0 results as if there are no workers. Use existing shadcn-ui Button and existing layout patterns; do not edit ui components. Verify the component's usage instructions before implementing."
         }
       ]
     }

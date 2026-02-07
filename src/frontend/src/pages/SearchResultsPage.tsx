@@ -1,7 +1,7 @@
 import { useSearch } from '@tanstack/react-router';
 import { useGetAllWorkers } from '../hooks/useQueries';
 import { Button } from '../components/ui/button';
-import { X, Loader2 } from 'lucide-react';
+import { X, Loader2, AlertCircle } from 'lucide-react';
 import { Badge } from '../components/ui/badge';
 import WorkerCard from '../components/workers/WorkerCard';
 import { useNavigate } from '@tanstack/react-router';
@@ -16,10 +16,21 @@ function EmptyState({ title, description, action }: { title: string; description
   );
 }
 
+function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+      <AlertCircle className="h-12 w-12 text-destructive mb-4" />
+      <h3 className="text-lg font-semibold mb-2">Connection Problem</h3>
+      <p className="text-sm text-muted-foreground mb-6 max-w-md">{message}</p>
+      <Button onClick={onRetry}>Try Again</Button>
+    </div>
+  );
+}
+
 export default function SearchResultsPage() {
   const search = useSearch({ from: '/search' }) as any;
   const navigate = useNavigate();
-  const { data: allWorkers = [], isLoading } = useGetAllWorkers();
+  const { data: allWorkers = [], isLoading, isError, error, refetch } = useGetAllWorkers();
 
   const { category, location, availability } = search;
 
@@ -49,6 +60,22 @@ export default function SearchResultsPage() {
     return (
       <div className="container px-4 py-16 flex justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="container px-4 py-12">
+        <div className="space-y-8">
+          <div className="space-y-4">
+            <h1 className="text-4xl font-bold">Search Results</h1>
+          </div>
+          <ErrorState 
+            message="Unable to load workers. Please check your connection and try again."
+            onRetry={() => refetch()}
+          />
+        </div>
       </div>
     );
   }

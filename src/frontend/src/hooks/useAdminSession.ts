@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useActor } from './useActor';
-import { saveAdminSession, getAdminSession, clearAdminSession, isAdminSessionActive } from '../utils/adminSessionStorage';
+import { saveAdminSession, getAdminSession, clearAdminSession } from '../utils/adminSessionStorage';
 
 export function useAdminSession() {
-  const { actor } = useActor();
+  const { actor, isFetching: actorLoading } = useActor();
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -16,7 +16,7 @@ export function useAdminSession() {
 
   const login = async (username: string, password: string): Promise<boolean> => {
     if (!actor) {
-      throw new Error('Actor not available');
+      throw new Error('Connection not ready. Please wait a moment and try again.');
     }
 
     try {
@@ -24,15 +24,39 @@ export function useAdminSession() {
       // The backend will validate the credentials
       await actor.getAllInquiries(username, password);
       
-      // If successful, save the session
-      saveAdminSession(username);
+      // If successful, save the session with both username and password
+      saveAdminSession(username, password);
       setIsAdminAuthenticated(true);
       return true;
     } catch (error: any) {
-      // Login failed
+      // Clear any stale session
       clearAdminSession();
       setIsAdminAuthenticated(false);
-      throw new Error('Invalid username or password');
+      
+      // Classify the error
+      const errorMessage = error?.message || String(error);
+      
+      // Network/connectivity errors
+      if (
+        errorMessage.includes('fetch') ||
+        errorMessage.includes('network') ||
+        errorMessage.includes('Failed to fetch') ||
+        errorMessage.includes('NetworkError') ||
+        errorMessage.includes('timeout')
+      ) {
+        throw new Error('Connection problem. Please check your internet and try again.');
+      }
+      
+      // Unauthorized/invalid credentials
+      if (
+        errorMessage.includes('Unauthorized') ||
+        errorMessage.includes('trap')
+      ) {
+        throw new Error('Invalid username or password. Please check your credentials.');
+      }
+      
+      // Generic error
+      throw new Error('Login failed. Please try again.');
     }
   };
 
@@ -44,6 +68,7 @@ export function useAdminSession() {
   return {
     isAdminAuthenticated,
     isLoading,
+    actorReady: !!actor && !actorLoading,
     login,
     logout,
     getCredentials: getAdminSession,

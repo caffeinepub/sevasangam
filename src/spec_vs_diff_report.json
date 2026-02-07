@@ -1,22 +1,60 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-07T14:06:22.916Z",
-  "summary": "The diff clearly adds an \"Admin Login\" button in the desktop header actions and wires it to navigate to \"/admin-login\". Due to truncation of the mobile menu portion and absence of route/guard diffs, mobile-menu placement and admin-route redirect behavior cannot be fully verified from the provided changes.",
-  "missing_requirements": [],
-  "hallucinated_features": [
+  "generatedAt": "2026-02-07T15:10:51.608Z",
+  "summary": "The diff adds frontend error/loading/empty states for admin and public worker lists, plus introduces a backend migration module and references migration in the main Motoko actor. However, the backend persistence across upgrades (stable state + upgrade hooks) is not evidenced in the diff summary, and key acceptance criteria around refetch/invalidation after approvals and admin unauthorized redirect are not conclusively shown due to truncation.",
+  "missing_requirements": [
     {
-      "description": "Clearing the React Query cache on admin logout (queryClient.clear())",
-      "reason": "BuildRequest scope is UI navigation only and explicitly says not to change the admin authentication mechanism or backend behavior; clearing the query cache changes client-side session/data behavior beyond adding a navigation entry point.",
+      "id": "REQ-27",
+      "requirement": "Persist workers, categories, inquiries, and userProfiles across canister upgrades/deploys so production deployments do not reset data.",
+      "reason": "The diff shows in-memory `var` Maps for category/worker/inquiry/userProfiles and adds a migration module reference, but does not show any `stable` variables or `preupgrade`/`postupgrade` (or equivalent) logic required to actually persist and restore these maps across upgrades. The added migration module is a no-op returning `{}` and does not evidence preserving existing production state.",
       "evidence": [
-        "frontend/src/components/layout/Header.tsx (truncated) — imports useQueryClient, calls queryClient.clear() in handleAdminLogout"
+        "backend/main.mo",
+        "backend/migration.mo"
+      ]
+    },
+    {
+      "id": "REQ-28",
+      "requirement": "If useGetAllWorkersAdmin fails due to unauthorized, clear admin session and navigate to /admin-login, and do not display a misleading empty state before redirect.",
+      "reason": "WorkersAdminPanel adds an error UI, but the shown code path renders an ErrorState (including for session-expired messaging) and does not itself clear session or navigate. While helper functions for redirect exist, the diff summary does not show that the admin workers query uses them on query failure, so the redirect/clear-session AC is not confirmed.",
+      "evidence": [
+        "frontend/src/components/admin/WorkersAdminPanel.tsx",
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/utils/adminApiErrorHandling.ts"
+      ]
+    },
+    {
+      "id": "REQ-29",
+      "requirement": "After a worker is approved in the Admin Dashboard, navigating to the worker’s category page and the Search Results page shows the approved worker without requiring a hard refresh (via refetch/invalidation + backend persistence).",
+      "reason": "Public pages now surface query errors with retry, but the diff summary does not show React Query cache invalidation/refetch wiring after approve/reject actions (e.g., invalidating ['workers'] / category workers queries). WorkersAdminPanel calls approve mutation and shows a toast, but no evidence is shown that relevant public queries are invalidated/refetched after approval.",
+      "evidence": [
+        "frontend/src/components/admin/WorkersAdminPanel.tsx",
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/CategoryPage.tsx",
+        "frontend/src/pages/SearchResultsPage.tsx"
       ]
     }
   ],
-  "confidence": 0.62,
+  "hallucinated_features": [
+    {
+      "description": "Introduced a backend migration module and wired `(with migration = Migration.run)` even though the migration is a no-op and persistence logic is not evidenced.",
+      "reason": "BuildRequest allows a migration file only if required to preserve existing production state, but the added `backend/migration.mo` contains only empty types and returns `{}`, which does not appear to implement any state preservation or conditional migration policy per the request.",
+      "evidence": [
+        "backend/migration.mo",
+        "backend/main.mo"
+      ]
+    }
+  ],
+  "confidence": 0.55,
   "changed_files": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/layout/Header.tsx",
+    "frontend/src/components/admin/WorkersAdminPanel.tsx",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/CategoryPage.tsx",
+    "frontend/src/pages/SearchResultsPage.tsx",
+    "frontend/src/utils/adminApiErrorHandling.ts",
     "project_state.json"
   ]
 }

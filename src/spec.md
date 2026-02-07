@@ -1,11 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Make the admin login entry point visible by adding an “Admin Login” button in the header next to the existing Internet Identity “Login” button, including in the mobile menu.
+**Goal:** Fix the production regression where workers and related data disappear after canister upgrades, and ensure both admin and public pages show clear error states instead of empty lists when queries fail.
 
 **Planned changes:**
-- Add an “Admin Login” button to the desktop header actions (md and up) when the admin session is not authenticated, placed next to the existing “Login” button and using the same Button styling system.
-- Add an “Admin Login” button to the mobile menu action area when the admin session is not authenticated, aligned with the existing “Login” action.
-- Wire “Admin Login” to navigate to the admin login route (`/admin-login`) while keeping existing admin-session behavior unchanged (authenticated state shows “Admin Logout”; unauthenticated access to `/admin` continues to redirect to `/admin-login`).
+- Persist workers, categories, inquiries, and userProfiles across canister upgrades/deploys so production redeploys do not reset state and hide previously approved/pending workers.
+- Update Admin Dashboard workers list to distinguish loading/empty/error states, show pending workers when returned, and display an explicit retryable network error message (instead of silently showing an empty list).
+- Update public Category and Search Results pages to surface network/connection errors with a retry option (instead of showing “0 workers”), and ensure data refetch/invalidation so newly approved workers appear without a hard refresh.
 
-**User-visible outcome:** Users can click “Admin Login” from the header (desktop and mobile) to go to `/admin-login`, and authenticated admins continue to see “Admin Logout” instead of “Admin Login”.
+**User-visible outcome:** After deployments, previously registered workers and categories remain visible; admins reliably see pending workers (or a clear error with retry), and public users see approved workers on category/search pages with clear, retryable error states if connectivity fails.

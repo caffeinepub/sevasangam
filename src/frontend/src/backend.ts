@@ -215,13 +215,16 @@ export interface backendInterface {
     getAllCategories(): Promise<Array<Category>>;
     getAllInquiries(username: string | null, password: string | null): Promise<Array<Inquiry>>;
     getAllWorkers(): Promise<Array<WorkerProfile>>;
+    getAllWorkersAdmin(username: string | null, password: string | null): Promise<Array<WorkerProfile>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getCategory(categoryId: string): Promise<Category | null>;
     getMyWorkerProfile(): Promise<WorkerProfile | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     getWorkerInquiries(workerId: string): Promise<Array<Inquiry>>;
+    getWorkerInquiriesAdmin(username: string | null, password: string | null, workerId: string): Promise<Array<Inquiry>>;
     getWorkerProfile(workerId: string): Promise<WorkerProfile | null>;
+    getWorkerProfileAdmin(username: string | null, password: string | null, workerId: string): Promise<WorkerProfile | null>;
     getWorkersByCategory(categoryId: string): Promise<Array<WorkerProfile>>;
     isCallerAdmin(): Promise<boolean>;
     isCallerApproved(): Promise<boolean>;
@@ -463,6 +466,20 @@ export class Backend implements backendInterface {
             return from_candid_vec_n34(this._uploadFile, this._downloadFile, result);
         }
     }
+    async getAllWorkersAdmin(arg0: string | null, arg1: string | null): Promise<Array<WorkerProfile>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllWorkersAdmin(to_candid_opt_n8(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n8(this._uploadFile, this._downloadFile, arg1));
+                return from_candid_vec_n34(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllWorkersAdmin(to_candid_opt_n8(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n8(this._uploadFile, this._downloadFile, arg1));
+            return from_candid_vec_n34(this._uploadFile, this._downloadFile, result);
+        }
+    }
     async getCallerUserProfile(): Promise<UserProfile | null> {
         if (this.processError) {
             try {
@@ -547,6 +564,20 @@ export class Backend implements backendInterface {
             return from_candid_vec_n27(this._uploadFile, this._downloadFile, result);
         }
     }
+    async getWorkerInquiriesAdmin(arg0: string | null, arg1: string | null, arg2: string): Promise<Array<Inquiry>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getWorkerInquiriesAdmin(to_candid_opt_n8(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n8(this._uploadFile, this._downloadFile, arg1), arg2);
+                return from_candid_vec_n27(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getWorkerInquiriesAdmin(to_candid_opt_n8(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n8(this._uploadFile, this._downloadFile, arg1), arg2);
+            return from_candid_vec_n27(this._uploadFile, this._downloadFile, result);
+        }
+    }
     async getWorkerProfile(arg0: string): Promise<WorkerProfile | null> {
         if (this.processError) {
             try {
@@ -558,6 +589,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.getWorkerProfile(arg0);
+            return from_candid_opt_n54(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getWorkerProfileAdmin(arg0: string | null, arg1: string | null, arg2: string): Promise<WorkerProfile | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getWorkerProfileAdmin(to_candid_opt_n8(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n8(this._uploadFile, this._downloadFile, arg1), arg2);
+                return from_candid_opt_n54(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getWorkerProfileAdmin(to_candid_opt_n8(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n8(this._uploadFile, this._downloadFile, arg1), arg2);
             return from_candid_opt_n54(this._uploadFile, this._downloadFile, result);
         }
     }
