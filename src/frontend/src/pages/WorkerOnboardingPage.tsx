@@ -8,20 +8,48 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../co
 import { LogIn, Loader2 } from 'lucide-react';
 import WorkerRegistrationForm from '../components/workers/WorkerRegistrationForm';
 import { toast } from 'sonner';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { logLoginAttempt, logLoginSuccess, logLoginFailure } from '../utils/authDiagnostics';
+import InternetIdentityErrorNotice from '../components/auth/InternetIdentityErrorNotice';
+import ConnectionErrorNotice from '../components/errors/ConnectionErrorNotice';
 
 export default function WorkerOnboardingPage() {
   const navigate = useNavigate();
-  const { identity, login, loginStatus } = useInternetIdentity();
-  const { data: workerProfile, isLoading: workerLoading } = useGetMyWorkerProfile();
-  const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
+  const { identity, login, loginStatus, loginError } = useInternetIdentity();
+  const { data: workerProfile, isLoading: workerLoading, error: workerError, refetch: refetchWorker } = useGetMyWorkerProfile();
+  const { data: userProfile, isLoading: profileLoading, isFetched, error: profileError, refetch: refetchProfile } = useGetCallerUserProfile();
   const saveProfile = useSaveCallerUserProfile();
   const registerWorker = useRegisterWorker();
   const [userName, setUserName] = useState('');
+  const [retryAttempt, setRetryAttempt] = useState(0);
 
   const isAuthenticated = !!identity;
   const showProfileSetup = isAuthenticated && !profileLoading && isFetched && userProfile === null;
   const showWorkerRegistration = isAuthenticated && userProfile !== null && !workerProfile && !workerLoading;
+  const showLoginError = loginStatus === 'loginError' && !isAuthenticated && loginError;
+
+  // Log login status changes
+  useEffect(() => {
+    if (loginStatus === 'success' && identity) {
+      logLoginSuccess();
+    }
+  }, [loginStatus, identity]);
+
+  const handleLogin = async () => {
+    const hadIdentityBefore = !!identity;
+    logLoginAttempt(hadIdentityBefore);
+    
+    try {
+      await login();
+    } catch (error: any) {
+      logLoginFailure(error, hadIdentityBefore);
+    }
+  };
+
+  const handleRetryLogin = () => {
+    setRetryAttempt((prev) => prev + 1);
+    handleLogin();
+  };
 
   const handleProfileSetup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,37 +71,65 @@ export default function WorkerOnboardingPage() {
     }
   };
 
+  // Handle connection errors after login
+  if (isAuthenticated && (profileError || workerError)) {
+    const isConnectionError = 
+      profileError?.message?.includes('Actor not available') ||
+      profileError?.message?.includes('network') ||
+      workerError?.message?.includes('Actor not available') ||
+      workerError?.message?.includes('network');
+
+    if (isConnectionError) {
+      return (
+        <div className="container max-w-2xl mx-auto px-4 py-16">
+          <ConnectionErrorNotice
+            onRetry={() => {
+              refetchProfile();
+              refetchWorker();
+            }}
+            title="Connection Problem"
+            message="We couldn't load your profile data. This might be a temporary network issue."
+          />
+        </div>
+      );
+    }
+  }
+
   if (!isAuthenticated) {
     return (
       <div className="container max-w-md mx-auto px-4 py-16">
-        <Card>
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Join as a Worker</CardTitle>
-            <CardDescription>
-              Sign in with Internet Identity to register as a service worker on SevaSangam
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button
-              onClick={login}
-              disabled={loginStatus === 'logging-in'}
-              size="lg"
-              className="w-full"
-            >
-              {loginStatus === 'logging-in' ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Logging in...
-                </>
-              ) : (
-                <>
-                  <LogIn className="mr-2 h-5 w-5" />
-                  Login with Internet Identity
-                </>
-              )}
-            </Button>
-          </CardContent>
-        </Card>
+        {showLoginError ? (
+          <InternetIdentityErrorNotice error={loginError} onRetry={handleRetryLogin} />
+        ) : (
+          <Card>
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl">Join as a Worker</CardTitle>
+              <CardDescription>
+                Sign in with Internet Identity to register as a service worker on SevaSangam
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button
+                onClick={handleLogin}
+                disabled={loginStatus === 'logging-in'}
+                size="lg"
+                className="w-full"
+              >
+                {loginStatus === 'logging-in' ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Logging in...
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="mr-2 h-5 w-5" />
+                    Login with Internet Identity
+                  </>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+        )}
       </div>
     );
   }

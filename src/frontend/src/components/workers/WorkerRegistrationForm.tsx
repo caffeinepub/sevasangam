@@ -9,6 +9,7 @@ import { CATEGORY_NAMES } from '../../utils/categories';
 import type { WorkerProfile } from '../../backend';
 import { ExternalBlob } from '../../backend';
 import { useInternetIdentity } from '../../hooks/useInternetIdentity';
+import { toast } from 'sonner';
 
 interface WorkerRegistrationFormProps {
   onSubmit: (profile: WorkerProfile) => Promise<void>;
@@ -33,6 +34,11 @@ export default function WorkerRegistrationForm({ onSubmit, isSubmitting }: Worke
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!identity) return;
+
+    if (!formData.categoryId) {
+      toast.error('Please select a service category');
+      return;
+    }
 
     const profile: WorkerProfile = {
       id: `worker-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -112,7 +118,7 @@ export default function WorkerRegistrationForm({ onSubmit, isSubmitting }: Worke
 
       <div className="space-y-2">
         <Label htmlFor="categoryId">Service Category *</Label>
-        <Select value={formData.categoryId} onValueChange={(value) => setFormData({ ...formData, categoryId: value })}>
+        <Select value={formData.categoryId} onValueChange={(value) => setFormData({ ...formData, categoryId: value })} required>
           <SelectTrigger id="categoryId">
             <SelectValue placeholder="Select your service" />
           </SelectTrigger>
@@ -176,7 +182,7 @@ export default function WorkerRegistrationForm({ onSubmit, isSubmitting }: Worke
 
       <div className="space-y-2">
         <Label htmlFor="availability">Availability *</Label>
-        <Select value={formData.availability} onValueChange={(value) => setFormData({ ...formData, availability: value })}>
+        <Select value={formData.availability} onValueChange={(value) => setFormData({ ...formData, availability: value })} required>
           <SelectTrigger id="availability">
             <SelectValue placeholder="Select availability" />
           </SelectTrigger>

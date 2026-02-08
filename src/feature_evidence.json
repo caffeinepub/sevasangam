@@ -2,13 +2,12 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-site-footer-so-it-displays-exactly-2026-crafted-with-care-and-remove-the-current-built-with-love-using-caffeine-ai-wording-including-the-heart-icon-the-literal-word-using-and-the-caffeine-ai-link",
-      "featureTitle": "Update the site footer so it displays exactly: \"© 2026 - Crafted with care\" and remove the current \"Built with love using caffeine.ai\" wording (including the heart icon, the literal word \"using\", and the caffeine.ai link).",
+      "featureId": "feature-remove-the-ability-for-workers-to-mark-jobs-inquiries-as-completed-from-the-worker-ui-by-hiding-the-mark-as-completed-button-and-eliminating-any-worker-side-action-that-triggers-completion",
+      "featureTitle": "Remove the ability for workers to mark jobs/inquiries as completed from the worker UI by hiding the \"Mark as Completed\" button and eliminating any worker-side action that triggers completion.",
       "files": [
-        "frontend/src/components/layout/Footer.tsx",
-        "frontend/src/i18n/locales/as.ts",
-        "frontend/src/i18n/locales/en.ts",
-        "frontend/src/i18n/locales/hi.ts"
+        "frontend/src/components/workers/WorkerJobsList.tsx",
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/WorkerDashboardPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -26,9 +25,12 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-generate-and-add-cartoon-style-occupation-images-for-each-existing-service-category-and-store-them-as-static-assets-under-frontend-public-assets-generated-one-image-per-category-plumber-electrician-mason-house-cleaner-garden-cleaner-carpenter-painter-mechanic-and-other",
-      "featureTitle": "Generate and add cartoon-style occupation images for each existing service category and store them as static assets under frontend/public/assets/generated, one image per category: plumber, electrician, mason, house-cleaner, garden-cleaner, carpenter, painter, mechanic, and other.",
-      "files": [],
+      "featureId": "feature-provide-an-admin-only-mark-completed-control-in-the-admin-interface-to-set-a-job-inquiry-status-to-completed-and-ensure-that-once-the-admin-marks-it-completed-workers-see-the-same-job-as-completed-in-their-dashboard",
+      "featureTitle": "Provide an admin-only \"Mark Completed\" control in the admin interface to set a job/inquiry status to completed, and ensure that once the admin marks it completed, workers see the same job as completed in their dashboard.",
+      "files": [
+        "frontend/src/components/admin/InquiriesAdminPanel.tsx",
+        "frontend/src/hooks/useQueries.ts"
+      ],
       "components": [
         "authorization@4.0.0",
         "user-approval@3.0.0",
@@ -41,28 +43,6 @@
       ],
       "testIds": [
         "REQ-2"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-the-service-category-ui-category-cards-grid-to-display-the-new-per-category-cartoon-images-matching-the-category-id-so-users-can-visually-identify-each-service-category-by-its-occupation-image",
-      "featureTitle": "Update the service category UI (category cards/grid) to display the new per-category cartoon images (matching the category ID) so users can visually identify each service category by its occupation image.",
-      "files": [
-        "frontend/src/components/categories/CategoryCardGrid.tsx",
-        "frontend/src/utils/categories.ts"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "user-approval@3.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-3"
       ],
       "confidence": "high"
     }

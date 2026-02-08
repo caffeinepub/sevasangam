@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { useGetAllInquiries, useUpdateInquiry, useDeleteInquiry } from '../../hooks/useQueries';
+import { useGetAllInquiriesAdmin, useUpdateInquiry, useDeleteInquiry } from '../../hooks/useQueries';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Trash2, Loader2, AlertCircle } from 'lucide-react';
+import { Trash2, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert, AlertDescription } from '../ui/alert';
 import type { Inquiry } from '../../backend';
+import { InquiryStatus } from '../../backend';
 import { handleAdminApiError } from '../../utils/adminApiErrorHandling';
 
 function EmptyState({ title, description }: { title: string; description?: string }) {
@@ -21,10 +22,11 @@ function EmptyState({ title, description }: { title: string; description?: strin
 }
 
 export default function InquiriesAdminPanel() {
-  const { data: inquiries = [], isLoading, error } = useGetAllInquiries();
+  const { data: inquiries = [], isLoading, error } = useGetAllInquiriesAdmin();
   const updateInquiry = useUpdateInquiry();
   const deleteInquiry = useDeleteInquiry();
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [markingCompletedId, setMarkingCompletedId] = useState<string | null>(null);
   const navigate = useNavigate();
 
   // Handle query errors
@@ -52,6 +54,21 @@ export default function InquiriesAdminPanel() {
       toast.success('Inquiry status updated');
     } catch (error) {
       toast.error('Failed to update inquiry');
+    }
+  };
+
+  const handleMarkCompleted = async (inquiry: Inquiry) => {
+    setMarkingCompletedId(inquiry.id);
+    try {
+      await updateInquiry.mutateAsync({
+        inquiryId: inquiry.id,
+        inquiry: { ...inquiry, status: InquiryStatus.completed },
+      });
+      toast.success('Job marked as completed');
+    } catch (error) {
+      toast.error('Failed to mark job as completed');
+    } finally {
+      setMarkingCompletedId(null);
     }
   };
 
@@ -105,57 +122,82 @@ export default function InquiriesAdminPanel() {
         <EmptyState title="No inquiries found" description="No inquiries match the selected filter." />
       ) : (
         <div className="grid gap-4">
-          {filteredInquiries.map((inquiry) => (
-            <Card key={inquiry.id}>
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-base">
-                      {inquiry.customer_name || 'Anonymous'} - {inquiry.inquiry_type}
-                    </CardTitle>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Worker ID: {inquiry.worker_id}
-                    </p>
+          {filteredInquiries.map((inquiry) => {
+            const isCompleted = inquiry.status === InquiryStatus.completed;
+            const isMarkingThisInquiry = markingCompletedId === inquiry.id;
+
+            return (
+              <Card key={inquiry.id}>
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle className="text-base">
+                        {inquiry.customer_name || 'Anonymous'} - {inquiry.inquiry_type}
+                      </CardTitle>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Worker ID: {inquiry.worker_id}
+                      </p>
+                    </div>
+                    <Badge>{inquiry.status}</Badge>
                   </div>
-                  <Badge>{inquiry.status}</Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <p className="text-sm">{inquiry.inquiry_text}</p>
-                  {inquiry.customer_contact && (
-                    <p className="text-sm text-muted-foreground">
-                      Contact: {inquiry.customer_contact}
-                    </p>
-                  )}
-                  <div className="flex gap-2">
-                    <Select
-                      value={inquiry.status}
-                      onValueChange={(value) => handleStatusChange(inquiry, value)}
-                    >
-                      <SelectTrigger className="w-[150px]">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="new">New</SelectItem>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="completed">Completed</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => handleDelete(inquiry.id)}
-                      disabled={deleteInquiry.isPending}
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Delete
-                    </Button>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <p className="text-sm">{inquiry.inquiry_text}</p>
+                    {inquiry.customer_contact && (
+                      <p className="text-sm text-muted-foreground">
+                        Contact: {inquiry.customer_contact}
+                      </p>
+                    )}
+                    <div className="flex gap-2 flex-wrap">
+                      <Select
+                        value={inquiry.status}
+                        onValueChange={(value) => handleStatusChange(inquiry, value)}
+                      >
+                        <SelectTrigger className="w-[150px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="new">New</SelectItem>
+                          <SelectItem value="pending">Pending</SelectItem>
+                          <SelectItem value="completed">Completed</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {!isCompleted && (
+                        <Button
+                          size="sm"
+                          onClick={() => handleMarkCompleted(inquiry)}
+                          disabled={isMarkingThisInquiry || markingCompletedId !== null}
+                          className="bg-green-600 hover:bg-green-700 text-white"
+                        >
+                          {isMarkingThisInquiry ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Marking...
+                            </>
+                          ) : (
+                            <>
+                              <CheckCircle2 className="mr-2 h-4 w-4" />
+                              Mark Completed
+                            </>
+                          )}
+                        </Button>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleDelete(inquiry.id)}
+                        disabled={deleteInquiry.isPending}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
     </div>

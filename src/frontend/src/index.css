@@ -82,3 +82,96 @@
         font-feature-settings: "rlig" 1, "calt" 1;
     }
 }
+
+@layer components {
+    /* Hero Image Glow Effect */
+    .hero-image-glow {
+        position: relative;
+        display: inline-block;
+    }
+
+    .hero-image-glow::before {
+        content: '';
+        position: absolute;
+        inset: -8px;
+        border-radius: 1.25rem;
+        background: linear-gradient(
+            45deg,
+            oklch(var(--primary)),
+            oklch(var(--secondary)),
+            oklch(var(--accent)),
+            oklch(var(--primary))
+        );
+        opacity: 0;
+        z-index: 0;
+        transition: opacity 400ms ease-in-out;
+        filter: blur(16px);
+        pointer-events: none;
+    }
+
+    .hero-image-glow img {
+        display: block;
+        transition: transform 300ms ease-in-out;
+    }
+
+    .hero-image-glow:hover::before {
+        opacity: 0.7;
+        animation: hero-glow-pulse 2.5s ease-in-out infinite;
+    }
+
+    .hero-image-glow:hover img {
+        transform: translateY(-4px) scale(1.01);
+    }
+
+    .dark .hero-image-glow:hover::before {
+        opacity: 0.9;
+        filter: blur(20px);
+        animation: hero-glow-pulse-dark 2.5s ease-in-out infinite;
+    }
+
+    @keyframes hero-glow-pulse {
+        0%, 100% {
+            opacity: 0.7;
+            filter: blur(16px);
+        }
+        50% {
+            opacity: 0.85;
+            filter: blur(18px);
+        }
+    }
+
+    @keyframes hero-glow-pulse-dark {
+        0%, 100% {
+            opacity: 0.9;
+            filter: blur(20px);
+        }
+        50% {
+            opacity: 1;
+            filter: blur(24px);
+        }
+    }
+
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+        .hero-image-glow::before {
+            animation: none !important;
+            transition: opacity 200ms ease-in-out;
+        }
+        
+        .hero-image-glow img {
+            transition: none;
+        }
+        
+        .hero-image-glow:hover::before {
+            opacity: 0.5;
+        }
+        
+        .hero-image-glow:hover img {
+            transform: none;
+        }
+        
+        .dark .hero-image-glow:hover::before {
+            opacity: 0.6;
+        }
+    }
+}

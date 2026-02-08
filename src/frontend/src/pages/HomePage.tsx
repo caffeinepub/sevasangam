@@ -37,11 +37,13 @@ export default function HomePage() {
             </div>
 
             <div className="hidden lg:block">
-              <img
-                src="/assets/generated/sevasangam-hero-illustration.dim_1600x800.png"
-                alt={t('home.heroImageAlt')}
-                className="w-full h-auto rounded-2xl shadow-2xl"
-              />
+              <div className="hero-image-glow relative">
+                <img
+                  src="/assets/generated/sevasangam-hero-illustration.dim_1600x800.png"
+                  alt={t('home.heroImageAlt')}
+                  className="w-full h-auto rounded-2xl relative z-10"
+                />
+              </div>
             </div>
           </div>
         </div>

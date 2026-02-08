@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
@@ -20,7 +20,6 @@ export default function WorkerProfileEditor({ profile, onSubmit, isSubmitting }:
   const [formData, setFormData] = useState({
     fullName: profile.full_name,
     phoneNumber: profile.phone_number,
-    categoryId: profile.category_id,
     yearsExperience: String(profile.years_experience),
     city: profile.location.city || '',
     district: profile.location.district || '',
@@ -29,15 +28,6 @@ export default function WorkerProfileEditor({ profile, onSubmit, isSubmitting }:
     whatsappNumber: profile.integrations.whatsapp_number || '',
   });
   const [photo, setPhoto] = useState<ExternalBlob | undefined>(profile.photo);
-  const [categoryChanged, setCategoryChanged] = useState(false);
-
-  useEffect(() => {
-    if (formData.categoryId !== profile.category_id) {
-      setCategoryChanged(true);
-    } else {
-      setCategoryChanged(false);
-    }
-  }, [formData.categoryId, profile.category_id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,7 +37,7 @@ export default function WorkerProfileEditor({ profile, onSubmit, isSubmitting }:
       full_name: formData.fullName,
       phone_number: formData.phoneNumber,
       photo: photo,
-      category_id: formData.categoryId,
+      category_id: profile.category_id,
       location: {
         ...profile.location,
         city: formData.city || undefined,
@@ -74,19 +64,10 @@ export default function WorkerProfileEditor({ profile, onSubmit, isSubmitting }:
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {categoryChanged && (
-        <Alert>
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            Changing your service category will require admin approval. Your profile will be set to "Pending" status until approved.
-          </AlertDescription>
-        </Alert>
-      )}
-
       <Alert>
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          Major edits (name, phone, location, category, pricing, availability) will trigger re-approval and temporarily hide your profile from public view.
+          Major edits (name, phone, location, pricing, availability) will trigger re-approval and temporarily hide your profile from public view.
         </AlertDescription>
       </Alert>
 
@@ -123,18 +104,12 @@ export default function WorkerProfileEditor({ profile, onSubmit, isSubmitting }:
 
       <div className="space-y-2">
         <Label htmlFor="categoryId">Service Category</Label>
-        <Select value={formData.categoryId} onValueChange={(value) => setFormData({ ...formData, categoryId: value })}>
-          <SelectTrigger id="categoryId">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {Object.entries(CATEGORY_NAMES).map(([id, name]) => (
-              <SelectItem key={id} value={id}>
-                {name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="px-3 py-2 border rounded-xl bg-muted text-muted-foreground">
+          {CATEGORY_NAMES[profile.category_id as keyof typeof CATEGORY_NAMES] || profile.category_id}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Service category cannot be changed. Contact admin if you need to change your service category.
+        </p>
       </div>
 
       <div className="space-y-2">

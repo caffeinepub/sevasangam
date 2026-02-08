@@ -220,6 +220,7 @@ export interface backendInterface {
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getCategory(categoryId: string): Promise<Category | null>;
+    getMyWorkItems(): Promise<Array<Inquiry>>;
     getMyWorkerProfile(): Promise<WorkerProfile | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     getWorkerInquiries(workerId: string): Promise<Array<Inquiry>>;
@@ -240,6 +241,7 @@ export interface backendInterface {
     unpublishWorker(username: string | null, password: string | null, workerId: string): Promise<void>;
     updateCategory(username: string | null, password: string | null, categoryId: string, category: Category): Promise<void>;
     updateInquiry(username: string | null, password: string | null, inquiryId: string, inquiry: Inquiry): Promise<void>;
+    updateWorkerCategoryAdmin(username: string | null, password: string | null, workerId: string, newCategoryId: string): Promise<void>;
     updateWorkerProfile(workerId: string, profile: WorkerProfile): Promise<void>;
 }
 import type { ApprovalStatus as _ApprovalStatus, Category as _Category, ExternalBlob as _ExternalBlob, Inquiry as _Inquiry, InquiryStatus as _InquiryStatus, InquiryType as _InquiryType, Integrations as _Integrations, Location as _Location, Pricing as _Pricing, Schedule as _Schedule, Status as _Status, Status__1 as _Status__1, UserApprovalInfo as _UserApprovalInfo, UserProfile as _UserProfile, UserRole as _UserRole, WorkerProfile as _WorkerProfile, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
@@ -525,6 +527,20 @@ export class Backend implements backendInterface {
             return from_candid_opt_n53(this._uploadFile, this._downloadFile, result);
         }
     }
+    async getMyWorkItems(): Promise<Array<Inquiry>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getMyWorkItems();
+                return from_candid_vec_n27(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getMyWorkItems();
+            return from_candid_vec_n27(this._uploadFile, this._downloadFile, result);
+        }
+    }
     async getMyWorkerProfile(): Promise<WorkerProfile | null> {
         if (this.processError) {
             try {
@@ -802,6 +818,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.updateInquiry(to_candid_opt_n8(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n8(this._uploadFile, this._downloadFile, arg1), arg2, to_candid_Inquiry_n15(this._uploadFile, this._downloadFile, arg3));
+            return result;
+        }
+    }
+    async updateWorkerCategoryAdmin(arg0: string | null, arg1: string | null, arg2: string, arg3: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateWorkerCategoryAdmin(to_candid_opt_n8(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n8(this._uploadFile, this._downloadFile, arg1), arg2, arg3);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateWorkerCategoryAdmin(to_candid_opt_n8(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n8(this._uploadFile, this._downloadFile, arg1), arg2, arg3);
             return result;
         }
     }

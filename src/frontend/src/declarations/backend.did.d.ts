@@ -154,6 +154,7 @@ export interface _SERVICE {
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getCategory' : ActorMethod<[string], [] | [Category]>,
+  'getMyWorkItems' : ActorMethod<[], Array<Inquiry>>,
   'getMyWorkerProfile' : ActorMethod<[], [] | [WorkerProfile]>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'getWorkerInquiries' : ActorMethod<[string], Array<Inquiry>>,
@@ -196,6 +197,10 @@ export interface _SERVICE {
   >,
   'updateInquiry' : ActorMethod<
     [[] | [string], [] | [string], string, Inquiry],
+    undefined
+  >,
+  'updateWorkerCategoryAdmin' : ActorMethod<
+    [[] | [string], [] | [string], string, string],
     undefined
   >,
   'updateWorkerProfile' : ActorMethod<[string, WorkerProfile], undefined>,

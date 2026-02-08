@@ -1,6 +1,7 @@
 import { Button } from '../ui/button';
 import { Phone, MessageCircle } from 'lucide-react';
 import { createTelLink, createWhatsAppLink } from '../../utils/contactLinks';
+import { usePostCallAlarm } from '../../hooks/usePostCallAlarm';
 
 interface WorkerContactActionsProps {
   phoneNumber: string;
@@ -8,10 +9,16 @@ interface WorkerContactActionsProps {
 }
 
 export default function WorkerContactActions({ phoneNumber, workerName }: WorkerContactActionsProps) {
+  const { markCallStarted } = usePostCallAlarm();
+
+  const handleCallClick = () => {
+    markCallStarted();
+  };
+
   return (
     <div className="flex flex-col sm:flex-row gap-3">
       <Button asChild size="lg" className="flex-1">
-        <a href={createTelLink(phoneNumber)}>
+        <a href={createTelLink(phoneNumber)} onClick={handleCallClick}>
           <Phone className="mr-2 h-5 w-5" />
           Call Now
         </a>

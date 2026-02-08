@@ -182,6 +182,7 @@ export const idlService = IDL.Service({
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getCategory' : IDL.Func([IDL.Text], [IDL.Opt(Category)], ['query']),
+  'getMyWorkItems' : IDL.Func([], [IDL.Vec(Inquiry)], ['query']),
   'getMyWorkerProfile' : IDL.Func([], [IDL.Opt(WorkerProfile)], ['query']),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
@@ -243,6 +244,11 @@ export const idlService = IDL.Service({
     ),
   'updateInquiry' : IDL.Func(
       [IDL.Opt(IDL.Text), IDL.Opt(IDL.Text), IDL.Text, Inquiry],
+      [],
+      [],
+    ),
+  'updateWorkerCategoryAdmin' : IDL.Func(
+      [IDL.Opt(IDL.Text), IDL.Opt(IDL.Text), IDL.Text, IDL.Text],
       [],
       [],
     ),
@@ -426,6 +432,7 @@ export const idlFactory = ({ IDL }) => {
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getCategory' : IDL.Func([IDL.Text], [IDL.Opt(Category)], ['query']),
+    'getMyWorkItems' : IDL.Func([], [IDL.Vec(Inquiry)], ['query']),
     'getMyWorkerProfile' : IDL.Func([], [IDL.Opt(WorkerProfile)], ['query']),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
@@ -487,6 +494,11 @@ export const idlFactory = ({ IDL }) => {
       ),
     'updateInquiry' : IDL.Func(
         [IDL.Opt(IDL.Text), IDL.Opt(IDL.Text), IDL.Text, Inquiry],
+        [],
+        [],
+      ),
+    'updateWorkerCategoryAdmin' : IDL.Func(
+        [IDL.Opt(IDL.Text), IDL.Opt(IDL.Text), IDL.Text, IDL.Text],
         [],
         [],
       ),

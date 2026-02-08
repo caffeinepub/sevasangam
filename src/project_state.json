@@ -1,33 +1,26 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Service marketplace UI updates: change footer text and add cartoon occupation images to each service category.",
-  "architectural_notes": [],
+  "summary": "Task/job management app with admin and worker roles; only admin can mark tasks completed and workers see completion status after admin updates it.",
+  "architectural_notes": [
+    "Role-based UI permissions: 'Mark Completed' control visible/actionable only for admin; completion status must propagate to worker view."
+  ],
   "known_issues": [],
   "isFixRequest": false,
-  "imageRequirements": "## Required Images\n- Cartoon plumber character illustration (sevasangam-category-plumber.dim_512x512.png)\n- Cartoon electrician character illustration (sevasangam-category-electrician.dim_512x512.png)\n- Cartoon mason character illustration (sevasangam-category-mason.dim_512x512.png)\n- Cartoon house cleaner character illustration (sevasangam-category-house-cleaner.dim_512x512.png)\n- Cartoon garden/backyard cleaner character illustration (sevasangam-category-garden-cleaner.dim_512x512.png)\n- Cartoon carpenter character illustration (sevasangam-category-carpenter.dim_512x512.png)\n- Cartoon painter character illustration (sevasangam-category-painter.dim_512x512.png)\n- Cartoon mechanic character illustration (sevasangam-category-mechanic.dim_512x512.png)\n- Cartoon general services/handyman character illustration (sevasangam-category-other.dim_512x512.png)",
   "existing_features": [
     {
-      "id": "feature-update-the-site-footer-so-it-displays-exactly-2026-crafted-with-care-and-remove-the-current-built-with-love-using-caffeine-ai-wording-including-the-heart-icon-the-literal-word-using-and-the-caffeine-ai-link",
-      "title": "Update the site footer so it displays exactly: \"© 2026 - Crafted with care\" and remove the current \"Built with love using caffeine.ai\" wording (including the heart icon, the literal word \"using\", and the caffeine.ai link).",
+      "id": "feature-remove-the-ability-for-workers-to-mark-jobs-inquiries-as-completed-from-the-worker-ui-by-hiding-the-mark-as-completed-button-and-eliminating-any-worker-side-action-that-triggers-completion",
+      "title": "Remove the ability for workers to mark jobs/inquiries as completed from the worker UI by hiding the \"Mark as Completed\" button and eliminating any worker-side action that triggers completion.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-generate-and-add-cartoon-style-occupation-images-for-each-existing-service-category-and-store-them-as-static-assets-under-frontend-public-assets-generated-one-image-per-category-plumber-electrician-mason-house-cleaner-garden-cleaner-carpenter-painter-mechanic-and-other",
-      "title": "Generate and add cartoon-style occupation images for each existing service category and store them as static assets under frontend/public/assets/generated, one image per category: plumber, electrician, mason, house-cleaner, garden-cleaner, carpenter, painter, mechanic, and other.",
+      "id": "feature-provide-an-admin-only-mark-completed-control-in-the-admin-interface-to-set-a-job-inquiry-status-to-completed-and-ensure-that-once-the-admin-marks-it-completed-workers-see-the-same-job-as-completed-in-their-dashboard",
+      "title": "Provide an admin-only \"Mark Completed\" control in the admin interface to set a job/inquiry status to completed, and ensure that once the admin marks it completed, workers see the same job as completed in their dashboard.",
       "reqIds": [
         "REQ-2"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-the-service-category-ui-category-cards-grid-to-display-the-new-per-category-cartoon-images-matching-the-category-id-so-users-can-visually-identify-each-service-category-by-its-occupation-image",
-      "title": "Update the service category UI (category cards/grid) to display the new per-category cartoon images (matching the category ID) so users can visually identify each service category by its occupation image.",
-      "reqIds": [
-        "REQ-3"
       ],
       "version": 1
     }
@@ -35,18 +28,20 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Update footer line to \"@ 2026 - Crafted with care\" (replacing \"@ 2026. built with love using caffeine.ai\").",
+      "summary": "Restrict 'Mark Completed' action to admin only (hidden from workers); workers call admin to report completion; once admin marks complete, worker UI shows task as completed.",
       "reqIds": [],
       "status": "pending"
     },
     {
-      "id": "AR-2",
-      "summary": "Add cartoon-style occupation images to each service category section (e.g., plumber image for plumber, electrician image for electrician, etc.).",
-      "reqIds": [],
+      "id": "AR-4",
+      "summary": "Update backend authorization so that worker callers cannot mark an inquiry/job as completed via dedicated completion endpoints; completion must be an admin-only operation (e.g., via existing admin update inquiry flows).",
+      "reqIds": [
+        "REQ-3"
+      ],
       "status": "pending"
     }
   ],
-  "projectName": "Update footer tagline and add cartoon images for each service category",
+  "projectName": "Restrict job completion to admin only and reflect completion status for workers",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

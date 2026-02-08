@@ -38,7 +38,7 @@ export const hi = {
 
   // Footer
   footer: {
-    copyright: '© 2026 - Crafted with care',
+    copyright: '© 2026 SevaSangam. All Rights Reserved.',
   },
 
   // Home Page
@@ -177,7 +177,7 @@ export const hi = {
     continueButton: 'जारी रखें',
     registerTitle: 'कामगार पंजीकरण',
     registerMessage: 'अपनी कामगार प्रोफ़ाइल बनाने के लिए अपना विवरण भरें',
-    registrationSuccess: 'पंजीकरण सफल! डैशबोर्ड पर पुनर्निर्देशित किया जा रहा है...',
+    registrationSuccess: 'पंजीकरण सफल! डैशबोर्ड पर रीडायरेक्ट कर रहे हैं...',
     registrationError: 'पंजीकरण विफल। कृपया पुनः प्रयास करें।',
   },
 
@@ -208,7 +208,7 @@ export const hi = {
     availableDaysLabel: 'उपलब्ध दिन',
     whatsappLabel: 'व्हाट्सएप नंबर',
     whatsappPlaceholder: '+91 1234567890',
-    photoLabel: 'प्रोफ़ाइल फ़ोटो (वैकल्पिक)',
+    photoLabel: 'प्रोफ़ाइल फोटो (वैकल्पिक)',
     submitButton: 'पंजीकरण करें',
     submitting: 'पंजीकरण हो रहा है...',
     updateButton: 'प्रोफ़ाइल अपडेट करें',
@@ -275,6 +275,11 @@ export const hi = {
     emptyMessage: 'चयनित फ़िल्टर से मेल खाने वाला कोई कामगार नहीं मिला।',
     experience: '{{count}} वर्ष का अनुभव',
     experience_plural: '{{count}} वर्षों का अनुभव',
+    changeCategoryButton: 'श्रेणी बदलें',
+    changeCategoryTitle: 'कामगार श्रेणी बदलें',
+    changeCategoryMessage: 'इस कामगार के लिए एक नई श्रेणी चुनें',
+    changeCategorySuccess: 'कामगार श्रेणी सफलतापूर्वक अपडेट की गई',
+    changeCategoryError: 'कामगार श्रेणी अपडेट करने में विफल',
   },
 
   // Categories Admin Panel

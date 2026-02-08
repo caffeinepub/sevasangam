@@ -127,6 +127,7 @@ export interface backendInterface {
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getCategory(categoryId: string): Promise<Category | null>;
+    getMyWorkItems(): Promise<Array<Inquiry>>;
     getMyWorkerProfile(): Promise<WorkerProfile | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     getWorkerInquiries(workerId: string): Promise<Array<Inquiry>>;
@@ -147,5 +148,6 @@ export interface backendInterface {
     unpublishWorker(username: string | null, password: string | null, workerId: string): Promise<void>;
     updateCategory(username: string | null, password: string | null, categoryId: string, category: Category): Promise<void>;
     updateInquiry(username: string | null, password: string | null, inquiryId: string, inquiry: Inquiry): Promise<void>;
+    updateWorkerCategoryAdmin(username: string | null, password: string | null, workerId: string, newCategoryId: string): Promise<void>;
     updateWorkerProfile(workerId: string, profile: WorkerProfile): Promise<void>;
 }

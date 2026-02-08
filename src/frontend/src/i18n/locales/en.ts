@@ -38,7 +38,7 @@ export const en = {
 
   // Footer
   footer: {
-    copyright: '© 2026 - Crafted with care',
+    copyright: '© 2026 SevaSangam. All Rights Reserved.',
   },
 
   // Home Page
@@ -275,6 +275,11 @@ export const en = {
     emptyMessage: 'No workers found matching the selected filter.',
     experience: '{{count}} year experience',
     experience_plural: '{{count}} years experience',
+    changeCategoryButton: 'Change Category',
+    changeCategoryTitle: 'Change Worker Category',
+    changeCategoryMessage: 'Select a new category for this worker',
+    changeCategorySuccess: 'Worker category updated successfully',
+    changeCategoryError: 'Failed to update worker category',
   },
 
   // Categories Admin Panel

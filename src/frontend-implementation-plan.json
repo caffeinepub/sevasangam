@@ -1,114 +1,52 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Footer tagline update and category cartoon images",
+  "title": "Admin-only job completion controls with worker status reflection",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Replace the footer content with a single, non-linked text line that reads exactly \"© 2026 - Crafted with care\" across all languages.",
+      "summary": "Remove worker-side job completion action while preserving status visibility in the worker dashboard.",
       "acceptanceCriteria": [
-        "Footer renders a single text line: \"© 2026 - Crafted with care\" (with the © symbol)",
-        "The footer no longer renders the Heart icon",
-        "The footer no longer renders the word \"using\" and no longer renders a link to https://caffeine.ai",
-        "Change is applied consistently across all supported languages (no language shows the old phrase/link)"
+        "In the worker dashboard jobs list, no \"Mark as Completed\" (or equivalent) button/action is visible for any job status.",
+        "Worker UI does not attempt to call any completion mutation/API when a job is pending/new.",
+        "The worker jobs list still shows status badges (e.g., Pending/Completed) based on the inquiry status."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/layout/Footer.tsx",
+          "path": "frontend/src/components/workers/WorkerJobsList.tsx",
           "operation": "modify",
-          "description": "Remove the Heart icon, the \"using\" text, and the caffeine.ai anchor; render only one text node sourced from i18n (footer.copyright) so the footer displays exactly \"© 2026 - Crafted with care\"."
+          "description": "Remove the worker-only completion UI by deleting the \"Mark as Completed\" button rendering and eliminating the onMarkCompleted/markingJobId props; keep status badges (Pending/Completed) driven by InquiryStatus. Verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/src/i18n/locales/en.ts",
+          "path": "frontend/src/pages/WorkerDashboardPage.tsx",
           "operation": "modify",
-          "description": "Update footer.copyright to exactly \"© 2026 - Crafted with care\" and ensure no other footer strings are used to render the removed caffeine.ai wording/link."
+          "description": "Remove all worker-side completion wiring: drop useMarkInquiryAsCompleted import/usage, remove marking state and handler, and render WorkerJobsList without completion-related props while still showing status/counts based on InquiryStatus. Verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/src/i18n/locales/hi.ts",
+          "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Update footer.copyright to exactly \"© 2026 - Crafted with care\" so Hindi no longer shows the old footer wording/link."
-        },
-        {
-          "path": "frontend/src/i18n/locales/as.ts",
-          "operation": "modify",
-          "description": "Update footer.copyright to exactly \"© 2026 - Crafted with care\" so Assamese no longer shows the old footer wording/link."
+          "description": "Remove the worker completion mutation hook (useMarkInquiryAsCompleted) so the worker UI cannot trigger completion; ensure any remaining worker job queries (useGetMyWorkItems) continue to drive status display and refresh behavior. Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Add one cartoon-style static occupation image asset per service category under frontend/public/assets/generated using the specified filenames.",
+      "summary": "Add an explicit admin-only \"Mark Completed\" control in admin inquiry management and ensure worker dashboards reflect completion after refresh/invalidation.",
       "acceptanceCriteria": [
-        "All required category images exist in frontend/public/assets/generated with the specified filenames",
-        "Each image is a clear cartoon illustration that visually matches the intended occupation",
-        "No category is left without an image (including \"other\")"
+        "In the admin inquiry management UI, admins can mark an inquiry as completed via an explicit admin-only action (e.g., a \"Mark Completed\" button) for non-completed inquiries.",
+        "After the admin marks an inquiry completed, the worker dashboard jobs list reflects the job as \"Completed\" (badge/label) after data refresh (React Query invalidation/refetch).",
+        "No admin completion controls are shown anywhere in the worker-facing UI."
       ],
       "file_operations": [
         {
-          "path": "frontend/public/assets/generated/sevasangam-category-plumber.dim_512x512.png",
-          "operation": "create",
-          "description": "Add the generated static asset for the plumber category at this exact path/filename."
-        },
-        {
-          "path": "frontend/public/assets/generated/sevasangam-category-electrician.dim_512x512.png",
-          "operation": "create",
-          "description": "Add the generated static asset for the electrician category at this exact path/filename."
-        },
-        {
-          "path": "frontend/public/assets/generated/sevasangam-category-mason.dim_512x512.png",
-          "operation": "create",
-          "description": "Add the generated static asset for the mason category at this exact path/filename."
-        },
-        {
-          "path": "frontend/public/assets/generated/sevasangam-category-house-cleaner.dim_512x512.png",
-          "operation": "create",
-          "description": "Add the generated static asset for the house-cleaner category at this exact path/filename."
-        },
-        {
-          "path": "frontend/public/assets/generated/sevasangam-category-garden-cleaner.dim_512x512.png",
-          "operation": "create",
-          "description": "Add the generated static asset for the garden-cleaner category at this exact path/filename."
-        },
-        {
-          "path": "frontend/public/assets/generated/sevasangam-category-carpenter.dim_512x512.png",
-          "operation": "create",
-          "description": "Add the generated static asset for the carpenter category at this exact path/filename."
-        },
-        {
-          "path": "frontend/public/assets/generated/sevasangam-category-painter.dim_512x512.png",
-          "operation": "create",
-          "description": "Add the generated static asset for the painter category at this exact path/filename."
-        },
-        {
-          "path": "frontend/public/assets/generated/sevasangam-category-mechanic.dim_512x512.png",
-          "operation": "create",
-          "description": "Add the generated static asset for the mechanic category at this exact path/filename."
-        },
-        {
-          "path": "frontend/public/assets/generated/sevasangam-category-other.dim_512x512.png",
-          "operation": "create",
-          "description": "Add the generated static asset for the other category at this exact path/filename."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Update the category cards/grid UI to display the new per-category cartoon images from static assets, matching each category ID, while keeping the layout responsive.",
-      "acceptanceCriteria": [
-        "Each category card shows the correct cartoon image for its category (e.g., plumber card shows plumber image)",
-        "Images are loaded directly from /assets/generated/* (static assets) and are not fetched via the backend",
-        "Layout remains responsive and visually balanced on mobile and desktop"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/utils/categories.ts",
+          "path": "frontend/src/components/admin/InquiriesAdminPanel.tsx",
           "operation": "modify",
-          "description": "Add a categoryId -> static image path mapping helper (e.g., a function returning the correct /assets/generated/sevasangam-category-*.dim_512x512.png path) for all existing category IDs, including \"other\"."
+          "description": "Add an explicit \"Mark Completed\" admin-only button per inquiry (shown only when status is not completed) that triggers the existing admin update flow to set status to completed; rely on existing RequireAdmin/admin session gating for admin-only access (authorization component role-based access control). Verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/src/components/categories/CategoryCardGrid.tsx",
+          "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Replace the sprite-based icon rendering with an <img> (or equivalent) using the new category image path helper so each card shows its occupation image from the static assets. Ensure sizing/cropping remains consistent and responsive without fetching from the backend."
+          "description": "Confirm/adjust React Query invalidation so that successful admin inquiry updates that set status to completed invalidate/refetch both admin inquiries and worker jobs queries (e.g., ['workerJobs','me']) to reflect completion on the worker dashboard after refresh. Verify the component's usage instructions before implementing."
         }
       ]
     }

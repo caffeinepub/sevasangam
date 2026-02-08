@@ -1,12 +1,14 @@
 import { useState } from 'react';
-import { useGetAllWorkersAdmin, useApproveWorker, useRejectWorker, useRemoveWorker, usePublishWorker, useUnpublishWorker } from '../../hooks/useQueries';
+import { useGetAllWorkersAdmin, useApproveWorker, useRejectWorker, useRemoveWorker, usePublishWorker, useUnpublishWorker, useUpdateWorkerCategoryAdmin, useGetAllCategories, useGetAllInquiriesAdmin } from '../../hooks/useQueries';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { CheckCircle, XCircle, Trash2, Loader2, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { CheckCircle, XCircle, Trash2, Eye, EyeOff, Loader2, Edit3 } from 'lucide-react';
+import { toast } from 'sonner';
 import type { WorkerProfile } from '../../backend';
-import { CATEGORY_NAMES } from '../../utils/categories';
+import { InquiryStatus } from '../../backend';
 
 function EmptyState({ title, description }: { title: string; description?: string }) {
   return (
@@ -17,44 +19,37 @@ function EmptyState({ title, description }: { title: string; description?: strin
   );
 }
 
-function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
-  return (
-    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-      <AlertCircle className="h-12 w-12 text-destructive mb-4" />
-      <h3 className="text-lg font-semibold mb-2">Connection Problem</h3>
-      <p className="text-sm text-muted-foreground mb-6 max-w-md">{message}</p>
-      <Button onClick={onRetry}>Try Again</Button>
-    </div>
-  );
-}
-
 export default function WorkersAdminPanel() {
-  const { data: workers = [], isLoading, isError, error, refetch } = useGetAllWorkersAdmin();
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const { data: workers = [], isLoading } = useGetAllWorkersAdmin();
+  const { data: categories = [] } = useGetAllCategories();
+  const { data: inquiries = [] } = useGetAllInquiriesAdmin();
   const approveWorker = useApproveWorker();
   const rejectWorker = useRejectWorker();
   const removeWorker = useRemoveWorker();
   const publishWorker = usePublishWorker();
   const unpublishWorker = useUnpublishWorker();
-
-  const filteredWorkers = workers.filter((w) => {
-    if (statusFilter === 'all') return true;
-    return w.status === statusFilter;
+  const updateCategory = useUpdateWorkerCategoryAdmin();
+  const [changeCategoryDialog, setChangeCategoryDialog] = useState<{ open: boolean; worker: WorkerProfile | null }>({
+    open: false,
+    worker: null,
   });
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
 
   const handleApprove = async (workerId: string) => {
     try {
       await approveWorker.mutateAsync(workerId);
+      toast.success('Worker approved successfully');
     } catch (error) {
-      // Error already handled by mutation hook
+      toast.error('Failed to approve worker');
     }
   };
 
   const handleReject = async (workerId: string) => {
     try {
       await rejectWorker.mutateAsync(workerId);
+      toast.success('Worker rejected');
     } catch (error) {
-      // Error already handled by mutation hook
+      toast.error('Failed to reject worker');
     }
   };
 
@@ -62,35 +57,59 @@ export default function WorkersAdminPanel() {
     if (!confirm('Are you sure you want to remove this worker?')) return;
     try {
       await removeWorker.mutateAsync(workerId);
+      toast.success('Worker removed');
     } catch (error) {
-      // Error already handled by mutation hook
+      toast.error('Failed to remove worker');
     }
   };
 
   const handlePublish = async (workerId: string) => {
     try {
       await publishWorker.mutateAsync(workerId);
+      toast.success('Worker published');
     } catch (error) {
-      // Error already handled by mutation hook
+      toast.error('Failed to publish worker');
     }
   };
 
   const handleUnpublish = async (workerId: string) => {
     try {
       await unpublishWorker.mutateAsync(workerId);
+      toast.success('Worker unpublished');
     } catch (error) {
-      // Error already handled by mutation hook
+      toast.error('Failed to unpublish worker');
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-      pending: 'secondary',
-      approved: 'default',
-      rejected: 'destructive',
-      featured: 'default',
-    };
-    return <Badge variant={variants[status] || 'outline'}>{status}</Badge>;
+  const handleOpenCategoryDialog = (worker: WorkerProfile) => {
+    setSelectedCategoryId(worker.category_id);
+    setChangeCategoryDialog({ open: true, worker });
+  };
+
+  const handleChangeCategory = async () => {
+    if (!changeCategoryDialog.worker || !selectedCategoryId) return;
+    try {
+      await updateCategory.mutateAsync({
+        workerId: changeCategoryDialog.worker.id,
+        newCategoryId: selectedCategoryId,
+      });
+      toast.success('Worker category updated');
+      setChangeCategoryDialog({ open: false, worker: null });
+    } catch (error) {
+      toast.error('Failed to update category');
+    }
+  };
+
+  const getCategoryName = (categoryId: string) => {
+    const category = categories.find((c) => c.id === categoryId);
+    return category?.name || categoryId;
+  };
+
+  const getWorkerJobStats = (workerId: string) => {
+    const workerInquiries = inquiries.filter(inq => inq.worker_id === workerId);
+    const pending = workerInquiries.filter(inq => inq.status === InquiryStatus.pending || inq.status === InquiryStatus.new_).length;
+    const completed = workerInquiries.filter(inq => inq.status === InquiryStatus.completed).length;
+    return { pending, completed, total: workerInquiries.length };
   };
 
   if (isLoading) {
@@ -101,211 +120,137 @@ export default function WorkersAdminPanel() {
     );
   }
 
-  if (isError) {
-    const errorMessage = error?.message || 'Unable to load workers. Please try again.';
-    return (
-      <ErrorState 
-        message={errorMessage.includes('session') ? 'Your session has expired. Redirecting to login...' : 'Connection problem. Please try again.'}
-        onRetry={() => refetch()}
-      />
-    );
+  if (workers.length === 0) {
+    return <EmptyState title="No workers registered yet" description="Workers will appear here once they register." />;
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Worker Management</h2>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Workers</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="approved">Approved</SelectItem>
-            <SelectItem value="rejected">Rejected</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {filteredWorkers.length === 0 ? (
-        <EmptyState title="No workers found" description="No workers match the selected filter." />
-      ) : (
-        <div className="grid gap-4">
-          {filteredWorkers.map((worker) => (
+      <h2 className="text-2xl font-bold">Worker Management</h2>
+      <div className="grid gap-4">
+        {workers.map((worker) => {
+          const jobStats = getWorkerJobStats(worker.id);
+          return (
             <Card key={worker.id}>
               <CardHeader>
                 <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle>{worker.full_name}</CardTitle>
+                  <div className="flex-1">
+                    <CardTitle className="text-base">{worker.full_name}</CardTitle>
                     <p className="text-sm text-muted-foreground mt-1">
-                      {CATEGORY_NAMES[worker.category_id] || worker.category_id}
+                      {getCategoryName(worker.category_id)} • {worker.years_experience} years exp.
                     </p>
+                    <p className="text-sm text-muted-foreground">
+                      {worker.location.city || 'Location not specified'}
+                    </p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <span className="text-xs font-medium text-amber-700 dark:text-amber-400">
+                        Jobs: {jobStats.pending} pending
+                      </span>
+                      <span className="text-xs text-muted-foreground">•</span>
+                      <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                        {jobStats.completed} completed
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    {getStatusBadge(worker.status)}
-                    {worker.published ? (
-                      <Badge variant="default" className="bg-green-600">
-                        <Eye className="mr-1 h-3 w-3" />
-                        Published
+                  <div className="flex flex-col gap-2 items-end">
+                    <div className="flex gap-2">
+                      <Badge variant={worker.status === 'approved' ? 'default' : worker.status === 'pending' ? 'secondary' : 'destructive'}>
+                        {worker.status}
                       </Badge>
-                    ) : (
-                      <Badge variant="outline">
-                        <EyeOff className="mr-1 h-3 w-3" />
-                        Unpublished
-                      </Badge>
-                    )}
+                      {worker.published ? (
+                        <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                          Published
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline">Unpublished</Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="text-muted-foreground">Phone:</span>
-                      <p className="font-medium">{worker.phone_number}</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Experience:</span>
-                      <p className="font-medium">{worker.years_experience} years</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Location:</span>
-                      <p className="font-medium">
-                        {worker.location.city || worker.location.district || 'Not specified'}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Availability:</span>
-                      <p className="font-medium">
-                        {worker.availability.available_days.length === 7 ? 'Full-time' : 'Part-time'}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 pt-2">
-                    {worker.status === 'pending' && (
-                      <>
-                        <Button
-                          size="sm"
-                          onClick={() => handleApprove(worker.id)}
-                          disabled={approveWorker.isPending}
-                        >
-                          {approveWorker.isPending ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <>
-                              <CheckCircle className="mr-2 h-4 w-4" />
-                              Approve
-                            </>
-                          )}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleReject(worker.id)}
-                          disabled={rejectWorker.isPending}
-                        >
-                          {rejectWorker.isPending ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <>
-                              <XCircle className="mr-2 h-4 w-4" />
-                              Reject
-                            </>
-                          )}
-                        </Button>
-                      </>
-                    )}
-                    {worker.status === 'approved' && (
-                      <>
-                        {worker.published ? (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleUnpublish(worker.id)}
-                            disabled={unpublishWorker.isPending}
-                          >
-                            {unpublishWorker.isPending ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <>
-                                <EyeOff className="mr-2 h-4 w-4" />
-                                Unpublish
-                              </>
-                            )}
-                          </Button>
-                        ) : (
-                          <Button
-                            size="sm"
-                            onClick={() => handlePublish(worker.id)}
-                            disabled={publishWorker.isPending}
-                          >
-                            {publishWorker.isPending ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <>
-                                <Eye className="mr-2 h-4 w-4" />
-                                Publish
-                              </>
-                            )}
-                          </Button>
-                        )}
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleReject(worker.id)}
-                          disabled={rejectWorker.isPending}
-                        >
-                          {rejectWorker.isPending ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <>
-                              <XCircle className="mr-2 h-4 w-4" />
-                              Reject
-                            </>
-                          )}
-                        </Button>
-                      </>
-                    )}
-                    {worker.status === 'rejected' && (
-                      <Button
-                        size="sm"
-                        onClick={() => handleApprove(worker.id)}
-                        disabled={approveWorker.isPending}
-                      >
-                        {approveWorker.isPending ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <>
-                            <CheckCircle className="mr-2 h-4 w-4" />
-                            Approve
-                          </>
-                        )}
+                <div className="flex flex-wrap gap-2">
+                  {worker.status === 'pending' && (
+                    <>
+                      <Button size="sm" onClick={() => handleApprove(worker.id)} disabled={approveWorker.isPending}>
+                        <CheckCircle className="mr-2 h-4 w-4" />
+                        Approve
                       </Button>
-                    )}
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleRemove(worker.id)}
-                      disabled={removeWorker.isPending}
-                    >
-                      {removeWorker.isPending ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
+                      <Button size="sm" variant="destructive" onClick={() => handleReject(worker.id)} disabled={rejectWorker.isPending}>
+                        <XCircle className="mr-2 h-4 w-4" />
+                        Reject
+                      </Button>
+                    </>
+                  )}
+                  {worker.status === 'approved' && (
+                    <>
+                      {worker.published ? (
+                        <Button size="sm" variant="outline" onClick={() => handleUnpublish(worker.id)} disabled={unpublishWorker.isPending}>
+                          <EyeOff className="mr-2 h-4 w-4" />
+                          Unpublish
+                        </Button>
                       ) : (
-                        <>
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Remove
-                        </>
+                        <Button size="sm" onClick={() => handlePublish(worker.id)} disabled={publishWorker.isPending}>
+                          <Eye className="mr-2 h-4 w-4" />
+                          Publish
+                        </Button>
                       )}
-                    </Button>
-                  </div>
+                    </>
+                  )}
+                  <Button size="sm" variant="outline" onClick={() => handleOpenCategoryDialog(worker)}>
+                    <Edit3 className="mr-2 h-4 w-4" />
+                    Change Category
+                  </Button>
+                  <Button size="sm" variant="destructive" onClick={() => handleRemove(worker.id)} disabled={removeWorker.isPending}>
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Remove
+                  </Button>
                 </div>
               </CardContent>
             </Card>
-          ))}
-        </div>
-      )}
+          );
+        })}
+      </div>
+
+      <Dialog open={changeCategoryDialog.open} onOpenChange={(open) => setChangeCategoryDialog({ open, worker: null })}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Change Worker Category</DialogTitle>
+            <DialogDescription>
+              Update the service category for {changeCategoryDialog.worker?.full_name}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Select value={selectedCategoryId} onValueChange={setSelectedCategoryId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setChangeCategoryDialog({ open: false, worker: null })}>
+              Cancel
+            </Button>
+            <Button onClick={handleChangeCategory} disabled={updateCategory.isPending || !selectedCategoryId}>
+              {updateCategory.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                'Update Category'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

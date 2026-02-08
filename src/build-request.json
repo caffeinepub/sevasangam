@@ -1,97 +1,80 @@
 {
   "kind": "build_request",
-  "title": "Update footer tagline and add cartoon images for each service category",
+  "title": "Restrict job completion to admin only and reflect completion status for workers",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Update the site footer so it displays exactly: \"© 2026 - Crafted with care\" and remove the current \"Built with love using caffeine.ai\" wording (including the heart icon, the literal word \"using\", and the caffeine.ai link).",
+      "text": "Remove the ability for workers to mark jobs/inquiries as completed from the worker UI by hiding the \"Mark as Completed\" button and eliminating any worker-side action that triggers completion.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-4",
-          "msg-8"
+          "msg-5"
         ],
         "quotes": [
-          "in the footer \"@ 2026. built with love using caffeine.ai\" replace the line with \"@ 2026 - Crafted with care\""
+          "the \"Mark Completed\" button should only be visible on the admin’s interface and completely hidden from the worker’s view.",
+          "the system is simply not involved (they only call the admin )."
         ]
       },
       "acceptanceCriteria": [
-        "Footer renders a single text line: \"© 2026 - Crafted with care\" (with the © symbol)",
-        "The footer no longer renders the Heart icon",
-        "The footer no longer renders the word \"using\" and no longer renders a link to https://caffeine.ai",
-        "Change is applied consistently across all supported languages (no language shows the old phrase/link)"
+        "In the worker dashboard jobs list, no \"Mark as Completed\" (or equivalent) button/action is visible for any job status.",
+        "Worker UI does not attempt to call any completion mutation/API when a job is pending/new.",
+        "The worker jobs list still shows status badges (e.g., Pending/Completed) based on the inquiry status."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Generate and add cartoon-style occupation images for each existing service category and store them as static assets under frontend/public/assets/generated, one image per category: plumber, electrician, mason, house-cleaner, garden-cleaner, carpenter, painter, mechanic, and other.",
+      "text": "Provide an admin-only \"Mark Completed\" control in the admin interface to set a job/inquiry status to completed, and ensure that once the admin marks it completed, workers see the same job as completed in their dashboard.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-4",
-          "msg-6"
+          "msg-5"
         ],
         "quotes": [
-          "Add the required images to service categories, like, add a plumber image to the plumber section, electrician image to electrician section and so on.",
-          "yes some cartoon images according to that occupation"
+          "only admin will mark the complete button, once the work is done. not the worker.",
+          "yes, it should show as task completed on the worker side too after admin marks it as job completed."
         ]
       },
       "acceptanceCriteria": [
-        "All required category images exist in frontend/public/assets/generated with the specified filenames",
-        "Each image is a clear cartoon illustration that visually matches the intended occupation",
-        "No category is left without an image (including \"other\")"
+        "In the admin inquiry management UI, admins can mark an inquiry as completed via an explicit admin-only action (e.g., a \"Mark Completed\" button) for non-completed inquiries.",
+        "After the admin marks an inquiry completed, the worker dashboard jobs list reflects the job as \"Completed\" (badge/label) after data refresh (React Query invalidation/refetch).",
+        "No admin completion controls are shown anywhere in the worker-facing UI."
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Update the service category UI (category cards/grid) to display the new per-category cartoon images (matching the category ID) so users can visually identify each service category by its occupation image.",
-      "target": "frontend",
+      "text": "Update backend authorization so that worker callers cannot mark an inquiry/job as completed via dedicated completion endpoints; completion must be an admin-only operation (e.g., via existing admin update inquiry flows).",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-4",
+          "msg-5"
         ],
         "quotes": [
-          "Add the required images to service categories, like, add a plumber image to the plumber section, electrician image to electrician section and so on."
+          "only admin will mark the complete button, once the work is done. not the worker."
         ]
       },
       "acceptanceCriteria": [
-        "Each category card shows the correct cartoon image for its category (e.g., plumber card shows plumber image)",
-        "Images are loaded directly from /assets/generated/* (static assets) and are not fetched via the backend",
-        "Layout remains responsive and visually balanced on mobile and desktop"
+        "Calls to backend completion methods intended for workers (e.g., markInquiryAsCompleted/markJobAsCompleted) fail for non-admin callers with an unauthorized error/trap.",
+        "Admin can still set an inquiry to completed through existing admin-authorized update mechanisms (e.g., updateInquiry with admin credentials).",
+        "Worker job status returned by getMyWorkItems reflects the updated completed status after admin updates it."
       ]
     }
   ],
   "constraints": [
-    "Do not edit files under frontend/src/components/ui (Shadcn UI components are read-only).",
-    "Do not modify frontend immutable hook/bootstrapping paths listed in SYSTEM_CONTEXT."
+    "Use English for any user-facing text.",
+    "Do not edit frontend immutable paths listed in SYSTEM_CONTEXT (e.g., frontend/src/hooks/useActor.ts, frontend/src/hooks/useInternetIdentity.ts(x), frontend/src/main.tsx, frontend/src/components/ui).",
+    "Backend must remain a single Motoko actor in backend/main.mo; only add backend/migration.mo if state schema changes require migration."
   ],
   "nonGoals": [
-    "No backend (Motoko) changes.",
-    "No changes to category IDs/names or admin category management behavior beyond displaying images."
+    "Do not add any in-app worker workflow for notifying admin of completion (worker will call admin outside the system).",
+    "Do not implement real-time updates (e.g., websockets/push); status updates can rely on refetch/invalidation.",
+    "Do not change inquiry/job data model unless required to enforce authorization."
   ],
   "imageRequirements": {
-    "required": [
-      "Cartoon plumber character illustration (sevasangam-category-plumber.dim_512x512.png)",
-      "Cartoon electrician character illustration (sevasangam-category-electrician.dim_512x512.png)",
-      "Cartoon mason character illustration (sevasangam-category-mason.dim_512x512.png)",
-      "Cartoon house cleaner character illustration (sevasangam-category-house-cleaner.dim_512x512.png)",
-      "Cartoon garden/backyard cleaner character illustration (sevasangam-category-garden-cleaner.dim_512x512.png)",
-      "Cartoon carpenter character illustration (sevasangam-category-carpenter.dim_512x512.png)",
-      "Cartoon painter character illustration (sevasangam-category-painter.dim_512x512.png)",
-      "Cartoon mechanic character illustration (sevasangam-category-mechanic.dim_512x512.png)",
-      "Cartoon general services/handyman character illustration (sevasangam-category-other.dim_512x512.png)"
-    ],
+    "required": [],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }

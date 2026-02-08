@@ -1,23 +1,66 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import { useInternetIdentity } from '../../hooks/useInternetIdentity';
 import { Button } from '../ui/button';
-import { LogIn } from 'lucide-react';
+import { LogIn, Loader2 } from 'lucide-react';
+import { logLoginAttempt, logLoginSuccess, logLoginFailure } from '../../utils/authDiagnostics';
+import InternetIdentityErrorNotice from '../auth/InternetIdentityErrorNotice';
 
 export default function RequireAuth({ children }: { children: ReactNode }) {
-  const { identity, login, loginStatus } = useInternetIdentity();
+  const { identity, login, loginStatus, loginError } = useInternetIdentity();
+  const [retryAttempt, setRetryAttempt] = useState(0);
+
+  const showError = loginStatus === 'loginError' && !identity && loginError;
+
+  // Log login status changes
+  useEffect(() => {
+    if (loginStatus === 'success' && identity) {
+      logLoginSuccess();
+    }
+  }, [loginStatus, identity]);
+
+  const handleLogin = async () => {
+    const hadIdentityBefore = !!identity;
+    logLoginAttempt(hadIdentityBefore);
+    
+    try {
+      await login();
+    } catch (error: any) {
+      logLoginFailure(error, hadIdentityBefore);
+    }
+  };
+
+  const handleRetry = () => {
+    setRetryAttempt((prev) => prev + 1);
+    handleLogin();
+  };
 
   if (!identity) {
     return (
-      <div className="container max-w-md mx-auto py-16 px-4 text-center">
+      <div className="container max-w-md mx-auto py-16 px-4">
         <div className="space-y-6">
-          <div className="space-y-2">
-            <h2 className="text-2xl font-bold">Authentication Required</h2>
-            <p className="text-muted-foreground">Please log in to access this page.</p>
-          </div>
-          <Button onClick={login} disabled={loginStatus === 'logging-in'} size="lg">
-            <LogIn className="mr-2 h-5 w-5" />
-            {loginStatus === 'logging-in' ? 'Logging in...' : 'Login with Internet Identity'}
-          </Button>
+          {showError ? (
+            <InternetIdentityErrorNotice error={loginError} onRetry={handleRetry} />
+          ) : (
+            <div className="text-center space-y-6">
+              <div className="space-y-2">
+                <h2 className="text-2xl font-bold">Authentication Required</h2>
+                <p className="text-muted-foreground">Please log in to access this page.</p>
+              </div>
+              <Button onClick={handleLogin} disabled={loginStatus === 'logging-in'} size="lg">
+                {loginStatus === 'logging-in' ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Logging in...
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="mr-2 h-5 w-5" />
+                    Login with Internet Identity
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     );

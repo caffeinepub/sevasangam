@@ -1,155 +1,217 @@
 import { useState } from 'react';
-import { useGetMyWorkerProfile, useUpdateWorkerProfile } from '../hooks/useQueries';
+import { useGetMyWorkerProfile, useUpdateWorkerProfile, useGetMyWorkItems } from '../hooks/useQueries';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
-import { Loader2, Edit } from 'lucide-react';
+import { Loader2, Edit, Briefcase, AlertCircle } from 'lucide-react';
 import RequireAuth from '../components/guards/RequireAuth';
 import WorkerProfileEditor from '../components/workers/WorkerProfileEditor';
-import { toast } from 'sonner';
-import { useNavigate } from '@tanstack/react-router';
+import WorkerJobsList from '../components/workers/WorkerJobsList';
+import ConnectionErrorNotice from '../components/errors/ConnectionErrorNotice';
+import PostCallAlarmHost from '../components/alarms/PostCallAlarmHost';
+import { InquiryStatus } from '../backend';
 
 function WorkerDashboardContent() {
-  const navigate = useNavigate();
-  const { data: workerProfile, isLoading } = useGetMyWorkerProfile();
+  const { data: profile, isLoading: profileLoading, error: profileError, refetch: refetchProfile } = useGetMyWorkerProfile();
+  const { data: jobs = [], isLoading: jobsLoading, error: jobsError, refetch: refetchJobs } = useGetMyWorkItems();
   const updateProfile = useUpdateWorkerProfile();
   const [isEditing, setIsEditing] = useState(false);
 
-  const handleUpdate = async (profile: any) => {
+  const isConnectionError = (error: any) => {
+    if (!error) return false;
+    const message = error?.message?.toLowerCase() || '';
+    return message.includes('fetch') || message.includes('network') || message.includes('connection');
+  };
+
+  const handleRetry = () => {
+    refetchProfile();
+    refetchJobs();
+  };
+
+  if (profileLoading || jobsLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (profileError && isConnectionError(profileError)) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <ConnectionErrorNotice onRetry={handleRetry} />
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Worker Profile Not Found</CardTitle>
+            <CardDescription>
+              You need to register as a worker first. Please complete the worker registration process.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    );
+  }
+
+  const handleSubmit = async (updatedProfile: any) => {
     try {
-      await updateProfile.mutateAsync({ workerId: profile.id, profile });
-      toast.success('Profile updated successfully');
+      await updateProfile.mutateAsync({
+        workerId: profile.id,
+        profile: updatedProfile,
+      });
       setIsEditing(false);
     } catch (error) {
-      toast.error('Failed to update profile');
+      console.error('Failed to update profile:', error);
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="container px-4 py-16 flex justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
+  const getStatusBadge = (status: string) => {
+    const statusMap: Record<string, { label: string; className: string }> = {
+      pending: { label: 'Pending Approval', className: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' },
+      approved: { label: 'Approved', className: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' },
+      rejected: { label: 'Rejected', className: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' },
+      featured: { label: 'Featured', className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' },
+    };
+    const config = statusMap[status] || { label: status, className: '' };
+    return <Badge className={config.className}>{config.label}</Badge>;
+  };
 
-  if (!workerProfile) {
-    return (
-      <div className="container max-w-md mx-auto px-4 py-16 text-center">
+  const pendingJobs = jobs.filter(job => job.status === InquiryStatus.pending || job.status === InquiryStatus.new_);
+  const completedJobs = jobs.filter(job => job.status === InquiryStatus.completed);
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+      <PostCallAlarmHost />
+      
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Worker Dashboard</h1>
+          <p className="text-muted-foreground mt-1">Manage your profile and track your jobs</p>
+        </div>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-3">
         <Card>
-          <CardHeader>
-            <CardTitle>No Worker Profile</CardTitle>
-            <CardDescription>You haven't registered as a worker yet</CardDescription>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total Jobs</CardTitle>
           </CardHeader>
           <CardContent>
-            <Button onClick={() => navigate({ to: '/join' })} size="lg" className="w-full">
-              Register as Worker
-            </Button>
+            <div className="text-3xl font-bold">{jobs.length}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Pending</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-amber-600">{pendingJobs.length}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Completed</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-green-600">{completedJobs.length}</div>
           </CardContent>
         </Card>
       </div>
-    );
-  }
 
-  const getStatusBadge = (status: string) => {
-    const config: Record<string, { variant: 'default' | 'secondary' | 'destructive'; label: string }> = {
-      pending: { variant: 'secondary', label: 'Pending Approval' },
-      approved: { variant: 'default', label: 'Approved' },
-      rejected: { variant: 'destructive', label: 'Rejected' },
-      featured: { variant: 'default', label: 'Featured' },
-    };
-    const { variant, label } = config[status] || { variant: 'secondary', label: status };
-    return <Badge variant={variant}>{label}</Badge>;
-  };
-
-  const getStatusMessage = (status: string) => {
-    const messages: Record<string, string> = {
-      pending: 'Your profile is currently under review by our admin team. You will be notified once approved.',
-      approved: 'Your profile is live and visible to customers!',
-      rejected: 'Your profile was not approved. Please contact support for more information.',
-    };
-    return messages[status] || '';
-  };
-
-  return (
-    <div className="container max-w-4xl mx-auto px-4 py-12">
-      <div className="space-y-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-bold">Worker Dashboard</h1>
-            <p className="text-muted-foreground mt-2">Manage your profile and view your status</p>
-          </div>
-          {!isEditing && (
-            <Button onClick={() => setIsEditing(true)}>
-              <Edit className="mr-2 h-4 w-4" />
-              Edit Profile
-            </Button>
-          )}
-        </div>
-
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Profile Status</CardTitle>
-              {getStatusBadge(workerProfile.status)}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Your Profile</CardTitle>
+              <CardDescription>Your worker profile information</CardDescription>
             </div>
-            <CardDescription>{getStatusMessage(workerProfile.status)}</CardDescription>
-          </CardHeader>
-        </Card>
-
-        {isEditing ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>Edit Profile</CardTitle>
-              <CardDescription>
-                Note: Major changes will require admin re-approval
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+            <div className="flex items-center gap-2">
+              {getStatusBadge(profile.status)}
+              {!profile.published && (
+                <Badge variant="outline" className="bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                  Unpublished
+                </Badge>
+              )}
+              {!isEditing && (
+                <Button onClick={() => setIsEditing(true)} variant="outline" size="sm">
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit Profile
+                </Button>
+              )}
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {isEditing ? (
+            <div>
               <WorkerProfileEditor
-                profile={workerProfile}
-                onSubmit={handleUpdate}
+                profile={profile}
+                onSubmit={handleSubmit}
                 isSubmitting={updateProfile.isPending}
               />
-              <Button
-                variant="outline"
-                onClick={() => setIsEditing(false)}
-                className="mt-4"
+              <Button 
+                variant="outline" 
+                onClick={() => setIsEditing(false)} 
+                className="w-full mt-4"
               >
                 Cancel
               </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          <Card>
-            <CardHeader>
-              <CardTitle>Profile Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid sm:grid-cols-2 gap-4 text-sm">
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="font-semibold">Name</p>
-                  <p className="text-muted-foreground">{workerProfile.full_name}</p>
+                  <p className="text-sm font-medium text-muted-foreground">Name</p>
+                  <p className="text-base">{profile.full_name}</p>
                 </div>
                 <div>
-                  <p className="font-semibold">Phone</p>
-                  <p className="text-muted-foreground">{workerProfile.phone_number}</p>
+                  <p className="text-sm font-medium text-muted-foreground">Phone</p>
+                  <p className="text-base">{profile.phone_number}</p>
                 </div>
                 <div>
-                  <p className="font-semibold">Experience</p>
-                  <p className="text-muted-foreground">{Number(workerProfile.years_experience)} years</p>
+                  <p className="text-sm font-medium text-muted-foreground">Experience</p>
+                  <p className="text-base">{profile.years_experience} years</p>
                 </div>
                 <div>
-                  <p className="font-semibold">Location</p>
-                  <p className="text-muted-foreground">
-                    {[workerProfile.location.city, workerProfile.location.district].filter(Boolean).join(', ')}
-                  </p>
+                  <p className="text-sm font-medium text-muted-foreground">Location</p>
+                  <p className="text-base">{profile.location.city || 'Not specified'}</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        )}
-      </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Briefcase className="h-5 w-5" />
+            <CardTitle>My Jobs</CardTitle>
+          </div>
+          <CardDescription>
+            Track and manage your assigned customer inquiries
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {jobsError && isConnectionError(jobsError) ? (
+            <div className="py-4">
+              <ConnectionErrorNotice onRetry={refetchJobs} />
+            </div>
+          ) : jobsError ? (
+            <div className="flex items-center gap-2 text-destructive py-4">
+              <AlertCircle className="h-4 w-4" />
+              <span className="text-sm">Failed to load jobs. Please try again.</span>
+            </div>
+          ) : (
+            <WorkerJobsList jobs={jobs} />
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

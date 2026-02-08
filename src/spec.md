@@ -1,11 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Refresh the site footer tagline and enhance service category browsing by showing a cartoon occupation image per category.
+**Goal:** Ensure only admins can mark inquiries/jobs as completed, while workers can still view up-to-date completion status in their dashboard.
 
 **Planned changes:**
-- Update the footer to display exactly: "© 2026 - Crafted with care" and remove the existing “Built with love using caffeine.ai” wording, heart icon, and caffeine.ai link across all supported languages.
-- Add one cartoon-style occupation image per existing service category (plumber, electrician, mason, house-cleaner, garden-cleaner, carpenter, painter, mechanic, other) as static assets under `frontend/public/assets/generated`.
-- Update the service category cards/grid UI to display the correct per-category cartoon image loaded from `/assets/generated/*` while keeping the layout responsive.
+- Remove/hide any worker-facing "Mark as Completed" UI and prevent the worker UI from triggering any completion action/API.
+- Add an admin-only "Mark Completed" control in the admin inquiry management UI for non-completed inquiries.
+- Update backend authorization to reject any non-admin attempts to mark an inquiry/job completed, while allowing admin-authorized updates to set status to completed.
+- Ensure worker job lists display status badges (e.g., Pending/Completed) based on inquiry status and reflect admin-made completion changes after refresh/refetch.
 
-**User-visible outcome:** The footer shows the new single-line tagline, and each service category card displays a matching cartoon occupation image to help users quickly identify categories.
+**User-visible outcome:** Workers can no longer mark jobs completed and will only see completion status updates after an admin marks an inquiry/job as completed; admins have a dedicated control to complete inquiries in the admin interface.

@@ -1,38 +1,66 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-08T04:20:43.793Z",
-  "summary": "Footer text was updated to an i18n-driven single-line copyright string, and the category grid was updated to show per-category images via a new getCategoryImagePath mapping. However, the required static image assets themselves were not added in the diff, and the category grid now uses hardcoded English category names from utils (potentially changing localization behavior beyond the request).",
+  "generatedAt": "2026-02-08T13:41:52.980Z",
+  "summary": "Frontend changes add an explicit admin \"mark completed\" action and show completion badges in the worker jobs list, but the diff summary does not provide evidence that backend authorization was updated to block worker completion endpoints or that any worker-side completion mutation/action was removed. The diff also includes multiple unrelated frontend features (i18n/trilingual UI, contact links, category image mapping, UI/UX changes) that were not requested.",
   "missing_requirements": [
     {
-      "id": "REQ-2",
-      "requirement": "Generate and add cartoon-style occupation images for each existing service category and store them as static assets under frontend/public/assets/generated with the specified filenames.",
-      "reason": "The diff shows no new files added under frontend/public/assets/generated (or anywhere). getCategoryImagePath references these files, but the assets themselves are not present in the provided diff summary.",
+      "id": "REQ-1",
+      "requirement": "Remove the ability for workers to mark jobs/inquiries as completed from the worker UI by hiding the \"Mark as Completed\" button and eliminating any worker-side action that triggers completion.",
+      "reason": "While the worker jobs list component shown only renders status badges and no completion button, the diff summary does not show removal of any existing worker-side completion mutation/API call (e.g., a hook/mutation like markInquiryAsCompleted) elsewhere in the worker UI or hooks. With truncated diffs, there is insufficient evidence that all worker completion triggers were eliminated.",
       "evidence": [
-        "File diff summary: \"Added: 0\"",
-        "frontend/src/utils/categories.ts (references /assets/generated/*.png paths)"
+        "frontend/src/components/workers/WorkerJobsList.tsx",
+        "frontend/src/hooks/useQueries.ts (truncated)",
+        "frontend/src/pages/WorkerDashboardPage.tsx (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "requirement": "Update backend authorization so that worker callers cannot mark an inquiry/job as completed via dedicated completion endpoints; completion must be an admin-only operation.",
+      "reason": "backend/main.mo is truncated and the diff summary does not show any dedicated completion endpoint changes (e.g., markInquiryAsCompleted/markJobAsCompleted) nor any explicit new authorization checks/traps for non-admin callers on completion operations. Therefore the required backend authorization enforcement is not evidenced.",
+      "evidence": [
+        "backend/main.mo (truncated)"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Category grid now derives category display names from a hardcoded CATEGORY_NAMES map (English strings) instead of i18n translations, which may remove/alter localized category naming behavior.",
-      "reason": "REQ-3 only asked to display per-category images and keep layout responsive; it did not ask to change how category names are sourced/displayed. Using CATEGORY_NAMES may override prior localized names.",
+      "description": "Trilingual/i18n support and translated navigation/branding (e.g., I18nProvider, language switcher, brand shown in multiple languages).",
+      "reason": "The BuildRequest requires English user-facing text and focuses only on restricting completion to admin and reflecting status for workers; i18n/trilingual UI is not requested and may conflict with the English-only constraint.",
       "evidence": [
-        "frontend/src/components/categories/CategoryCardGrid.tsx",
-        "frontend/src/utils/categories.ts (CATEGORY_NAMES map)"
+        "frontend-file-summaries.txt (entries for frontend/src/App.tsx, frontend/src/components/Brand.tsx, frontend/src/components/layout/Header.tsx, frontend/src/components/layout/Footer.tsx)"
+      ]
+    },
+    {
+      "description": "Contact link utilities (tel:/wa.me normalization) and worker contact action changes with post-call alarm marker recording.",
+      "reason": "Not part of the requested admin-only completion restriction/status propagation work.",
+      "evidence": [
+        "frontend-file-summaries.txt (entries for frontend/src/utils/contactLinks.ts, frontend/src/components/workers/WorkerContactActions.tsx)"
+      ]
+    },
+    {
+      "description": "Category image mapping to static assets and category UI changes (generated cartoons, search panel translation/category name helpers).",
+      "reason": "Not requested; outside the scope of job completion authorization/status propagation.",
+      "evidence": [
+        "frontend-file-summaries.txt (entries for frontend/src/utils/categories.ts, frontend/src/components/categories/CategoryCardGrid.tsx, frontend/src/components/search/HomeSearchPanel.tsx)"
+      ]
+    },
+    {
+      "description": "Multiple UI/UX refactors unrelated to completion controls (new reusable EmptyState component, layout changes, login/auth guard error handling enhancements, admin guard messaging).",
+      "reason": "Not requested by the BuildRequest; scope is limited to completion controls and backend authorization.",
+      "evidence": [
+        "frontend-file-summaries.txt (entries for frontend/src/components/ui-kit/EmptyState.tsx, frontend/src/components/layout/AppLayout.tsx, frontend/src/components/auth/LoginButton.tsx, frontend/src/components/guards/RequireAuth.tsx, frontend/src/components/guards/RequireAdmin.tsx)"
       ]
     }
   ],
-  "confidence": 0.72,
+  "confidence": 0.62,
   "changed_files": [
+    "backend/main.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/categories/CategoryCardGrid.tsx",
-    "frontend/src/components/layout/Footer.tsx",
-    "frontend/src/i18n/locales/as.ts",
-    "frontend/src/i18n/locales/en.ts",
-    "frontend/src/i18n/locales/hi.ts",
-    "frontend/src/utils/categories.ts",
+    "frontend/src/components/admin/InquiriesAdminPanel.tsx",
+    "frontend/src/components/workers/WorkerJobsList.tsx",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/WorkerDashboardPage.tsx",
     "project_state.json"
   ]
 }

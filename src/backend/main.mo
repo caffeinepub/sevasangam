@@ -9,8 +9,6 @@ import BlobStorage "blob-storage/Storage";
 import MixinStorage "blob-storage/Mixin";
 import UserApproval "user-approval/approval";
 
-
-
 actor {
   include MixinStorage();
 
@@ -135,7 +133,7 @@ actor {
 
   let approvalState = UserApproval.initState(accessControlState);
 
-  // Persisted stores (now must be mutable vars for migration to work)
+  // Persisted stores
   var categoryMap = Map.empty<Text, Category.Category>();
   var workerMap = Map.empty<Text, Worker.WorkerProfile>();
   var inquiryMap = Map.empty<Text, Inquiry.Inquiry>();
@@ -288,27 +286,40 @@ actor {
           Runtime.trap("Unauthorized: Can only update your own profile");
         };
 
-        if (not AccessControl.isAdmin(accessControlState, caller)) {
-          let needsReapproval = worker.category_id != profile.category_id;
-          let updatedProfile = {
-            id = profile.id;
-            principal = worker.principal;
-            full_name = profile.full_name;
-            phone_number = profile.phone_number;
-            photo = profile.photo;
-            category_id = profile.category_id;
-            location = profile.location;
-            years_experience = profile.years_experience;
-            pricing = profile.pricing;
-            availability = profile.availability;
-            integrations = profile.integrations;
-            status = if (needsReapproval) { #pending } else { worker.status };
-            published = worker.published;
-          };
-          workerMap.add(workerId, updatedProfile);
-        } else {
-          workerMap.add(workerId, profile);
+        let updatedProfile = {
+          id = profile.id;
+          principal = worker.principal;
+          full_name = profile.full_name;
+          phone_number = profile.phone_number;
+          photo = profile.photo;
+          category_id = worker.category_id; // Workers cannot change their own category
+          location = profile.location;
+          years_experience = profile.years_experience;
+          pricing = profile.pricing;
+          availability = profile.availability;
+          integrations = profile.integrations;
+          status = worker.status;
+          published = worker.published;
         };
+        workerMap.add(workerId, updatedProfile);
+      };
+    };
+  };
+
+  // Explicit update category for admins
+  public shared ({ caller }) func updateWorkerCategoryAdmin(username : ?Text, password : ?Text, workerId : Text, newCategoryId : Text) : async () {
+    if (not isAuthorizedAdmin(caller, username, password)) {
+      Runtime.trap("Unauthorized: Only admins can update worker category");
+    };
+
+    let existingWorker = workerMap.get(workerId);
+    switch (existingWorker) {
+      case null {
+        Runtime.trap("Worker profile not found");
+      };
+      case (?worker) {
+        let updatedProfile = { worker with category_id = newCategoryId };
+        workerMap.add(workerId, updatedProfile);
       };
     };
   };
@@ -535,6 +546,26 @@ actor {
       Runtime.trap("Unauthorized: Only admins can delete inquiries");
     };
     inquiryMap.remove(inquiryId);
+  };
+
+  public query ({ caller }) func getMyWorkItems() : async [Inquiry.Inquiry] {
+    let foundWorker = workerMap.entries().find(
+      func((_, w)) { Principal.equal(w.principal, caller) }
+    );
+
+    switch (foundWorker) {
+      case (null) {
+        Runtime.trap("Unauthorized: Only registered workers can access their work items");
+      };
+      case (?(workerId, _)) {
+        let myInquiries = inquiryMap.values().toArray().filter(
+          func(inq) {
+            inq.worker_id == workerId;
+          }
+        );
+        myInquiries;
+      };
+    };
   };
 
   public query ({ caller }) func getWorkerInquiries(workerId : Text) : async [Inquiry.Inquiry] {
