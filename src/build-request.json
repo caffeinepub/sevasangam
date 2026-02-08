@@ -1,85 +1,87 @@
 {
   "kind": "build_request",
-  "title": "Fix production regression: workers not visible publicly and pending list empty in Admin Dashboard",
-  "priority": "high",
+  "title": "Update footer tagline and add cartoon images for each service category",
+  "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-27",
-      "text": "Persist workers, categories, inquiries, and userProfiles across canister upgrades/deploys so that production deployments do not reset data and cause approved workers to disappear from public pages and pending workers to disappear from the Admin Dashboard.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-recent-7",
-          "msg-recent-8",
-          "msg-recent-9"
-        ],
-        "quotes": [
-          "on going live, the workers are not showing",
-          "Approved workers are not showing.  Admin dashboard is not showing pending workers.",
-          "Fix this issue"
-        ]
-      },
-      "acceptanceCriteria": [
-        "After an upgrade/redeploy, previously registered workers (Pending/Approved/Rejected) still exist in canister state and can be fetched via the same APIs as before.",
-        "After an upgrade/redeploy, previously created categories still exist in canister state and can be fetched via getAllCategories/getCategory.",
-        "After an upgrade/redeploy, approved workers remain publicly visible via getAllWorkers/getWorkersByCategory/getWorkerProfile (for approved/featured only).",
-        "No migration file is introduced unless required to preserve existing production state; if a migration is required, it is implemented according to the platform conditional migration policy."
-      ]
-    },
-    {
-      "id": "REQ-28",
-      "text": "Ensure the Admin Dashboard worker list reliably shows Pending workers in production by (a) making the admin worker fetch return real data (not an empty list caused by backend state reset) and (b) adding explicit error UI when the admin worker query fails (network/unauthorized) instead of silently showing an empty state.",
+      "id": "REQ-1",
+      "text": "Update the site footer so it displays exactly: \"© 2026 - Crafted with care\" and remove the current \"Built with love using caffeine.ai\" wording (including the heart icon, the literal word \"using\", and the caffeine.ai link).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-recent-7",
-          "msg-recent-8"
+          "msg-4",
+          "msg-8"
         ],
         "quotes": [
-          "Admin dashboard is not showing pending workers.",
-          "on going live, the workers are not showing"
+          "in the footer \"@ 2026. built with love using caffeine.ai\" replace the line with \"@ 2026 - Crafted with care\""
         ]
       },
       "acceptanceCriteria": [
-        "When the backend returns pending workers from getAllWorkersAdmin, the WorkersAdminPanel default filter 'pending' shows them.",
-        "If useGetAllWorkersAdmin fails due to unauthorized, the admin session is cleared and the UI navigates to /admin-login (existing behavior), and the panel does not display a misleading 'No workers found' empty state before redirect.",
-        "If useGetAllWorkersAdmin fails due to a network/connection error, the panel shows an error message in English (e.g., 'Connection problem. Please try again.') with a retry action, and does not present an empty list as if there are no workers.",
-        "The loading state, empty state, and error state are visually distinct in WorkersAdminPanel."
+        "Footer renders a single text line: \"© 2026 - Crafted with care\" (with the © symbol)",
+        "The footer no longer renders the Heart icon",
+        "The footer no longer renders the word \"using\" and no longer renders a link to https://caffeine.ai",
+        "Change is applied consistently across all supported languages (no language shows the old phrase/link)"
       ]
     },
     {
-      "id": "REQ-29",
-      "text": "Ensure approved workers reliably appear on public category pages and search results in production by surfacing query errors (instead of silently treating actor/unreachable errors as an empty list) and by ensuring public worker queries refetch successfully after deployment and after admin approval actions.",
+      "id": "REQ-2",
+      "text": "Generate and add cartoon-style occupation images for each existing service category and store them as static assets under frontend/public/assets/generated, one image per category: plumber, electrician, mason, house-cleaner, garden-cleaner, carpenter, painter, mechanic, and other.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-recent-7",
-          "msg-recent-8"
+          "msg-4",
+          "msg-6"
         ],
         "quotes": [
-          "Approved workers are not showing.",
-          "on going live, the workers are not showing"
+          "Add the required images to service categories, like, add a plumber image to the plumber section, electrician image to electrician section and so on.",
+          "yes some cartoon images according to that occupation"
         ]
       },
       "acceptanceCriteria": [
-        "If the public worker queries fail due to a network/connection issue, CategoryPage and SearchResultsPage show an error state in English with a retry option (not '0 workers available' as if there are none).",
-        "If public worker queries succeed, CategoryPage counts and renders approved workers correctly for the selected category.",
-        "After a worker is approved in the Admin Dashboard, navigating to the worker’s category page and the Search Results page shows the approved worker without requiring a hard refresh (relies on successful refetch/invalidation and successful backend persistence)."
+        "All required category images exist in frontend/public/assets/generated with the specified filenames",
+        "Each image is a clear cartoon illustration that visually matches the intended occupation",
+        "No category is left without an image (including \"other\")"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Update the service category UI (category cards/grid) to display the new per-category cartoon images (matching the category ID) so users can visually identify each service category by its occupation image.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Add the required images to service categories, like, add a plumber image to the plumber section, electrician image to electrician section and so on."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Each category card shows the correct cartoon image for its category (e.g., plumber card shows plumber image)",
+        "Images are loaded directly from /assets/generated/* (static assets) and are not fetched via the backend",
+        "Layout remains responsive and visually balanced on mobile and desktop"
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor in backend/main.mo; do not introduce additional backend services.",
-    "Do not edit files under frontend/src/components/ui or any other frontend immutablePaths listed in SYSTEM_CONTEXT; compose existing UI components instead.",
-    "Use English for all user-facing text added or modified."
+    "Do not edit files under frontend/src/components/ui (Shadcn UI components are read-only).",
+    "Do not modify frontend immutable hook/bootstrapping paths listed in SYSTEM_CONTEXT."
   ],
   "nonGoals": [
-    "Adding new product features (e.g., bookings, payments, messaging) beyond fixing worker visibility and related error handling.",
-    "Changing authentication methods (workers still use Internet Identity; admin still uses the custom username/password session).",
-    "Introducing external databases or third-party services."
+    "No backend (Motoko) changes.",
+    "No changes to category IDs/names or admin category management behavior beyond displaying images."
   ],
   "imageRequirements": {
-    "required": [],
+    "required": [
+      "Cartoon plumber character illustration (sevasangam-category-plumber.dim_512x512.png)",
+      "Cartoon electrician character illustration (sevasangam-category-electrician.dim_512x512.png)",
+      "Cartoon mason character illustration (sevasangam-category-mason.dim_512x512.png)",
+      "Cartoon house cleaner character illustration (sevasangam-category-house-cleaner.dim_512x512.png)",
+      "Cartoon garden/backyard cleaner character illustration (sevasangam-category-garden-cleaner.dim_512x512.png)",
+      "Cartoon carpenter character illustration (sevasangam-category-carpenter.dim_512x512.png)",
+      "Cartoon painter character illustration (sevasangam-category-painter.dim_512x512.png)",
+      "Cartoon mechanic character illustration (sevasangam-category-mechanic.dim_512x512.png)",
+      "Cartoon general services/handyman character illustration (sevasangam-category-other.dim_512x512.png)"
+    ],
     "edits": []
   },
   "userProfileUpdate": {

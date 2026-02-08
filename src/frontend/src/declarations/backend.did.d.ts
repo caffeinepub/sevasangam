@@ -85,6 +85,7 @@ export interface WorkerProfile {
   'status' : Status,
   'principal' : Principal,
   'integrations' : Integrations,
+  'published' : boolean,
   'pricing' : Pricing,
   'availability' : Schedule,
   'years_experience' : bigint,
@@ -169,6 +170,10 @@ export interface _SERVICE {
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'isCallerApproved' : ActorMethod<[], boolean>,
   'listApprovals' : ActorMethod<[], Array<UserApprovalInfo>>,
+  'publishWorker' : ActorMethod<
+    [[] | [string], [] | [string], string],
+    undefined
+  >,
   'registerWorker' : ActorMethod<[WorkerProfile], undefined>,
   'rejectWorker' : ActorMethod<
     [[] | [string], [] | [string], string],
@@ -181,6 +186,10 @@ export interface _SERVICE {
   'requestApproval' : ActorMethod<[], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'setApproval' : ActorMethod<[Principal, ApprovalStatus], undefined>,
+  'unpublishWorker' : ActorMethod<
+    [[] | [string], [] | [string], string],
+    undefined
+  >,
   'updateCategory' : ActorMethod<
     [[] | [string], [] | [string], string, Category],
     undefined

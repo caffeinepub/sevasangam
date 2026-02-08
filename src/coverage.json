@@ -1,70 +1,94 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-07T15:10:51.611Z",
+  "generatedAt": "2026-02-08T04:20:43.796Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
     "total": 3,
-    "implemented": 2,
+    "implemented": 3,
     "items": [
       {
-        "id": "REQ-27",
-        "summary": "Persist workers, categories, inquiries, and userProfiles across canister upgrades/deploys so that production deployments do not reset data and cause approved workers to disappear from public pages and pending workers to disappear from the Admin Dashboard.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-28",
-        "summary": "Ensure the Admin Dashboard worker list reliably shows Pending workers in production by (a) making the admin worker fetch return real data (not an empty list caused by backend state reset) and (b) adding explicit error UI when the admin worker query fails (network/unauthorized) instead of silently showing an empty state.",
+        "id": "REQ-1",
+        "summary": "Update the site footer so it displays exactly: \"© 2026 - Crafted with care\" and remove the current \"Built with love using caffeine.ai\" wording (including the heart icon, the literal word \"using\", and the caffeine.ai link).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/components/admin/WorkersAdminPanel.tsx",
-          "frontend/src/utils/adminApiErrorHandling.ts"
+          "frontend/src/components/layout/Footer.tsx",
+          "frontend/src/i18n/locales/en.ts",
+          "frontend/src/i18n/locales/hi.ts",
+          "frontend/src/i18n/locales/as.ts"
         ],
         "matchedFiles": [
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/components/admin/WorkersAdminPanel.tsx",
-          "frontend/src/utils/adminApiErrorHandling.ts"
+          "frontend/src/components/layout/Footer.tsx",
+          "frontend/src/i18n/locales/en.ts",
+          "frontend/src/i18n/locales/hi.ts",
+          "frontend/src/i18n/locales/as.ts"
         ]
       },
       {
-        "id": "REQ-29",
-        "summary": "Ensure approved workers reliably appear on public category pages and search results in production by surfacing query errors (instead of silently treating actor/unreachable errors as an empty list) and by ensuring public worker queries refetch successfully after deployment and after admin approval actions.",
+        "id": "REQ-2",
+        "summary": "Generate and add cartoon-style occupation images for each existing service category and store them as static assets under frontend/public/assets/generated, one image per category: plumber, electrician, mason, house-cleaner, garden-cleaner, carpenter, painter, mechanic, and other.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/pages/CategoryPage.tsx",
-          "frontend/src/pages/SearchResultsPage.tsx"
+          "frontend/public/assets/generated/sevasangam-category-plumber.dim_512x512.png",
+          "frontend/public/assets/generated/sevasangam-category-electrician.dim_512x512.png",
+          "frontend/public/assets/generated/sevasangam-category-mason.dim_512x512.png",
+          "frontend/public/assets/generated/sevasangam-category-house-cleaner.dim_512x512.png",
+          "frontend/public/assets/generated/sevasangam-category-garden-cleaner.dim_512x512.png",
+          "frontend/public/assets/generated/sevasangam-category-carpenter.dim_512x512.png",
+          "frontend/public/assets/generated/sevasangam-category-painter.dim_512x512.png",
+          "frontend/public/assets/generated/sevasangam-category-mechanic.dim_512x512.png",
+          "frontend/public/assets/generated/sevasangam-category-other.dim_512x512.png"
         ],
         "matchedFiles": [
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/pages/CategoryPage.tsx",
-          "frontend/src/pages/SearchResultsPage.tsx"
+          "frontend/public/assets/generated/sevasangam-category-plumber.dim_512x512.png",
+          "frontend/public/assets/generated/sevasangam-category-electrician.dim_512x512.png",
+          "frontend/public/assets/generated/sevasangam-category-mason.dim_512x512.png",
+          "frontend/public/assets/generated/sevasangam-category-house-cleaner.dim_512x512.png",
+          "frontend/public/assets/generated/sevasangam-category-garden-cleaner.dim_512x512.png",
+          "frontend/public/assets/generated/sevasangam-category-carpenter.dim_512x512.png",
+          "frontend/public/assets/generated/sevasangam-category-painter.dim_512x512.png",
+          "frontend/public/assets/generated/sevasangam-category-mechanic.dim_512x512.png",
+          "frontend/public/assets/generated/sevasangam-category-other.dim_512x512.png"
+        ]
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Update the service category UI (category cards/grid) to display the new per-category cartoon images (matching the category ID) so users can visually identify each service category by its occupation image.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/utils/categories.ts",
+          "frontend/src/components/categories/CategoryCardGrid.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/utils/categories.ts",
+          "frontend/src/components/categories/CategoryCardGrid.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
-    "frontend/src/components/admin/WorkersAdminPanel.tsx",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/useQueries.ts",
-    "frontend/src/pages/CategoryPage.tsx",
-    "frontend/src/pages/SearchResultsPage.tsx",
-    "frontend/src/utils/adminApiErrorHandling.ts",
+    "frontend/public/assets/generated/sevasangam-category-carpenter.dim_512x512.png",
+    "frontend/public/assets/generated/sevasangam-category-electrician.dim_512x512.png",
+    "frontend/public/assets/generated/sevasangam-category-garden-cleaner.dim_512x512.png",
+    "frontend/public/assets/generated/sevasangam-category-house-cleaner.dim_512x512.png",
+    "frontend/public/assets/generated/sevasangam-category-mason.dim_512x512.png",
+    "frontend/public/assets/generated/sevasangam-category-mechanic.dim_512x512.png",
+    "frontend/public/assets/generated/sevasangam-category-other.dim_512x512.png",
+    "frontend/public/assets/generated/sevasangam-category-painter.dim_512x512.png",
+    "frontend/public/assets/generated/sevasangam-category-plumber.dim_512x512.png",
+    "frontend/src/components/categories/CategoryCardGrid.tsx",
+    "frontend/src/components/layout/Footer.tsx",
+    "frontend/src/i18n/locales/as.ts",
+    "frontend/src/i18n/locales/en.ts",
+    "frontend/src/i18n/locales/hi.ts",
+    "frontend/src/utils/categories.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

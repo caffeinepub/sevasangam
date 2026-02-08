@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { useGetAllWorkersAdmin, useApproveWorker, useRejectWorker, useRemoveWorker } from '../../hooks/useQueries';
+import { useGetAllWorkersAdmin, useApproveWorker, useRejectWorker, useRemoveWorker, usePublishWorker, useUnpublishWorker } from '../../hooks/useQueries';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { CheckCircle, XCircle, Trash2, Loader2, AlertCircle } from 'lucide-react';
-import { toast } from 'sonner';
+import { CheckCircle, XCircle, Trash2, Loader2, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import type { WorkerProfile } from '../../backend';
 import { CATEGORY_NAMES } from '../../utils/categories';
 
@@ -31,10 +30,12 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
 
 export default function WorkersAdminPanel() {
   const { data: workers = [], isLoading, isError, error, refetch } = useGetAllWorkersAdmin();
-  const [statusFilter, setStatusFilter] = useState<string>('pending');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const approveWorker = useApproveWorker();
   const rejectWorker = useRejectWorker();
   const removeWorker = useRemoveWorker();
+  const publishWorker = usePublishWorker();
+  const unpublishWorker = useUnpublishWorker();
 
   const filteredWorkers = workers.filter((w) => {
     if (statusFilter === 'all') return true;
@@ -44,7 +45,6 @@ export default function WorkersAdminPanel() {
   const handleApprove = async (workerId: string) => {
     try {
       await approveWorker.mutateAsync(workerId);
-      toast.success('Worker approved successfully');
     } catch (error) {
       // Error already handled by mutation hook
     }
@@ -53,7 +53,6 @@ export default function WorkersAdminPanel() {
   const handleReject = async (workerId: string) => {
     try {
       await rejectWorker.mutateAsync(workerId);
-      toast.success('Worker rejected');
     } catch (error) {
       // Error already handled by mutation hook
     }
@@ -63,7 +62,22 @@ export default function WorkersAdminPanel() {
     if (!confirm('Are you sure you want to remove this worker?')) return;
     try {
       await removeWorker.mutateAsync(workerId);
-      toast.success('Worker removed');
+    } catch (error) {
+      // Error already handled by mutation hook
+    }
+  };
+
+  const handlePublish = async (workerId: string) => {
+    try {
+      await publishWorker.mutateAsync(workerId);
+    } catch (error) {
+      // Error already handled by mutation hook
+    }
+  };
+
+  const handleUnpublish = async (workerId: string) => {
+    try {
+      await unpublishWorker.mutateAsync(workerId);
     } catch (error) {
       // Error already handled by mutation hook
     }
@@ -128,7 +142,20 @@ export default function WorkersAdminPanel() {
                       {CATEGORY_NAMES[worker.category_id] || worker.category_id}
                     </p>
                   </div>
-                  {getStatusBadge(worker.status)}
+                  <div className="flex gap-2">
+                    {getStatusBadge(worker.status)}
+                    {worker.published ? (
+                      <Badge variant="default" className="bg-green-600">
+                        <Eye className="mr-1 h-3 w-3" />
+                        Published
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline">
+                        <EyeOff className="mr-1 h-3 w-3" />
+                        Unpublished
+                      </Badge>
+                    )}
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
@@ -156,7 +183,7 @@ export default function WorkersAdminPanel() {
                     </div>
                   </div>
 
-                  <div className="flex gap-2 pt-2">
+                  <div className="flex flex-wrap gap-2 pt-2">
                     {worker.status === 'pending' && (
                       <>
                         <Button
@@ -191,21 +218,55 @@ export default function WorkersAdminPanel() {
                       </>
                     )}
                     {worker.status === 'approved' && (
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => handleReject(worker.id)}
-                        disabled={rejectWorker.isPending}
-                      >
-                        {rejectWorker.isPending ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
+                      <>
+                        {worker.published ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleUnpublish(worker.id)}
+                            disabled={unpublishWorker.isPending}
+                          >
+                            {unpublishWorker.isPending ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <>
+                                <EyeOff className="mr-2 h-4 w-4" />
+                                Unpublish
+                              </>
+                            )}
+                          </Button>
                         ) : (
-                          <>
-                            <XCircle className="mr-2 h-4 w-4" />
-                            Reject
-                          </>
+                          <Button
+                            size="sm"
+                            onClick={() => handlePublish(worker.id)}
+                            disabled={publishWorker.isPending}
+                          >
+                            {publishWorker.isPending ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <>
+                                <Eye className="mr-2 h-4 w-4" />
+                                Publish
+                              </>
+                            )}
+                          </Button>
                         )}
-                      </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleReject(worker.id)}
+                          disabled={rejectWorker.isPending}
+                        >
+                          {rejectWorker.isPending ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <>
+                              <XCircle className="mr-2 h-4 w-4" />
+                              Reject
+                            </>
+                          )}
+                        </Button>
+                      </>
                     )}
                     {worker.status === 'rejected' && (
                       <Button

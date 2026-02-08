@@ -96,6 +96,7 @@ export const WorkerProfile = IDL.Record({
   'status' : Status,
   'principal' : IDL.Principal,
   'integrations' : Integrations,
+  'published' : IDL.Bool,
   'pricing' : Pricing,
   'availability' : Schedule,
   'years_experience' : IDL.Nat,
@@ -211,6 +212,11 @@ export const idlService = IDL.Service({
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'isCallerApproved' : IDL.Func([], [IDL.Bool], ['query']),
   'listApprovals' : IDL.Func([], [IDL.Vec(UserApprovalInfo)], ['query']),
+  'publishWorker' : IDL.Func(
+      [IDL.Opt(IDL.Text), IDL.Opt(IDL.Text), IDL.Text],
+      [],
+      [],
+    ),
   'registerWorker' : IDL.Func([WorkerProfile], [], []),
   'rejectWorker' : IDL.Func(
       [IDL.Opt(IDL.Text), IDL.Opt(IDL.Text), IDL.Text],
@@ -225,6 +231,11 @@ export const idlService = IDL.Service({
   'requestApproval' : IDL.Func([], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'setApproval' : IDL.Func([IDL.Principal, ApprovalStatus], [], []),
+  'unpublishWorker' : IDL.Func(
+      [IDL.Opt(IDL.Text), IDL.Opt(IDL.Text), IDL.Text],
+      [],
+      [],
+    ),
   'updateCategory' : IDL.Func(
       [IDL.Opt(IDL.Text), IDL.Opt(IDL.Text), IDL.Text, Category],
       [],
@@ -329,6 +340,7 @@ export const idlFactory = ({ IDL }) => {
     'status' : Status,
     'principal' : IDL.Principal,
     'integrations' : Integrations,
+    'published' : IDL.Bool,
     'pricing' : Pricing,
     'availability' : Schedule,
     'years_experience' : IDL.Nat,
@@ -444,6 +456,11 @@ export const idlFactory = ({ IDL }) => {
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'isCallerApproved' : IDL.Func([], [IDL.Bool], ['query']),
     'listApprovals' : IDL.Func([], [IDL.Vec(UserApprovalInfo)], ['query']),
+    'publishWorker' : IDL.Func(
+        [IDL.Opt(IDL.Text), IDL.Opt(IDL.Text), IDL.Text],
+        [],
+        [],
+      ),
     'registerWorker' : IDL.Func([WorkerProfile], [], []),
     'rejectWorker' : IDL.Func(
         [IDL.Opt(IDL.Text), IDL.Opt(IDL.Text), IDL.Text],
@@ -458,6 +475,11 @@ export const idlFactory = ({ IDL }) => {
     'requestApproval' : IDL.Func([], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'setApproval' : IDL.Func([IDL.Principal, ApprovalStatus], [], []),
+    'unpublishWorker' : IDL.Func(
+        [IDL.Opt(IDL.Text), IDL.Opt(IDL.Text), IDL.Text],
+        [],
+        [],
+      ),
     'updateCategory' : IDL.Func(
         [IDL.Opt(IDL.Text), IDL.Opt(IDL.Text), IDL.Text, Category],
         [],

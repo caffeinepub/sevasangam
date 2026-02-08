@@ -1,58 +1,114 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix worker visibility regression by surfacing admin/public query errors and enabling reliable refetch",
+  "title": "Footer tagline update and category cartoon images",
   "requirements": [
     {
-      "id": "REQ-28",
-      "summary": "Make Admin Dashboard Pending workers list reliable by adding explicit fetch error UI (unauthorized/network) and preventing empty-state flicker before redirect.",
+      "id": "REQ-1",
+      "summary": "Replace the footer content with a single, non-linked text line that reads exactly \"© 2026 - Crafted with care\" across all languages.",
       "acceptanceCriteria": [
-        "When the backend returns pending workers from getAllWorkersAdmin, the WorkersAdminPanel default filter 'pending' shows them.",
-        "If useGetAllWorkersAdmin fails due to unauthorized, the admin session is cleared and the UI navigates to /admin-login (existing behavior), and the panel does not display a misleading 'No workers found' empty state before redirect.",
-        "If useGetAllWorkersAdmin fails due to a network/connection error, the panel shows an error message in English (e.g., 'Connection problem. Please try again.') with a retry action, and does not present an empty list as if there are no workers.",
-        "The loading state, empty state, and error state are visually distinct in WorkersAdminPanel."
+        "Footer renders a single text line: \"© 2026 - Crafted with care\" (with the © symbol)",
+        "The footer no longer renders the Heart icon",
+        "The footer no longer renders the word \"using\" and no longer renders a link to https://caffeine.ai",
+        "Change is applied consistently across all supported languages (no language shows the old phrase/link)"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useQueries.ts",
+          "path": "frontend/src/components/layout/Footer.tsx",
           "operation": "modify",
-          "description": "Update useGetAllWorkersAdmin to stop returning an empty list on missing/invalid admin session and to propagate failures via React Query error state; ensure unauthorized failures trigger admin-session clearing + navigation to /admin-login without returning misleading empty data."
+          "description": "Remove the Heart icon, the \"using\" text, and the caffeine.ai anchor; render only one text node sourced from i18n (footer.copyright) so the footer displays exactly \"© 2026 - Crafted with care\"."
         },
         {
-          "path": "frontend/src/components/admin/WorkersAdminPanel.tsx",
+          "path": "frontend/src/i18n/locales/en.ts",
           "operation": "modify",
-          "description": "Use React Query states from useGetAllWorkersAdmin (isLoading/isError/error/refetch) to render distinct loading vs error vs empty vs success UI; add an English network error message with a retry action; ensure unauthorized errors render a redirecting/blocked state rather than the 'No workers found' empty state. Use existing shadcn-ui components (Button/Card/Badge/Select) to compose the UI (do not edit ui components). Verify the component's usage instructions before implementing."
+          "description": "Update footer.copyright to exactly \"© 2026 - Crafted with care\" and ensure no other footer strings are used to render the removed caffeine.ai wording/link."
         },
         {
-          "path": "frontend/src/utils/adminApiErrorHandling.ts",
+          "path": "frontend/src/i18n/locales/hi.ts",
           "operation": "modify",
-          "description": "Extend admin error helpers to support WorkersAdminPanel needs: provide a way to classify unauthorized vs network vs generic errors and support immediate redirect behavior for unauthorized cases to avoid empty-state flicker; keep all user-facing text in English."
+          "description": "Update footer.copyright to exactly \"© 2026 - Crafted with care\" so Hindi no longer shows the old footer wording/link."
+        },
+        {
+          "path": "frontend/src/i18n/locales/as.ts",
+          "operation": "modify",
+          "description": "Update footer.copyright to exactly \"© 2026 - Crafted with care\" so Assamese no longer shows the old footer wording/link."
         }
       ]
     },
     {
-      "id": "REQ-29",
-      "summary": "Ensure public Category and Search Results pages surface worker query failures with retry and refetch reliably after deployments and admin approval actions.",
+      "id": "REQ-2",
+      "summary": "Add one cartoon-style static occupation image asset per service category under frontend/public/assets/generated using the specified filenames.",
       "acceptanceCriteria": [
-        "If the public worker queries fail due to a network/connection issue, CategoryPage and SearchResultsPage show an error state in English with a retry option (not '0 workers available' as if there are none).",
-        "If public worker queries succeed, CategoryPage counts and renders approved workers correctly for the selected category.",
-        "After a worker is approved in the Admin Dashboard, navigating to the worker’s category page and the Search Results page shows the approved worker without requiring a hard refresh (relies on successful refetch/invalidation and successful backend persistence)."
+        "All required category images exist in frontend/public/assets/generated with the specified filenames",
+        "Each image is a clear cartoon illustration that visually matches the intended occupation",
+        "No category is left without an image (including \"other\")"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Adjust public worker query hooks (useGetAllWorkers, useGetWorkersByCategory) to avoid silently treating failures as empty lists; ensure errors propagate to components via React Query error state while preserving correct enabled/initial actor behavior and allowing refetch/invalidation to work after deployments and admin approval actions."
+          "path": "frontend/public/assets/generated/sevasangam-category-plumber.dim_512x512.png",
+          "operation": "create",
+          "description": "Add the generated static asset for the plumber category at this exact path/filename."
         },
         {
-          "path": "frontend/src/pages/CategoryPage.tsx",
-          "operation": "modify",
-          "description": "Render distinct loading/empty/error/success states for the category workers query; when the query fails (e.g., network/connection), show an English error message with a retry action that calls refetch, instead of showing 'No workers found' based on empty data. Use existing shadcn-ui Button and existing layout patterns; do not edit ui components. Verify the component's usage instructions before implementing."
+          "path": "frontend/public/assets/generated/sevasangam-category-electrician.dim_512x512.png",
+          "operation": "create",
+          "description": "Add the generated static asset for the electrician category at this exact path/filename."
         },
         {
-          "path": "frontend/src/pages/SearchResultsPage.tsx",
+          "path": "frontend/public/assets/generated/sevasangam-category-mason.dim_512x512.png",
+          "operation": "create",
+          "description": "Add the generated static asset for the mason category at this exact path/filename."
+        },
+        {
+          "path": "frontend/public/assets/generated/sevasangam-category-house-cleaner.dim_512x512.png",
+          "operation": "create",
+          "description": "Add the generated static asset for the house-cleaner category at this exact path/filename."
+        },
+        {
+          "path": "frontend/public/assets/generated/sevasangam-category-garden-cleaner.dim_512x512.png",
+          "operation": "create",
+          "description": "Add the generated static asset for the garden-cleaner category at this exact path/filename."
+        },
+        {
+          "path": "frontend/public/assets/generated/sevasangam-category-carpenter.dim_512x512.png",
+          "operation": "create",
+          "description": "Add the generated static asset for the carpenter category at this exact path/filename."
+        },
+        {
+          "path": "frontend/public/assets/generated/sevasangam-category-painter.dim_512x512.png",
+          "operation": "create",
+          "description": "Add the generated static asset for the painter category at this exact path/filename."
+        },
+        {
+          "path": "frontend/public/assets/generated/sevasangam-category-mechanic.dim_512x512.png",
+          "operation": "create",
+          "description": "Add the generated static asset for the mechanic category at this exact path/filename."
+        },
+        {
+          "path": "frontend/public/assets/generated/sevasangam-category-other.dim_512x512.png",
+          "operation": "create",
+          "description": "Add the generated static asset for the other category at this exact path/filename."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Update the category cards/grid UI to display the new per-category cartoon images from static assets, matching each category ID, while keeping the layout responsive.",
+      "acceptanceCriteria": [
+        "Each category card shows the correct cartoon image for its category (e.g., plumber card shows plumber image)",
+        "Images are loaded directly from /assets/generated/* (static assets) and are not fetched via the backend",
+        "Layout remains responsive and visually balanced on mobile and desktop"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/utils/categories.ts",
           "operation": "modify",
-          "description": "Render distinct loading/empty/error/success states for the all-workers query; when the query fails (e.g., network/connection), show an English error message with a retry action that calls refetch, instead of showing 0 results as if there are no workers. Use existing shadcn-ui Button and existing layout patterns; do not edit ui components. Verify the component's usage instructions before implementing."
+          "description": "Add a categoryId -> static image path mapping helper (e.g., a function returning the correct /assets/generated/sevasangam-category-*.dim_512x512.png path) for all existing category IDs, including \"other\"."
+        },
+        {
+          "path": "frontend/src/components/categories/CategoryCardGrid.tsx",
+          "operation": "modify",
+          "description": "Replace the sprite-based icon rendering with an <img> (or equivalent) using the new category image path helper so each card shows its occupation image from the static assets. Ensure sizing/cropping remains consistent and responsive without fetching from the backend."
         }
       ]
     }

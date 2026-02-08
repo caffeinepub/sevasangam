@@ -34,12 +34,12 @@ export default function WorkerCard({ worker }: WorkerCardProps) {
 
             <div className="space-y-1 text-sm text-muted-foreground mb-3">
               <div className="flex items-center gap-2">
-                <Briefcase className="h-4 w-4 flex-shrink-0" />
+                <Briefcase className="h-4 w-4 shrink-0" />
                 <span>{Number(worker.years_experience)} years experience</span>
               </div>
               {(worker.location.city || worker.location.district) && (
                 <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 flex-shrink-0" />
+                  <MapPin className="h-4 w-4 shrink-0" />
                   <span className="truncate">
                     {[worker.location.city, worker.location.district].filter(Boolean).join(', ')}
                   </span>

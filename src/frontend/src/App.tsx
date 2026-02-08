@@ -11,6 +11,7 @@ import SearchResultsPage from './pages/SearchResultsPage';
 import CategoriesIndexPage from './pages/CategoriesIndexPage';
 import AppLayout from './components/layout/AppLayout';
 import { Toaster } from './components/ui/sonner';
+import { I18nProvider } from './i18n/I18nProvider';
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -97,8 +98,10 @@ declare module '@tanstack/react-router' {
 export default function App() {
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-      <RouterProvider router={router} />
-      <Toaster />
+      <I18nProvider>
+        <RouterProvider router={router} />
+        <Toaster />
+      </I18nProvider>
     </ThemeProvider>
   );
 }

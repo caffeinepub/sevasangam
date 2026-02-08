@@ -242,6 +242,7 @@ export function useGetAllWorkersAdmin() {
       const session = getCredentials();
       if (!session) {
         clearAdminSession();
+        navigate({ to: '/admin-login' });
         throw new Error('Admin session not found');
       }
       try {
@@ -255,7 +256,7 @@ export function useGetAllWorkersAdmin() {
         throw error;
       }
     },
-    enabled: !!actor && !isFetching,
+    enabled: !!actor && !isFetching && !!getCredentials(),
     retry: (failureCount, error: any) => {
       // Don't retry on unauthorized errors
       if (isUnauthorizedError(error)) {
@@ -281,27 +282,6 @@ export function useApproveWorker() {
       return actor.approveWorker(session.username, session.password, workerId);
     },
     onSuccess: (_data, workerId) => {
-      // Update admin workers cache immediately
-      queryClient.setQueryData<WorkerProfile[]>(['workersAdmin'], (old) => {
-        if (!old) return old;
-        return old.map((w) =>
-          w.id === workerId ? { ...w, status: 'approved' as Status } : w
-        );
-      });
-
-      // Update public workers cache immediately
-      queryClient.setQueryData<WorkerProfile[]>(['workers'], (old) => {
-        if (!old) return old;
-        const worker = old.find((w) => w.id === workerId);
-        if (worker) {
-          return old.map((w) =>
-            w.id === workerId ? { ...w, status: 'approved' as Status } : w
-          );
-        }
-        // Worker wasn't in public list (was pending), need to refetch
-        return old;
-      });
-
       // Invalidate all worker-related queries to ensure consistency
       queryClient.invalidateQueries({ queryKey: ['workers'] });
       queryClient.invalidateQueries({ queryKey: ['workersAdmin'] });
@@ -311,7 +291,9 @@ export function useApproveWorker() {
           return Array.isArray(key) && key[0] === 'workers' && key[1] === 'category';
         }
       });
+      queryClient.invalidateQueries({ queryKey: ['worker', workerId] });
       queryClient.invalidateQueries({ queryKey: ['approvals'] });
+      toast.success('Worker approved successfully');
     },
     onError: (error: any) => {
       const message = handleAdminApiErrorWithRedirect(error, navigate);
@@ -334,20 +316,6 @@ export function useRejectWorker() {
       return actor.rejectWorker(session.username, session.password, workerId);
     },
     onSuccess: (_data, workerId) => {
-      // Update admin workers cache immediately
-      queryClient.setQueryData<WorkerProfile[]>(['workersAdmin'], (old) => {
-        if (!old) return old;
-        return old.map((w) =>
-          w.id === workerId ? { ...w, status: 'rejected' as Status } : w
-        );
-      });
-
-      // Remove from public workers cache immediately
-      queryClient.setQueryData<WorkerProfile[]>(['workers'], (old) => {
-        if (!old) return old;
-        return old.filter((w) => w.id !== workerId);
-      });
-
       // Invalidate all worker-related queries to ensure consistency
       queryClient.invalidateQueries({ queryKey: ['workers'] });
       queryClient.invalidateQueries({ queryKey: ['workersAdmin'] });
@@ -357,7 +325,9 @@ export function useRejectWorker() {
           return Array.isArray(key) && key[0] === 'workers' && key[1] === 'category';
         }
       });
+      queryClient.invalidateQueries({ queryKey: ['worker', workerId] });
       queryClient.invalidateQueries({ queryKey: ['approvals'] });
+      toast.success('Worker rejected');
     },
     onError: (error: any) => {
       const message = handleAdminApiErrorWithRedirect(error, navigate);
@@ -380,18 +350,6 @@ export function useRemoveWorker() {
       return actor.removeWorker(session.username, session.password, workerId);
     },
     onSuccess: (_data, workerId) => {
-      // Remove from admin workers cache immediately
-      queryClient.setQueryData<WorkerProfile[]>(['workersAdmin'], (old) => {
-        if (!old) return old;
-        return old.filter((w) => w.id !== workerId);
-      });
-
-      // Remove from public workers cache immediately
-      queryClient.setQueryData<WorkerProfile[]>(['workers'], (old) => {
-        if (!old) return old;
-        return old.filter((w) => w.id !== workerId);
-      });
-
       // Invalidate all worker-related queries to ensure consistency
       queryClient.invalidateQueries({ queryKey: ['workers'] });
       queryClient.invalidateQueries({ queryKey: ['workersAdmin'] });
@@ -401,6 +359,74 @@ export function useRemoveWorker() {
           return Array.isArray(key) && key[0] === 'workers' && key[1] === 'category';
         }
       });
+      queryClient.invalidateQueries({ queryKey: ['worker', workerId] });
+      toast.success('Worker removed');
+    },
+    onError: (error: any) => {
+      const message = handleAdminApiErrorWithRedirect(error, navigate);
+      toast.error(message);
+    },
+  });
+}
+
+export function usePublishWorker() {
+  const { actor } = useActor();
+  const { getCredentials } = useAdminSession();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  return useMutation({
+    mutationFn: async (workerId: string) => {
+      if (!actor) throw new Error('Actor not available');
+      const session = getCredentials();
+      if (!session) throw new Error('Admin session not found');
+      return actor.publishWorker(session.username, session.password, workerId);
+    },
+    onSuccess: (_data, workerId) => {
+      // Invalidate all worker-related queries to ensure consistency
+      queryClient.invalidateQueries({ queryKey: ['workers'] });
+      queryClient.invalidateQueries({ queryKey: ['workersAdmin'] });
+      queryClient.invalidateQueries({ 
+        predicate: (query) => {
+          const key = query.queryKey;
+          return Array.isArray(key) && key[0] === 'workers' && key[1] === 'category';
+        }
+      });
+      queryClient.invalidateQueries({ queryKey: ['worker', workerId] });
+      toast.success('Worker published successfully');
+    },
+    onError: (error: any) => {
+      const message = handleAdminApiErrorWithRedirect(error, navigate);
+      toast.error(message);
+    },
+  });
+}
+
+export function useUnpublishWorker() {
+  const { actor } = useActor();
+  const { getCredentials } = useAdminSession();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  return useMutation({
+    mutationFn: async (workerId: string) => {
+      if (!actor) throw new Error('Actor not available');
+      const session = getCredentials();
+      if (!session) throw new Error('Admin session not found');
+      return actor.unpublishWorker(session.username, session.password, workerId);
+    },
+    onSuccess: (_data, workerId) => {
+      // Invalidate all worker-related queries to ensure consistency
+      queryClient.invalidateQueries({ queryKey: ['workers'] });
+      queryClient.invalidateQueries({ queryKey: ['workersAdmin'] });
+      queryClient.invalidateQueries({ 
+        predicate: (query) => {
+          const key = query.queryKey;
+          return Array.isArray(key) && key[0] === 'workers' && key[1] === 'category';
+        }
+      });
+      queryClient.invalidateQueries({ queryKey: ['worker', workerId] });
+      toast.success('Worker unpublished');
     },
     onError: (error: any) => {
       const message = handleAdminApiErrorWithRedirect(error, navigate);

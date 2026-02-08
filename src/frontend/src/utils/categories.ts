@@ -36,3 +36,18 @@ export function getCategoryIcon(categoryId: string): number {
   };
   return iconMap[categoryId] ?? 8;
 }
+
+export function getCategoryImagePath(categoryId: string): string {
+  const imageMap: Record<string, string> = {
+    [CATEGORY_IDS.PLUMBER]: '/assets/generated/sevasangam-category-plumber.dim_512x512.png',
+    [CATEGORY_IDS.ELECTRICIAN]: '/assets/generated/sevasangam-category-electrician.dim_512x512.png',
+    [CATEGORY_IDS.MASON]: '/assets/generated/sevasangam-category-mason.dim_512x512.png',
+    [CATEGORY_IDS.HOUSE_CLEANER]: '/assets/generated/sevasangam-category-house-cleaner.dim_512x512.png',
+    [CATEGORY_IDS.GARDEN_CLEANER]: '/assets/generated/sevasangam-category-garden-cleaner.dim_512x512.png',
+    [CATEGORY_IDS.CARPENTER]: '/assets/generated/sevasangam-category-carpenter.dim_512x512.png',
+    [CATEGORY_IDS.PAINTER]: '/assets/generated/sevasangam-category-painter.dim_512x512.png',
+    [CATEGORY_IDS.MECHANIC]: '/assets/generated/sevasangam-category-mechanic.dim_512x512.png',
+    [CATEGORY_IDS.OTHER]: '/assets/generated/sevasangam-category-other.dim_512x512.png',
+  };
+  return imageMap[categoryId] ?? '/assets/generated/sevasangam-category-other.dim_512x512.png';
+}

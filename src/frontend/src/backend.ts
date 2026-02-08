@@ -137,6 +137,7 @@ export interface WorkerProfile {
     status: Status;
     principal: Principal;
     integrations: Integrations;
+    published: boolean;
     pricing: Pricing;
     availability: Schedule;
     years_experience: bigint;
@@ -229,12 +230,14 @@ export interface backendInterface {
     isCallerAdmin(): Promise<boolean>;
     isCallerApproved(): Promise<boolean>;
     listApprovals(): Promise<Array<UserApprovalInfo>>;
+    publishWorker(username: string | null, password: string | null, workerId: string): Promise<void>;
     registerWorker(profile: WorkerProfile): Promise<void>;
     rejectWorker(username: string | null, password: string | null, workerId: string): Promise<void>;
     removeWorker(username: string | null, password: string | null, workerId: string): Promise<void>;
     requestApproval(): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     setApproval(user: Principal, status: ApprovalStatus): Promise<void>;
+    unpublishWorker(username: string | null, password: string | null, workerId: string): Promise<void>;
     updateCategory(username: string | null, password: string | null, categoryId: string, category: Category): Promise<void>;
     updateInquiry(username: string | null, password: string | null, inquiryId: string, inquiry: Inquiry): Promise<void>;
     updateWorkerProfile(workerId: string, profile: WorkerProfile): Promise<void>;
@@ -662,6 +665,20 @@ export class Backend implements backendInterface {
             return from_candid_vec_n55(this._uploadFile, this._downloadFile, result);
         }
     }
+    async publishWorker(arg0: string | null, arg1: string | null, arg2: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.publishWorker(to_candid_opt_n8(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n8(this._uploadFile, this._downloadFile, arg1), arg2);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.publishWorker(to_candid_opt_n8(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n8(this._uploadFile, this._downloadFile, arg1), arg2);
+            return result;
+        }
+    }
     async registerWorker(arg0: WorkerProfile): Promise<void> {
         if (this.processError) {
             try {
@@ -743,6 +760,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.setApproval(arg0, to_candid_ApprovalStatus_n73(this._uploadFile, this._downloadFile, arg1));
+            return result;
+        }
+    }
+    async unpublishWorker(arg0: string | null, arg1: string | null, arg2: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.unpublishWorker(to_candid_opt_n8(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n8(this._uploadFile, this._downloadFile, arg1), arg2);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.unpublishWorker(to_candid_opt_n8(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n8(this._uploadFile, this._downloadFile, arg1), arg2);
             return result;
         }
     }
@@ -920,6 +951,7 @@ async function from_candid_record_n36(_uploadFile: (file: ExternalBlob) => Promi
     status: _Status;
     principal: Principal;
     integrations: _Integrations;
+    published: boolean;
     pricing: _Pricing;
     availability: _Schedule;
     years_experience: bigint;
@@ -933,6 +965,7 @@ async function from_candid_record_n36(_uploadFile: (file: ExternalBlob) => Promi
     status: Status;
     principal: Principal;
     integrations: Integrations;
+    published: boolean;
     pricing: Pricing;
     availability: Schedule;
     years_experience: bigint;
@@ -947,6 +980,7 @@ async function from_candid_record_n36(_uploadFile: (file: ExternalBlob) => Promi
         status: from_candid_Status_n37(_uploadFile, _downloadFile, value.status),
         principal: value.principal,
         integrations: from_candid_Integrations_n39(_uploadFile, _downloadFile, value.integrations),
+        published: value.published,
         pricing: from_candid_Pricing_n41(_uploadFile, _downloadFile, value.pricing),
         availability: from_candid_Schedule_n43(_uploadFile, _downloadFile, value.availability),
         years_experience: value.years_experience,
@@ -1248,6 +1282,7 @@ async function to_candid_record_n61(_uploadFile: (file: ExternalBlob) => Promise
     status: Status;
     principal: Principal;
     integrations: Integrations;
+    published: boolean;
     pricing: Pricing;
     availability: Schedule;
     years_experience: bigint;
@@ -1261,6 +1296,7 @@ async function to_candid_record_n61(_uploadFile: (file: ExternalBlob) => Promise
     status: _Status;
     principal: Principal;
     integrations: _Integrations;
+    published: boolean;
     pricing: _Pricing;
     availability: _Schedule;
     years_experience: bigint;
@@ -1275,6 +1311,7 @@ async function to_candid_record_n61(_uploadFile: (file: ExternalBlob) => Promise
         status: to_candid_Status_n62(_uploadFile, _downloadFile, value.status),
         principal: value.principal,
         integrations: to_candid_Integrations_n64(_uploadFile, _downloadFile, value.integrations),
+        published: value.published,
         pricing: to_candid_Pricing_n66(_uploadFile, _downloadFile, value.pricing),
         availability: to_candid_Schedule_n68(_uploadFile, _downloadFile, value.availability),
         years_experience: value.years_experience,

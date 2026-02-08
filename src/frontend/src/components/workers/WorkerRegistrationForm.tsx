@@ -69,6 +69,7 @@ export default function WorkerRegistrationForm({ onSubmit, isSubmitting }: Worke
         website_url: undefined,
       },
       status: 'pending' as any,
+      published: false,
     };
 
     await onSubmit(profile);

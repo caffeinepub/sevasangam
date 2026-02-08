@@ -2,12 +2,13 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-ensure-the-admin-dashboard-worker-list-reliably-shows-pending-workers-in-production-by-a-making-the-admin-worker-fetch-return-real-data-not-an-empty-list-caused-by-backend-state-reset-and-b-adding-explicit-error-ui-when-the-admin-worker-query-fails-network-unauthorized-instead-of-silently-showing-an-empty-state",
-      "featureTitle": "Ensure the Admin Dashboard worker list reliably shows Pending workers in production by (a) making the admin worker fetch return real data (not an empty list caused by backend state reset) and (b) adding explicit error UI when the admin worker query fails (network/unauthorized) instead of silently showing an empty state.",
+      "featureId": "feature-update-the-site-footer-so-it-displays-exactly-2026-crafted-with-care-and-remove-the-current-built-with-love-using-caffeine-ai-wording-including-the-heart-icon-the-literal-word-using-and-the-caffeine-ai-link",
+      "featureTitle": "Update the site footer so it displays exactly: \"© 2026 - Crafted with care\" and remove the current \"Built with love using caffeine.ai\" wording (including the heart icon, the literal word \"using\", and the caffeine.ai link).",
       "files": [
-        "frontend/src/components/admin/WorkersAdminPanel.tsx",
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/utils/adminApiErrorHandling.ts"
+        "frontend/src/components/layout/Footer.tsx",
+        "frontend/src/i18n/locales/as.ts",
+        "frontend/src/i18n/locales/en.ts",
+        "frontend/src/i18n/locales/hi.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -20,17 +21,35 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-28"
+        "REQ-1"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-ensure-approved-workers-reliably-appear-on-public-category-pages-and-search-results-in-production-by-surfacing-query-errors-instead-of-silently-treating-actor-unreachable-errors-as-an-empty-list-and-by-ensuring-public-worker-queries-refetch-successfully-after-deployment-and-after-admin-approval-actions",
-      "featureTitle": "Ensure approved workers reliably appear on public category pages and search results in production by surfacing query errors (instead of silently treating actor/unreachable errors as an empty list) and by ensuring public worker queries refetch successfully after deployment and after admin approval actions.",
+      "featureId": "feature-generate-and-add-cartoon-style-occupation-images-for-each-existing-service-category-and-store-them-as-static-assets-under-frontend-public-assets-generated-one-image-per-category-plumber-electrician-mason-house-cleaner-garden-cleaner-carpenter-painter-mechanic-and-other",
+      "featureTitle": "Generate and add cartoon-style occupation images for each existing service category and store them as static assets under frontend/public/assets/generated, one image per category: plumber, electrician, mason, house-cleaner, garden-cleaner, carpenter, painter, mechanic, and other.",
+      "files": [],
+      "components": [
+        "authorization@4.0.0",
+        "user-approval@3.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-the-service-category-ui-category-cards-grid-to-display-the-new-per-category-cartoon-images-matching-the-category-id-so-users-can-visually-identify-each-service-category-by-its-occupation-image",
+      "featureTitle": "Update the service category UI (category cards/grid) to display the new per-category cartoon images (matching the category ID) so users can visually identify each service category by its occupation image.",
       "files": [
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/pages/CategoryPage.tsx",
-        "frontend/src/pages/SearchResultsPage.tsx"
+        "frontend/src/components/categories/CategoryCardGrid.tsx",
+        "frontend/src/utils/categories.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -43,7 +62,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-29"
+        "REQ-3"
       ],
       "confidence": "high"
     }

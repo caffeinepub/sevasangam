@@ -1,11 +1,11 @@
 import { Link } from '@tanstack/react-router';
-import { CATEGORY_IDS, CATEGORY_NAMES, getCategoryIcon } from '../../utils/categories';
+import { CATEGORY_IDS, CATEGORY_NAMES, getCategoryImagePath } from '../../utils/categories';
 
 export default function CategoryCardGrid() {
   const categories = Object.entries(CATEGORY_NAMES).map(([id, name]) => ({
     id,
     name,
-    iconIndex: getCategoryIcon(id),
+    imagePath: getCategoryImagePath(id),
   }));
 
   return (
@@ -19,14 +19,11 @@ export default function CategoryCardGrid() {
         >
           <div className="bg-card border rounded-lg p-6 hover:shadow-md transition-all hover:border-primary">
             <div className="flex flex-col items-center text-center gap-3">
-              <div className="w-16 h-16 relative overflow-hidden">
-                <div
-                  className="absolute inset-0 bg-contain bg-no-repeat bg-center"
-                  style={{
-                    backgroundImage: `url(/assets/generated/sevasangam-category-icons-sprite.dim_1536x512.png)`,
-                    backgroundPosition: `${(category.iconIndex * -170)}px 0`,
-                    backgroundSize: '1530px 170px',
-                  }}
+              <div className="w-20 h-20 relative overflow-hidden rounded-lg">
+                <img
+                  src={category.imagePath}
+                  alt={category.name}
+                  className="w-full h-full object-cover"
                 />
               </div>
               <h3 className="font-semibold text-sm group-hover:text-primary transition-colors">

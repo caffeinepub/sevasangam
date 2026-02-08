@@ -52,25 +52,25 @@ export default function WorkerProfilePage() {
 
               <div className="grid sm:grid-cols-2 gap-3 text-sm">
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <Briefcase className="h-4 w-4 flex-shrink-0" />
+                  <Briefcase className="h-4 w-4 shrink-0" />
                   <span>{Number(worker.years_experience)} years experience</span>
                 </div>
 
                 {(worker.location.city || worker.location.district) && (
                   <div className="flex items-center gap-2 text-muted-foreground">
-                    <MapPin className="h-4 w-4 flex-shrink-0" />
+                    <MapPin className="h-4 w-4 shrink-0" />
                     <span>{[worker.location.city, worker.location.district].filter(Boolean).join(', ')}</span>
                   </div>
                 )}
 
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <Clock className="h-4 w-4 flex-shrink-0" />
+                  <Clock className="h-4 w-4 shrink-0" />
                   <span>{isFullTime ? 'Full-time' : 'Part-time'}</span>
                 </div>
 
                 {worker.pricing.rate_per_hour && (
                   <div className="flex items-center gap-2 text-muted-foreground">
-                    <DollarSign className="h-4 w-4 flex-shrink-0" />
+                    <DollarSign className="h-4 w-4 shrink-0" />
                     <span>₹{Number(worker.pricing.rate_per_hour)}/hour</span>
                   </div>
                 )}

@@ -1,60 +1,38 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-07T15:10:51.608Z",
-  "summary": "The diff adds frontend error/loading/empty states for admin and public worker lists, plus introduces a backend migration module and references migration in the main Motoko actor. However, the backend persistence across upgrades (stable state + upgrade hooks) is not evidenced in the diff summary, and key acceptance criteria around refetch/invalidation after approvals and admin unauthorized redirect are not conclusively shown due to truncation.",
+  "generatedAt": "2026-02-08T04:20:43.793Z",
+  "summary": "Footer text was updated to an i18n-driven single-line copyright string, and the category grid was updated to show per-category images via a new getCategoryImagePath mapping. However, the required static image assets themselves were not added in the diff, and the category grid now uses hardcoded English category names from utils (potentially changing localization behavior beyond the request).",
   "missing_requirements": [
     {
-      "id": "REQ-27",
-      "requirement": "Persist workers, categories, inquiries, and userProfiles across canister upgrades/deploys so production deployments do not reset data.",
-      "reason": "The diff shows in-memory `var` Maps for category/worker/inquiry/userProfiles and adds a migration module reference, but does not show any `stable` variables or `preupgrade`/`postupgrade` (or equivalent) logic required to actually persist and restore these maps across upgrades. The added migration module is a no-op returning `{}` and does not evidence preserving existing production state.",
+      "id": "REQ-2",
+      "requirement": "Generate and add cartoon-style occupation images for each existing service category and store them as static assets under frontend/public/assets/generated with the specified filenames.",
+      "reason": "The diff shows no new files added under frontend/public/assets/generated (or anywhere). getCategoryImagePath references these files, but the assets themselves are not present in the provided diff summary.",
       "evidence": [
-        "backend/main.mo",
-        "backend/migration.mo"
-      ]
-    },
-    {
-      "id": "REQ-28",
-      "requirement": "If useGetAllWorkersAdmin fails due to unauthorized, clear admin session and navigate to /admin-login, and do not display a misleading empty state before redirect.",
-      "reason": "WorkersAdminPanel adds an error UI, but the shown code path renders an ErrorState (including for session-expired messaging) and does not itself clear session or navigate. While helper functions for redirect exist, the diff summary does not show that the admin workers query uses them on query failure, so the redirect/clear-session AC is not confirmed.",
-      "evidence": [
-        "frontend/src/components/admin/WorkersAdminPanel.tsx",
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/utils/adminApiErrorHandling.ts"
-      ]
-    },
-    {
-      "id": "REQ-29",
-      "requirement": "After a worker is approved in the Admin Dashboard, navigating to the worker’s category page and the Search Results page shows the approved worker without requiring a hard refresh (via refetch/invalidation + backend persistence).",
-      "reason": "Public pages now surface query errors with retry, but the diff summary does not show React Query cache invalidation/refetch wiring after approve/reject actions (e.g., invalidating ['workers'] / category workers queries). WorkersAdminPanel calls approve mutation and shows a toast, but no evidence is shown that relevant public queries are invalidated/refetched after approval.",
-      "evidence": [
-        "frontend/src/components/admin/WorkersAdminPanel.tsx",
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/pages/CategoryPage.tsx",
-        "frontend/src/pages/SearchResultsPage.tsx"
+        "File diff summary: \"Added: 0\"",
+        "frontend/src/utils/categories.ts (references /assets/generated/*.png paths)"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Introduced a backend migration module and wired `(with migration = Migration.run)` even though the migration is a no-op and persistence logic is not evidenced.",
-      "reason": "BuildRequest allows a migration file only if required to preserve existing production state, but the added `backend/migration.mo` contains only empty types and returns `{}`, which does not appear to implement any state preservation or conditional migration policy per the request.",
+      "description": "Category grid now derives category display names from a hardcoded CATEGORY_NAMES map (English strings) instead of i18n translations, which may remove/alter localized category naming behavior.",
+      "reason": "REQ-3 only asked to display per-category images and keep layout responsive; it did not ask to change how category names are sourced/displayed. Using CATEGORY_NAMES may override prior localized names.",
       "evidence": [
-        "backend/migration.mo",
-        "backend/main.mo"
+        "frontend/src/components/categories/CategoryCardGrid.tsx",
+        "frontend/src/utils/categories.ts (CATEGORY_NAMES map)"
       ]
     }
   ],
-  "confidence": 0.55,
+  "confidence": 0.72,
   "changed_files": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/admin/WorkersAdminPanel.tsx",
-    "frontend/src/hooks/useQueries.ts",
-    "frontend/src/pages/CategoryPage.tsx",
-    "frontend/src/pages/SearchResultsPage.tsx",
-    "frontend/src/utils/adminApiErrorHandling.ts",
+    "frontend/src/components/categories/CategoryCardGrid.tsx",
+    "frontend/src/components/layout/Footer.tsx",
+    "frontend/src/i18n/locales/as.ts",
+    "frontend/src/i18n/locales/en.ts",
+    "frontend/src/i18n/locales/hi.ts",
+    "frontend/src/utils/categories.ts",
     "project_state.json"
   ]
 }

@@ -6,6 +6,7 @@ export function isUnauthorizedError(error: any): boolean {
     errorMessage.includes('Unauthorized') ||
     errorMessage.includes('Only admins') ||
     errorMessage.includes('Admin privileges') ||
+    errorMessage.includes('Admin session not found') ||
     errorMessage.includes('trap')
   );
 }

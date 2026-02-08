@@ -55,6 +55,7 @@ export interface WorkerProfile {
     status: Status;
     principal: Principal;
     integrations: Integrations;
+    published: boolean;
     pricing: Pricing;
     availability: Schedule;
     years_experience: bigint;
@@ -136,12 +137,14 @@ export interface backendInterface {
     isCallerAdmin(): Promise<boolean>;
     isCallerApproved(): Promise<boolean>;
     listApprovals(): Promise<Array<UserApprovalInfo>>;
+    publishWorker(username: string | null, password: string | null, workerId: string): Promise<void>;
     registerWorker(profile: WorkerProfile): Promise<void>;
     rejectWorker(username: string | null, password: string | null, workerId: string): Promise<void>;
     removeWorker(username: string | null, password: string | null, workerId: string): Promise<void>;
     requestApproval(): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     setApproval(user: Principal, status: ApprovalStatus): Promise<void>;
+    unpublishWorker(username: string | null, password: string | null, workerId: string): Promise<void>;
     updateCategory(username: string | null, password: string | null, categoryId: string, category: Category): Promise<void>;
     updateInquiry(username: string | null, password: string | null, inquiryId: string, inquiry: Inquiry): Promise<void>;
     updateWorkerProfile(workerId: string, profile: WorkerProfile): Promise<void>;

@@ -100,13 +100,13 @@ export default function SearchResultsPage() {
           )}
 
           <p className="text-lg text-muted-foreground">
-            {filteredWorkers.length} {filteredWorkers.length === 1 ? 'worker' : 'workers'} found
+            {filteredWorkers.length} published {filteredWorkers.length === 1 ? 'worker' : 'workers'} found
           </p>
         </div>
 
         {filteredWorkers.length === 0 ? (
           <EmptyState
-            title="No approved workers found"
+            title="No published workers found"
             description="Try adjusting your filters or search criteria."
             action={
               hasFilters ? (

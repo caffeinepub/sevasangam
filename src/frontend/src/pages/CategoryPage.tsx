@@ -61,14 +61,14 @@ export default function CategoryPage() {
         <div className="space-y-2">
           <h1 className="text-4xl font-bold">{categoryName}</h1>
           <p className="text-lg text-muted-foreground">
-            {workers.length} approved {workers.length === 1 ? 'worker' : 'workers'} available
+            {workers.length} published {workers.length === 1 ? 'worker' : 'workers'} available
           </p>
         </div>
 
         {workers.length === 0 ? (
           <EmptyState
             title="No workers found"
-            description={`No approved workers are currently available in the ${categoryName} category.`}
+            description={`No published workers are currently available in the ${categoryName} category.`}
           />
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
