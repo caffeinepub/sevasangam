@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { useGetAllWorkersAdmin, useApproveWorker, useRejectWorker, useRemoveWorker, usePublishWorker, useUnpublishWorker, useUpdateWorkerCategoryAdmin, useGetAllCategories, useGetAllInquiriesAdmin } from '../../hooks/useQueries';
+import { useGetAllWorkersAdmin, useApproveWorker, useRejectWorker, useRemoveWorker, usePublishWorker, useUnpublishWorker, useUpdateWorkerCategoryAdmin, useGetAllCategories, useGetAllInquiriesAdmin, useUpdateInquiry } from '../../hooks/useQueries';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { CheckCircle, XCircle, Trash2, Eye, EyeOff, Loader2, Edit3 } from 'lucide-react';
+import { CheckCircle, XCircle, Trash2, Eye, EyeOff, Loader2, Edit3, Check } from 'lucide-react';
 import { toast } from 'sonner';
-import type { WorkerProfile } from '../../backend';
+import type { WorkerProfile, Inquiry } from '../../backend';
 import { InquiryStatus } from '../../backend';
 
 function EmptyState({ title, description }: { title: string; description?: string }) {
@@ -29,11 +29,13 @@ export default function WorkersAdminPanel() {
   const publishWorker = usePublishWorker();
   const unpublishWorker = useUnpublishWorker();
   const updateCategory = useUpdateWorkerCategoryAdmin();
+  const updateInquiry = useUpdateInquiry();
   const [changeCategoryDialog, setChangeCategoryDialog] = useState<{ open: boolean; worker: WorkerProfile | null }>({
     open: false,
     worker: null,
   });
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
+  const [completingInquiryId, setCompletingInquiryId] = useState<string | null>(null);
 
   const handleApprove = async (workerId: string) => {
     try {
@@ -100,16 +102,42 @@ export default function WorkersAdminPanel() {
     }
   };
 
+  const handleMarkCompleted = async (inquiry: Inquiry) => {
+    setCompletingInquiryId(inquiry.id);
+    try {
+      const updatedInquiry: Inquiry = {
+        ...inquiry,
+        status: InquiryStatus.completed,
+      };
+      await updateInquiry.mutateAsync({
+        inquiryId: inquiry.id,
+        inquiry: updatedInquiry,
+      });
+      toast.success('Job marked as completed');
+    } catch (error) {
+      toast.error('Failed to mark job as completed');
+    } finally {
+      setCompletingInquiryId(null);
+    }
+  };
+
   const getCategoryName = (categoryId: string) => {
     const category = categories.find((c) => c.id === categoryId);
     return category?.name || categoryId;
   };
 
-  const getWorkerJobStats = (workerId: string) => {
-    const workerInquiries = inquiries.filter(inq => inq.worker_id === workerId);
-    const pending = workerInquiries.filter(inq => inq.status === InquiryStatus.pending || inq.status === InquiryStatus.new_).length;
-    const completed = workerInquiries.filter(inq => inq.status === InquiryStatus.completed).length;
-    return { pending, completed, total: workerInquiries.length };
+  const getWorkerInquiries = (workerId: string) => {
+    return inquiries.filter(inq => inq.worker_id === workerId);
+  };
+
+  const getStatusBadge = (status: InquiryStatus) => {
+    if (status === InquiryStatus.completed) {
+      return <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">Completed</Badge>;
+    }
+    if (status === InquiryStatus.pending) {
+      return <Badge className="bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">Pending</Badge>;
+    }
+    return <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">New</Badge>;
   };
 
   if (isLoading) {
@@ -129,7 +157,7 @@ export default function WorkersAdminPanel() {
       <h2 className="text-2xl font-bold">Worker Management</h2>
       <div className="grid gap-4">
         {workers.map((worker) => {
-          const jobStats = getWorkerJobStats(worker.id);
+          const workerInquiries = getWorkerInquiries(worker.id);
           return (
             <Card key={worker.id}>
               <CardHeader>
@@ -142,15 +170,6 @@ export default function WorkersAdminPanel() {
                     <p className="text-sm text-muted-foreground">
                       {worker.location.city || 'Location not specified'}
                     </p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className="text-xs font-medium text-amber-700 dark:text-amber-400">
-                        Jobs: {jobStats.pending} pending
-                      </span>
-                      <span className="text-xs text-muted-foreground">•</span>
-                      <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
-                        {jobStats.completed} completed
-                      </span>
-                    </div>
                   </div>
                   <div className="flex flex-col gap-2 items-end">
                     <div className="flex gap-2">
@@ -168,7 +187,7 @@ export default function WorkersAdminPanel() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
                 <div className="flex flex-wrap gap-2">
                   {worker.status === 'pending' && (
                     <>
@@ -206,6 +225,47 @@ export default function WorkersAdminPanel() {
                     Remove
                   </Button>
                 </div>
+
+                {workerInquiries.length > 0 && (
+                  <div className="border-t pt-4 mt-4">
+                    <h4 className="text-sm font-semibold mb-3">Assigned Jobs ({workerInquiries.length})</h4>
+                    <div className="space-y-2">
+                      {workerInquiries.map((inquiry) => (
+                        <div key={inquiry.id} className="flex items-start justify-between gap-4 p-3 bg-muted/50 rounded-lg">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              {getStatusBadge(inquiry.status)}
+                              <span className="text-xs text-muted-foreground">
+                                {new Date(Number(inquiry.created_at) / 1000000).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <p className="text-sm font-medium">{inquiry.customer_name || 'Anonymous'}</p>
+                            <p className="text-xs text-muted-foreground">{inquiry.customer_contact || 'No contact'}</p>
+                            <p className="text-sm mt-1 line-clamp-2">{inquiry.inquiry_text}</p>
+                          </div>
+                          {inquiry.status !== InquiryStatus.completed && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleMarkCompleted(inquiry)}
+                              disabled={completingInquiryId === inquiry.id}
+                              className="shrink-0"
+                            >
+                              {completingInquiryId === inquiry.id ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <>
+                                  <Check className="mr-2 h-4 w-4" />
+                                  Mark Completed
+                                </>
+                              )}
+                            </Button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           );
@@ -238,15 +298,9 @@ export default function WorkersAdminPanel() {
             <Button variant="outline" onClick={() => setChangeCategoryDialog({ open: false, worker: null })}>
               Cancel
             </Button>
-            <Button onClick={handleChangeCategory} disabled={updateCategory.isPending || !selectedCategoryId}>
-              {updateCategory.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Updating...
-                </>
-              ) : (
-                'Update Category'
-              )}
+            <Button onClick={handleChangeCategory} disabled={updateCategory.isPending}>
+              {updateCategory.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Update Category
             </Button>
           </DialogFooter>
         </DialogContent>

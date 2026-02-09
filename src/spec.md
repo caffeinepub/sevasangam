@@ -1,12 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Ensure only admins can mark inquiries/jobs as completed, while workers can still view up-to-date completion status in their dashboard.
+**Goal:** Simplify the Worker Dashboard to only show the worker’s job list, and restore a working admin-only per-job “Mark Completed” action within each worker’s assigned jobs list.
 
 **Planned changes:**
-- Remove/hide any worker-facing "Mark as Completed" UI and prevent the worker UI from triggering any completion action/API.
-- Add an admin-only "Mark Completed" control in the admin inquiry management UI for non-completed inquiries.
-- Update backend authorization to reject any non-admin attempts to mark an inquiry/job completed, while allowing admin-authorized updates to set status to completed.
-- Ensure worker job lists display status badges (e.g., Pending/Completed) based on inquiry status and reflect admin-made completion changes after refresh/refetch.
+- Remove all statistic/summary cards from the Worker Dashboard while keeping the “My Jobs” list (including loading/empty/error states) unchanged.
+- In the Admin Dashboard worker management view, display each worker’s assigned inquiries as individual job cards within that worker’s section.
+- Add a visible “Mark Completed” button on each non-completed job card in the admin worker job list, and hide it for already completed jobs.
+- Wire the admin “Mark Completed” button to update the inquiry status to completed via existing admin-authorized backend calls, then refetch/invalidate relevant queries so both admin and worker UIs reflect the updated status without a full page reload.
 
-**User-visible outcome:** Workers can no longer mark jobs completed and will only see completion status updates after an admin marks an inquiry/job as completed; admins have a dedicated control to complete inquiries in the admin interface.
+**User-visible outcome:** Workers see only their job list on the Worker Dashboard (no summary metrics). Admins can view each worker’s assigned jobs and mark individual jobs completed, with the updated status appearing immediately in both admin and worker job lists.

@@ -1,49 +1,49 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-08T13:41:52.982Z",
+  "generatedAt": "2026-02-08T14:44:52.506Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
     "total": 3,
-    "implemented": 2,
+    "implemented": 3,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Remove the ability for workers to mark jobs/inquiries as completed from the worker UI by hiding the \"Mark as Completed\" button and eliminating any worker-side action that triggers completion.",
+        "summary": "Remove all statistic/summary boxes from the Worker Dashboard so the worker sees no job summary metrics (e.g., Total Jobs, Pending, Completed) and the page remains functional with the worker’s job list section intact.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/workers/WorkerJobsList.tsx",
-          "frontend/src/pages/WorkerDashboardPage.tsx",
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/pages/WorkerDashboardPage.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/workers/WorkerJobsList.tsx",
-          "frontend/src/pages/WorkerDashboardPage.tsx",
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/pages/WorkerDashboardPage.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Provide an admin-only \"Mark Completed\" control in the admin interface to set a job/inquiry status to completed, and ensure that once the admin marks it completed, workers see the same job as completed in their dashboard.",
+        "summary": "In the Admin Dashboard’s worker management view, show each worker’s assigned jobs (inquiries) and render a visible 'Mark Completed' button on each individual job card for that worker when the job is not yet completed.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/admin/InquiriesAdminPanel.tsx",
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/components/admin/WorkersAdminPanel.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/admin/InquiriesAdminPanel.tsx",
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/components/admin/WorkersAdminPanel.tsx"
         ]
       },
       {
         "id": "REQ-3",
-        "summary": "Update backend authorization so that worker callers cannot mark an inquiry/job as completed via dedicated completion endpoints; completion must be an admin-only operation (e.g., via existing admin update inquiry flows).",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
+        "summary": "Wire the Admin 'Mark Completed' button to update the inquiry status to completed using existing admin-authorized backend calls, then refresh relevant admin and worker job data so the completed status appears immediately.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/admin/WorkersAdminPanel.tsx",
+          "frontend/src/hooks/useQueries.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/admin/WorkersAdminPanel.tsx",
+          "frontend/src/hooks/useQueries.ts"
+        ]
       }
     ]
   },
@@ -53,12 +53,7 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
-    "frontend/src/components/admin/InquiriesAdminPanel.tsx",
-    "frontend/src/components/workers/WorkerJobsList.tsx",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
+    "frontend/src/components/admin/WorkersAdminPanel.tsx",
     "frontend/src/hooks/useQueries.ts",
     "frontend/src/pages/WorkerDashboardPage.tsx",
     "project_state.json",

@@ -1,77 +1,74 @@
 {
   "kind": "build_request",
-  "title": "Restrict job completion to admin only and reflect completion status for workers",
-  "priority": "normal",
+  "title": "Simplify worker dashboard and restore admin 'Mark Completed' per worker job cards",
+  "priority": "high",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Remove the ability for workers to mark jobs/inquiries as completed from the worker UI by hiding the \"Mark as Completed\" button and eliminating any worker-side action that triggers completion.",
+      "text": "Remove all statistic/summary boxes from the Worker Dashboard so the worker sees no job summary metrics (e.g., Total Jobs, Pending, Completed) and the page remains functional with the worker’s job list section intact.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4",
-          "msg-5"
+          "user-1"
         ],
         "quotes": [
-          "the \"Mark Completed\" button should only be visible on the admin’s interface and completely hidden from the worker’s view.",
-          "the system is simply not involved (they only call the admin )."
+          "remove work assigned, pending, total jobs and all from worker's dashboard",
+          "yes, i want every statistic/summary box removed from the worker dashboard, leaving only their job list"
         ]
       },
       "acceptanceCriteria": [
-        "In the worker dashboard jobs list, no \"Mark as Completed\" (or equivalent) button/action is visible for any job status.",
-        "Worker UI does not attempt to call any completion mutation/API when a job is pending/new.",
-        "The worker jobs list still shows status badges (e.g., Pending/Completed) based on the inquiry status."
+        "On WorkerDashboardPage, the summary/stat cards (Total Jobs, Pending, Completed) are not rendered.",
+        "Worker dashboard still renders the 'My Jobs' list as before (including empty/loading/error states).",
+        "No new statistics/summary UI is introduced elsewhere on the worker dashboard as a replacement."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Provide an admin-only \"Mark Completed\" control in the admin interface to set a job/inquiry status to completed, and ensure that once the admin marks it completed, workers see the same job as completed in their dashboard.",
+      "text": "In the Admin Dashboard’s worker management view, show each worker’s assigned jobs (inquiries) and render a visible 'Mark Completed' button on each individual job card for that worker when the job is not yet completed.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4",
-          "msg-5"
+          "user-1"
         ],
         "quotes": [
-          "only admin will mark the complete button, once the work is done. not the worker.",
-          "yes, it should show as task completed on the worker side too after admin marks it as job completed."
+          "'mark completed' button is still not showing in the admin dashboard, in the respective workers jobs. fix all that.",
+          "yes, the button should appear on each individual job card inside each worker’s job list"
         ]
       },
       "acceptanceCriteria": [
-        "In the admin inquiry management UI, admins can mark an inquiry as completed via an explicit admin-only action (e.g., a \"Mark Completed\" button) for non-completed inquiries.",
-        "After the admin marks an inquiry completed, the worker dashboard jobs list reflects the job as \"Completed\" (badge/label) after data refresh (React Query invalidation/refetch).",
-        "No admin completion controls are shown anywhere in the worker-facing UI."
+        "In WorkersAdminPanel, each worker card includes a list of that worker’s inquiries (filtered by worker_id) with a per-inquiry/job card UI.",
+        "Each inquiry/job card in the worker’s job list shows a 'Mark Completed' button when its status is not completed.",
+        "The 'Mark Completed' button is not shown for jobs already completed."
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Update backend authorization so that worker callers cannot mark an inquiry/job as completed via dedicated completion endpoints; completion must be an admin-only operation (e.g., via existing admin update inquiry flows).",
-      "target": "backend",
+      "text": "Wire the Admin 'Mark Completed' button to update the inquiry status to completed using existing admin-authorized backend calls, then refresh relevant admin and worker job data so the completed status appears immediately.",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-4",
-          "msg-5"
+          "user-1"
         ],
         "quotes": [
-          "only admin will mark the complete button, once the work is done. not the worker."
+          "fix all that. make it flawless. dont repeat mistakes"
         ]
       },
       "acceptanceCriteria": [
-        "Calls to backend completion methods intended for workers (e.g., markInquiryAsCompleted/markJobAsCompleted) fail for non-admin callers with an unauthorized error/trap.",
-        "Admin can still set an inquiry to completed through existing admin-authorized update mechanisms (e.g., updateInquiry with admin credentials).",
-        "Worker job status returned by getMyWorkItems reflects the updated completed status after admin updates it."
+        "Clicking 'Mark Completed' updates the corresponding inquiry’s status to completed via an admin-authorized backend call (no worker-auth flow).",
+        "After completion, the admin UI reflects the updated completed status without a full page reload (queries are invalidated/refetched).",
+        "The worker’s 'My Jobs' list reflects the updated completed status after the relevant query refetch/invalidation."
       ]
     }
   ],
   "constraints": [
-    "Use English for any user-facing text.",
-    "Do not edit frontend immutable paths listed in SYSTEM_CONTEXT (e.g., frontend/src/hooks/useActor.ts, frontend/src/hooks/useInternetIdentity.ts(x), frontend/src/main.tsx, frontend/src/components/ui).",
-    "Backend must remain a single Motoko actor in backend/main.mo; only add backend/migration.mo if state schema changes require migration."
+    "Do not edit files under frontend/src/components/ui (read-only UI components).",
+    "Do not modify frontend immutable hook files (frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx).",
+    "Backend must remain a single Motoko actor in backend/main.mo; add migration.mo only if state schema changes (avoid schema changes for this request)."
   ],
   "nonGoals": [
-    "Do not add any in-app worker workflow for notifying admin of completion (worker will call admin outside the system).",
-    "Do not implement real-time updates (e.g., websockets/push); status updates can rely on refetch/invalidation.",
-    "Do not change inquiry/job data model unless required to enforce authorization."
+    "Do not add new worker-visible controls to complete jobs (job completion remains admin-only).",
+    "Do not change admin authentication/credential behavior beyond what is required to make 'Mark Completed' work.",
+    "Do not redesign unrelated admin panels (Categories/Inquiries panels) except as needed for this fix."
   ],
   "imageRequirements": {
     "required": [],

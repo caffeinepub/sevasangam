@@ -2,11 +2,9 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-remove-the-ability-for-workers-to-mark-jobs-inquiries-as-completed-from-the-worker-ui-by-hiding-the-mark-as-completed-button-and-eliminating-any-worker-side-action-that-triggers-completion",
-      "featureTitle": "Remove the ability for workers to mark jobs/inquiries as completed from the worker UI by hiding the \"Mark as Completed\" button and eliminating any worker-side action that triggers completion.",
+      "featureId": "feature-remove-all-statistic-summary-boxes-from-the-worker-dashboard-so-the-worker-sees-no-job-summary-metrics-e-g-total-jobs-pending-completed-and-the-page-remains-functional-with-the-worker-s-job-list-section-intact",
+      "featureTitle": "Remove all statistic/summary boxes from the Worker Dashboard so the worker sees no job summary metrics (e.g., Total Jobs, Pending, Completed) and the page remains functional with the worker’s job list section intact.",
       "files": [
-        "frontend/src/components/workers/WorkerJobsList.tsx",
-        "frontend/src/hooks/useQueries.ts",
         "frontend/src/pages/WorkerDashboardPage.tsx"
       ],
       "components": [
@@ -25,11 +23,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-provide-an-admin-only-mark-completed-control-in-the-admin-interface-to-set-a-job-inquiry-status-to-completed-and-ensure-that-once-the-admin-marks-it-completed-workers-see-the-same-job-as-completed-in-their-dashboard",
-      "featureTitle": "Provide an admin-only \"Mark Completed\" control in the admin interface to set a job/inquiry status to completed, and ensure that once the admin marks it completed, workers see the same job as completed in their dashboard.",
+      "featureId": "feature-in-the-admin-dashboard-s-worker-management-view-show-each-worker-s-assigned-jobs-inquiries-and-render-a-visible-mark-completed-button-on-each-individual-job-card-for-that-worker-when-the-job-is-not-yet-completed",
+      "featureTitle": "In the Admin Dashboard’s worker management view, show each worker’s assigned jobs (inquiries) and render a visible 'Mark Completed' button on each individual job card for that worker when the job is not yet completed.",
       "files": [
-        "frontend/src/components/admin/InquiriesAdminPanel.tsx",
-        "frontend/src/hooks/useQueries.ts"
+        "frontend/src/components/admin/WorkersAdminPanel.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -43,6 +40,28 @@
       ],
       "testIds": [
         "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-wire-the-admin-mark-completed-button-to-update-the-inquiry-status-to-completed-using-existing-admin-authorized-backend-calls-then-refresh-relevant-admin-and-worker-job-data-so-the-completed-status-appears-immediately",
+      "featureTitle": "Wire the Admin 'Mark Completed' button to update the inquiry status to completed using existing admin-authorized backend calls, then refresh relevant admin and worker job data so the completed status appears immediately.",
+      "files": [
+        "frontend/src/components/admin/WorkersAdminPanel.tsx",
+        "frontend/src/hooks/useQueries.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "user-approval@3.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
       ],
       "confidence": "high"
     }

@@ -1,26 +1,34 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Task/job management app with admin and worker roles; only admin can mark tasks completed and workers see completion status after admin updates it.",
-  "architectural_notes": [
-    "Role-based UI permissions: 'Mark Completed' control visible/actionable only for admin; completion status must propagate to worker view."
+  "summary": "New project",
+  "architectural_notes": [],
+  "known_issues": [
+    "'Mark completed' button is not showing in the admin dashboard within the respective worker's jobs"
   ],
-  "known_issues": [],
-  "isFixRequest": false,
+  "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-remove-the-ability-for-workers-to-mark-jobs-inquiries-as-completed-from-the-worker-ui-by-hiding-the-mark-as-completed-button-and-eliminating-any-worker-side-action-that-triggers-completion",
-      "title": "Remove the ability for workers to mark jobs/inquiries as completed from the worker UI by hiding the \"Mark as Completed\" button and eliminating any worker-side action that triggers completion.",
+      "id": "feature-remove-all-statistic-summary-boxes-from-the-worker-dashboard-so-the-worker-sees-no-job-summary-metrics-e-g-total-jobs-pending-completed-and-the-page-remains-functional-with-the-worker-s-job-list-section-intact",
+      "title": "Remove all statistic/summary boxes from the Worker Dashboard so the worker sees no job summary metrics (e.g., Total Jobs, Pending, Completed) and the page remains functional with the worker’s job list section intact.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-provide-an-admin-only-mark-completed-control-in-the-admin-interface-to-set-a-job-inquiry-status-to-completed-and-ensure-that-once-the-admin-marks-it-completed-workers-see-the-same-job-as-completed-in-their-dashboard",
-      "title": "Provide an admin-only \"Mark Completed\" control in the admin interface to set a job/inquiry status to completed, and ensure that once the admin marks it completed, workers see the same job as completed in their dashboard.",
+      "id": "feature-in-the-admin-dashboard-s-worker-management-view-show-each-worker-s-assigned-jobs-inquiries-and-render-a-visible-mark-completed-button-on-each-individual-job-card-for-that-worker-when-the-job-is-not-yet-completed",
+      "title": "In the Admin Dashboard’s worker management view, show each worker’s assigned jobs (inquiries) and render a visible 'Mark Completed' button on each individual job card for that worker when the job is not yet completed.",
       "reqIds": [
         "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-wire-the-admin-mark-completed-button-to-update-the-inquiry-status-to-completed-using-existing-admin-authorized-backend-calls-then-refresh-relevant-admin-and-worker-job-data-so-the-completed-status-appears-immediately",
+      "title": "Wire the Admin 'Mark Completed' button to update the inquiry status to completed using existing admin-authorized backend calls, then refresh relevant admin and worker job data so the completed status appears immediately.",
+      "reqIds": [
+        "REQ-3"
       ],
       "version": 1
     }
@@ -28,20 +36,18 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Restrict 'Mark Completed' action to admin only (hidden from workers); workers call admin to report completion; once admin marks complete, worker UI shows task as completed.",
+      "summary": "Remove all statistic/summary boxes from the worker dashboard, leaving only the worker's job list",
       "reqIds": [],
       "status": "pending"
     },
     {
-      "id": "AR-4",
-      "summary": "Update backend authorization so that worker callers cannot mark an inquiry/job as completed via dedicated completion endpoints; completion must be an admin-only operation (e.g., via existing admin update inquiry flows).",
-      "reqIds": [
-        "REQ-3"
-      ],
+      "id": "AR-2",
+      "summary": "Fix admin dashboard so the 'mark completed' button appears on each individual job card inside each worker’s job list",
+      "reqIds": [],
       "status": "pending"
     }
   ],
-  "projectName": "Restrict job completion to admin only and reflect completion status for workers",
+  "projectName": "Simplify worker dashboard and restore admin 'Mark Completed' per worker job cards",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

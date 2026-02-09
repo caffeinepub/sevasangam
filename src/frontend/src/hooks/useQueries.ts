@@ -436,6 +436,7 @@ export function useUpdateInquiry() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['inquiriesAdmin'] });
       queryClient.invalidateQueries({ queryKey: ['workerJobs'] });
+      queryClient.invalidateQueries({ queryKey: ['workerJobs', 'me'] });
     },
     onError: (error: any) => {
       const message = handleAdminApiErrorWithRedirect(error, navigate);
@@ -460,6 +461,7 @@ export function useDeleteInquiry() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['inquiriesAdmin'] });
       queryClient.invalidateQueries({ queryKey: ['workerJobs'] });
+      queryClient.invalidateQueries({ queryKey: ['workerJobs', 'me'] });
     },
     onError: (error: any) => {
       const message = handleAdminApiErrorWithRedirect(error, navigate);

@@ -1,52 +1,58 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Admin-only job completion controls with worker status reflection",
+  "title": "Simplify worker dashboard and restore admin per-job 'Mark Completed' actions",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Remove worker-side job completion action while preserving status visibility in the worker dashboard.",
+      "summary": "Remove all job statistic/summary cards from the Worker Dashboard while keeping the 'My Jobs' list behavior unchanged.",
       "acceptanceCriteria": [
-        "In the worker dashboard jobs list, no \"Mark as Completed\" (or equivalent) button/action is visible for any job status.",
-        "Worker UI does not attempt to call any completion mutation/API when a job is pending/new.",
-        "The worker jobs list still shows status badges (e.g., Pending/Completed) based on the inquiry status."
+        "On WorkerDashboardPage, the summary/stat cards (Total Jobs, Pending, Completed) are not rendered.",
+        "Worker dashboard still renders the 'My Jobs' list as before (including empty/loading/error states).",
+        "No new statistics/summary UI is introduced elsewhere on the worker dashboard as a replacement."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/workers/WorkerJobsList.tsx",
-          "operation": "modify",
-          "description": "Remove the worker-only completion UI by deleting the \"Mark as Completed\" button rendering and eliminating the onMarkCompleted/markingJobId props; keep status badges (Pending/Completed) driven by InquiryStatus. Verify the component's usage instructions before implementing."
-        },
-        {
           "path": "frontend/src/pages/WorkerDashboardPage.tsx",
           "operation": "modify",
-          "description": "Remove all worker-side completion wiring: drop useMarkInquiryAsCompleted import/usage, remove marking state and handler, and render WorkerJobsList without completion-related props while still showing status/counts based on InquiryStatus. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Remove the worker completion mutation hook (useMarkInquiryAsCompleted) so the worker UI cannot trigger completion; ensure any remaining worker job queries (useGetMyWorkItems) continue to drive status display and refresh behavior. Verify the component's usage instructions before implementing."
+          "description": "Remove the summary/statistics Card grid (Total Jobs/Pending/Completed) and any now-unused derived counts/imports, ensuring the 'My Jobs' section (loading/error/empty states via WorkerJobsList) remains intact and functional."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Add an explicit admin-only \"Mark Completed\" control in admin inquiry management and ensure worker dashboards reflect completion after refresh/invalidation.",
+      "summary": "In the Admin Dashboard worker management view, render each worker’s assigned inquiries as job cards with a per-card 'Mark Completed' control when not completed.",
       "acceptanceCriteria": [
-        "In the admin inquiry management UI, admins can mark an inquiry as completed via an explicit admin-only action (e.g., a \"Mark Completed\" button) for non-completed inquiries.",
-        "After the admin marks an inquiry completed, the worker dashboard jobs list reflects the job as \"Completed\" (badge/label) after data refresh (React Query invalidation/refetch).",
-        "No admin completion controls are shown anywhere in the worker-facing UI."
+        "In WorkersAdminPanel, each worker card includes a list of that worker’s inquiries (filtered by worker_id) with a per-inquiry/job card UI.",
+        "Each inquiry/job card in the worker’s job list shows a 'Mark Completed' button when its status is not completed.",
+        "The 'Mark Completed' button is not shown for jobs already completed."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/admin/InquiriesAdminPanel.tsx",
+          "path": "frontend/src/components/admin/WorkersAdminPanel.tsx",
           "operation": "modify",
-          "description": "Add an explicit \"Mark Completed\" admin-only button per inquiry (shown only when status is not completed) that triggers the existing admin update flow to set status to completed; rely on existing RequireAdmin/admin session gating for admin-only access (authorization component role-based access control). Verify the component's usage instructions before implementing."
+          "description": "Extend each worker Card to include a nested list of that worker’s inquiries (filtered from inquiriesAdmin by worker_id). Render each inquiry as its own job card row/mini-card with status display and a visible 'Mark Completed' Button only when status is not completed; keep existing worker management controls unchanged."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Wire the Admin per-job 'Mark Completed' action to the existing admin-authorized inquiry update call and refresh admin + worker job data immediately via React Query invalidation/refetch.",
+      "acceptanceCriteria": [
+        "Clicking 'Mark Completed' updates the corresponding inquiry’s status to completed via an admin-authorized backend call (no worker-auth flow).",
+        "After completion, the admin UI reflects the updated completed status without a full page reload (queries are invalidated/refetched).",
+        "The worker’s 'My Jobs' list reflects the updated completed status after the relevant query refetch/invalidation."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/admin/WorkersAdminPanel.tsx",
+          "operation": "modify",
+          "description": "Use the existing useUpdateInquiry mutation to implement the per-inquiry 'Mark Completed' handler (setting status to completed), add in-flight UI state (disable the clicked button / show progress), and rely on React Query invalidation to refresh both admin inquiries data and worker job lists."
         },
         {
           "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Confirm/adjust React Query invalidation so that successful admin inquiry updates that set status to completed invalidate/refetch both admin inquiries and worker jobs queries (e.g., ['workerJobs','me']) to reflect completion on the worker dashboard after refresh. Verify the component's usage instructions before implementing."
+          "description": "Harden React Query cache refresh for admin inquiry updates: ensure useUpdateInquiry (and any related inquiry mutations) invalidates/refetches admin inquiries queries and the worker job list queries (including the exact worker 'me' key), so both AdminDashboard and WorkerDashboard reflect completion immediately without a full reload."
         }
       ]
     }

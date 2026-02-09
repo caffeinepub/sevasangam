@@ -9,7 +9,6 @@ import WorkerProfileEditor from '../components/workers/WorkerProfileEditor';
 import WorkerJobsList from '../components/workers/WorkerJobsList';
 import ConnectionErrorNotice from '../components/errors/ConnectionErrorNotice';
 import PostCallAlarmHost from '../components/alarms/PostCallAlarmHost';
-import { InquiryStatus } from '../backend';
 
 function WorkerDashboardContent() {
   const { data: profile, isLoading: profileLoading, error: profileError, refetch: refetchProfile } = useGetMyWorkerProfile();
@@ -82,9 +81,6 @@ function WorkerDashboardContent() {
     return <Badge className={config.className}>{config.label}</Badge>;
   };
 
-  const pendingJobs = jobs.filter(job => job.status === InquiryStatus.pending || job.status === InquiryStatus.new_);
-  const completedJobs = jobs.filter(job => job.status === InquiryStatus.completed);
-
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
       <PostCallAlarmHost />
@@ -94,33 +90,6 @@ function WorkerDashboardContent() {
           <h1 className="text-3xl font-bold">Worker Dashboard</h1>
           <p className="text-muted-foreground mt-1">Manage your profile and track your jobs</p>
         </div>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-3">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Jobs</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{jobs.length}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Pending</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-amber-600">{pendingJobs.length}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Completed</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-green-600">{completedJobs.length}</div>
-          </CardContent>
-        </Card>
       </div>
 
       <Card>

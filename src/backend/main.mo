@@ -292,7 +292,7 @@ actor {
           full_name = profile.full_name;
           phone_number = profile.phone_number;
           photo = profile.photo;
-          category_id = worker.category_id; // Workers cannot change their own category
+          category_id = worker.category_id; // Workers cannot change own their category
           location = profile.location;
           years_experience = profile.years_experience;
           pricing = profile.pricing;
