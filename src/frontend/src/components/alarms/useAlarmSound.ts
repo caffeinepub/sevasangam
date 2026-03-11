@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
 
-const ALARM_SOUND_URL = '/assets/service-call-ring.mp3';
+const ALARM_SOUND_URL = "/assets/service-call-ring.mp3";
 const ALARM_DURATION_MS = 2500; // 2.5 seconds
 
 export function useAlarmSound(shouldPlay: boolean) {
@@ -29,7 +29,7 @@ export function useAlarmSound(shouldPlay: boolean) {
         })
         .catch((error) => {
           // Autoplay was prevented
-          console.warn('Alarm sound autoplay prevented:', error);
+          console.warn("Alarm sound autoplay prevented:", error);
         });
     }
 

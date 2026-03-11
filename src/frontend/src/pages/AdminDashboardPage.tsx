@@ -1,13 +1,18 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { Button } from '../components/ui/button';
-import { LogOut } from 'lucide-react';
-import { useNavigate } from '@tanstack/react-router';
-import { useQueryClient } from '@tanstack/react-query';
-import RequireAdmin from '../components/guards/RequireAdmin';
-import WorkersAdminPanel from '../components/admin/WorkersAdminPanel';
-import CategoriesAdminPanel from '../components/admin/CategoriesAdminPanel';
-import InquiriesAdminPanel from '../components/admin/InquiriesAdminPanel';
-import { useAdminSession } from '../hooks/useAdminSession';
+import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
+import { LogOut } from "lucide-react";
+import CategoriesAdminPanel from "../components/admin/CategoriesAdminPanel";
+import InquiriesAdminPanel from "../components/admin/InquiriesAdminPanel";
+import WorkersAdminPanel from "../components/admin/WorkersAdminPanel";
+import RequireAdmin from "../components/guards/RequireAdmin";
+import { Button } from "../components/ui/button";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../components/ui/tabs";
+import { useAdminSession } from "../hooks/useAdminSession";
 
 function AdminDashboardContent() {
   const { logout } = useAdminSession();
@@ -17,7 +22,7 @@ function AdminDashboardContent() {
   const handleLogout = () => {
     logout();
     queryClient.clear();
-    navigate({ to: '/' });
+    navigate({ to: "/" });
   };
 
   return (
@@ -26,7 +31,9 @@ function AdminDashboardContent() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-4xl font-bold">Admin Dashboard</h1>
-            <p className="text-muted-foreground mt-2">Manage workers, categories, and inquiries</p>
+            <p className="text-muted-foreground mt-2">
+              Manage workers, categories, and inquiries
+            </p>
           </div>
           <Button onClick={handleLogout} variant="outline">
             <LogOut className="mr-2 h-4 w-4" />

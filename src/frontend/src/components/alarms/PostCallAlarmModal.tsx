@@ -1,22 +1,25 @@
-import { useEffect } from 'react';
+import { Bell } from "lucide-react";
+import { useEffect } from "react";
+import { Button } from "../ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
-} from '../ui/dialog';
-import { Button } from '../ui/button';
-import { Bell } from 'lucide-react';
-import { useAlarmSound } from './useAlarmSound';
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
+import { useAlarmSound } from "./useAlarmSound";
 
 interface PostCallAlarmModalProps {
   open: boolean;
   onDismiss: () => void;
 }
 
-export default function PostCallAlarmModal({ open, onDismiss }: PostCallAlarmModalProps) {
+export default function PostCallAlarmModal({
+  open,
+  onDismiss,
+}: PostCallAlarmModalProps) {
   // Play alarm sound when modal opens
   useAlarmSound(open);
 
@@ -25,15 +28,15 @@ export default function PostCallAlarmModal({ open, onDismiss }: PostCallAlarmMod
     if (!open) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         e.preventDefault();
         e.stopPropagation();
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown, true);
+    document.addEventListener("keydown", handleKeyDown, true);
     return () => {
-      document.removeEventListener('keydown', handleKeyDown, true);
+      document.removeEventListener("keydown", handleKeyDown, true);
     };
   }, [open]);
 
@@ -49,13 +52,20 @@ export default function PostCallAlarmModal({ open, onDismiss }: PostCallAlarmMod
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
             <Bell className="h-8 w-8 text-primary animate-pulse" />
           </div>
-          <DialogTitle className="text-center text-xl">Service Reminder</DialogTitle>
+          <DialogTitle className="text-center text-xl">
+            Service Reminder
+          </DialogTitle>
           <DialogDescription className="text-center text-base">
-            Don't forget to visit the customer's location to provide the service!
+            Don't forget to visit the customer's location to provide the
+            service!
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="sm:justify-center">
-          <Button onClick={onDismiss} size="lg" className="w-full sm:w-auto px-12">
+          <Button
+            onClick={onDismiss}
+            size="lg"
+            className="w-full sm:w-auto px-12"
+          >
             OK
           </Button>
         </DialogFooter>

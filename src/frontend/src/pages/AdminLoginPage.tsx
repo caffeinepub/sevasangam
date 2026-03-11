@@ -1,45 +1,51 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from '@tanstack/react-router';
-import { useAdminSession } from '../hooks/useAdminSession';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Alert, AlertDescription } from '../components/ui/alert';
-import { AlertCircle, Loader2, Lock } from 'lucide-react';
+import { useNavigate } from "@tanstack/react-router";
+import { AlertCircle, Loader2, Lock } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Alert, AlertDescription } from "../components/ui/alert";
+import { Button } from "../components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { useAdminSession } from "../hooks/useAdminSession";
 
 export default function AdminLoginPage() {
   const navigate = useNavigate();
   const { login, isAdminAuthenticated, actorReady } = useAdminSession();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   // Redirect if already logged in (using effect instead of render-time)
   useEffect(() => {
     if (isAdminAuthenticated) {
-      navigate({ to: '/admin' });
+      navigate({ to: "/admin" });
     }
   }, [isAdminAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    
+    setError("");
+
     // Guard against actor not ready
     if (!actorReady) {
-      setError('Connection not ready. Please wait a moment and try again.');
+      setError("Connection not ready. Please wait a moment and try again.");
       return;
     }
-    
+
     setIsLoggingIn(true);
 
     try {
       await login(username, password);
       // Navigation will happen via the useEffect above
     } catch (err: any) {
-      setError(err.message || 'Login failed. Please check your credentials.');
+      setError(err.message || "Login failed. Please check your credentials.");
     } finally {
       setIsLoggingIn(false);
     }
@@ -107,7 +113,11 @@ export default function AdminLoginPage() {
               />
             </div>
 
-            <Button type="submit" className="w-full" disabled={isSubmitDisabled}>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isSubmitDisabled}
+            >
               {isLoggingIn ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -119,7 +129,7 @@ export default function AdminLoginPage() {
                   Connecting...
                 </>
               ) : (
-                'Login'
+                "Login"
               )}
             </Button>
           </form>

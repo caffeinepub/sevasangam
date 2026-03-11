@@ -1,6 +1,6 @@
-import { AlertCircle, RefreshCw } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
-import { Button } from '../ui/button';
+import { AlertCircle, RefreshCw } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { Button } from "../ui/button";
 
 interface InternetIdentityErrorNoticeProps {
   error?: any;
@@ -11,7 +11,7 @@ export default function InternetIdentityErrorNotice({
   error,
   onRetry,
 }: InternetIdentityErrorNoticeProps) {
-  const errorMessage = error?.message || 'Login failed';
+  const errorMessage = error?.message || "Login failed";
 
   return (
     <Alert variant="destructive" className="max-w-2xl mx-auto">
@@ -25,7 +25,9 @@ export default function InternetIdentityErrorNotice({
             <li>Allow pop-ups in your browser for this site</li>
             <li>Check your internet connection</li>
             <li>Make sure your device time is set to automatic</li>
-            <li>Try using a different browser (Chrome or Safari recommended)</li>
+            <li>
+              Try using a different browser (Chrome or Safari recommended)
+            </li>
             <li>Disable any VPN or proxy connections</li>
           </ul>
         </div>

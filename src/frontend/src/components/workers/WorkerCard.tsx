@@ -1,9 +1,9 @@
-import { Link } from '@tanstack/react-router';
-import { MapPin, Briefcase, User } from 'lucide-react';
-import { Card, CardContent } from '../ui/card';
-import { Button } from '../ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import type { WorkerProfile } from '../../backend';
+import { Link } from "@tanstack/react-router";
+import { Briefcase, MapPin, User } from "lucide-react";
+import type { WorkerProfile } from "../../backend";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Button } from "../ui/button";
+import { Card, CardContent } from "../ui/card";
 
 interface WorkerCardProps {
   worker: WorkerProfile;
@@ -11,10 +11,10 @@ interface WorkerCardProps {
 
 export default function WorkerCard({ worker }: WorkerCardProps) {
   const photoUrl = worker.photo?.getDirectURL();
-  const initials = worker.full_name
-    .split(' ')
+  const _initials = worker.full_name
+    .split(" ")
     .map((n) => n[0])
-    .join('')
+    .join("")
     .toUpperCase()
     .slice(0, 2);
 
@@ -30,7 +30,9 @@ export default function WorkerCard({ worker }: WorkerCardProps) {
           </Avatar>
 
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-lg mb-2 truncate">{worker.full_name}</h3>
+            <h3 className="font-semibold text-lg mb-2 truncate">
+              {worker.full_name}
+            </h3>
 
             <div className="space-y-1 text-sm text-muted-foreground mb-3">
               <div className="flex items-center gap-2">
@@ -41,7 +43,9 @@ export default function WorkerCard({ worker }: WorkerCardProps) {
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 shrink-0" />
                   <span className="truncate">
-                    {[worker.location.city, worker.location.district].filter(Boolean).join(', ')}
+                    {[worker.location.city, worker.location.district]
+                      .filter(Boolean)
+                      .join(", ")}
                   </span>
                 </div>
               )}

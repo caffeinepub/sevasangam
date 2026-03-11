@@ -3,175 +3,177 @@
 @tailwind utilities;
 
 @layer base {
-    :root {
-        --radius: 0.5rem;
-        --background: 0.99 0 0;
-        --foreground: 0.15 0 0;
-        --card: 1 0 0;
-        --card-foreground: 0.15 0 0;
-        --popover: 1 0 0;
-        --popover-foreground: 0.15 0 0;
-        --primary: 0.45 0.15 220;
-        --primary-foreground: 0.99 0 0;
-        --secondary: 0.96 0.01 220;
-        --secondary-foreground: 0.15 0 0;
-        --muted: 0.96 0.01 220;
-        --muted-foreground: 0.50 0 0;
-        --accent: 0.96 0.01 220;
-        --accent-foreground: 0.15 0 0;
-        --destructive: 0.55 0.22 25;
-        --destructive-foreground: 0.99 0 0;
-        --border: 0.90 0.01 220;
-        --input: 0.90 0.01 220;
-        --ring: 0.45 0.15 220;
-        --chart-1: 0.60 0.18 160;
-        --chart-2: 0.55 0.20 40;
-        --chart-3: 0.50 0.18 280;
-        --chart-4: 0.65 0.15 200;
-        --chart-5: 0.58 0.22 340;
-        --sidebar: 0.99 0 0;
-        --sidebar-foreground: 0.15 0 0;
-        --sidebar-primary: 0.45 0.15 220;
-        --sidebar-primary-foreground: 0.99 0 0;
-        --sidebar-accent: 0.96 0.01 220;
-        --sidebar-accent-foreground: 0.15 0 0;
-        --sidebar-border: 0.90 0.01 220;
-        --sidebar-ring: 0.45 0.15 220;
-    }
+  :root {
+    --radius: 0.5rem;
+    --background: 0.99 0 0;
+    --foreground: 0.15 0 0;
+    --card: 1 0 0;
+    --card-foreground: 0.15 0 0;
+    --popover: 1 0 0;
+    --popover-foreground: 0.15 0 0;
+    --primary: 0.45 0.15 220;
+    --primary-foreground: 0.99 0 0;
+    --secondary: 0.96 0.01 220;
+    --secondary-foreground: 0.15 0 0;
+    --muted: 0.96 0.01 220;
+    --muted-foreground: 0.5 0 0;
+    --accent: 0.96 0.01 220;
+    --accent-foreground: 0.15 0 0;
+    --destructive: 0.55 0.22 25;
+    --destructive-foreground: 0.99 0 0;
+    --border: 0.9 0.01 220;
+    --input: 0.9 0.01 220;
+    --ring: 0.45 0.15 220;
+    --chart-1: 0.6 0.18 160;
+    --chart-2: 0.55 0.2 40;
+    --chart-3: 0.5 0.18 280;
+    --chart-4: 0.65 0.15 200;
+    --chart-5: 0.58 0.22 340;
+    --sidebar: 0.99 0 0;
+    --sidebar-foreground: 0.15 0 0;
+    --sidebar-primary: 0.45 0.15 220;
+    --sidebar-primary-foreground: 0.99 0 0;
+    --sidebar-accent: 0.96 0.01 220;
+    --sidebar-accent-foreground: 0.15 0 0;
+    --sidebar-border: 0.9 0.01 220;
+    --sidebar-ring: 0.45 0.15 220;
+  }
 
-    .dark {
-        --background: 0.12 0 0;
-        --foreground: 0.98 0 0;
-        --card: 0.16 0 0;
-        --card-foreground: 0.98 0 0;
-        --popover: 0.14 0 0;
-        --popover-foreground: 0.98 0 0;
-        --primary: 0.65 0.18 220;
-        --primary-foreground: 0.12 0 0;
-        --secondary: 0.22 0 0;
-        --secondary-foreground: 0.98 0 0;
-        --muted: 0.22 0 0;
-        --muted-foreground: 0.65 0 0;
-        --accent: 0.28 0.02 220;
-        --accent-foreground: 0.98 0 0;
-        --destructive: 0.60 0.20 25;
-        --destructive-foreground: 0.98 0 0;
-        --border: 0.28 0.02 220;
-        --input: 0.28 0.02 220;
-        --ring: 0.65 0.18 220;
-        --chart-1: 0.55 0.20 160;
-        --chart-2: 0.60 0.22 40;
-        --chart-3: 0.50 0.18 280;
-        --chart-4: 0.65 0.15 200;
-        --chart-5: 0.58 0.22 340;
-        --sidebar: 0.16 0 0;
-        --sidebar-foreground: 0.98 0 0;
-        --sidebar-primary: 0.65 0.18 220;
-        --sidebar-primary-foreground: 0.12 0 0;
-        --sidebar-accent: 0.22 0 0;
-        --sidebar-accent-foreground: 0.98 0 0;
-        --sidebar-border: 0.28 0.02 220;
-        --sidebar-ring: 0.65 0.18 220;
-    }
+  .dark {
+    --background: 0.12 0 0;
+    --foreground: 0.98 0 0;
+    --card: 0.16 0 0;
+    --card-foreground: 0.98 0 0;
+    --popover: 0.14 0 0;
+    --popover-foreground: 0.98 0 0;
+    --primary: 0.65 0.18 220;
+    --primary-foreground: 0.12 0 0;
+    --secondary: 0.22 0 0;
+    --secondary-foreground: 0.98 0 0;
+    --muted: 0.22 0 0;
+    --muted-foreground: 0.65 0 0;
+    --accent: 0.28 0.02 220;
+    --accent-foreground: 0.98 0 0;
+    --destructive: 0.6 0.2 25;
+    --destructive-foreground: 0.98 0 0;
+    --border: 0.28 0.02 220;
+    --input: 0.28 0.02 220;
+    --ring: 0.65 0.18 220;
+    --chart-1: 0.55 0.2 160;
+    --chart-2: 0.6 0.22 40;
+    --chart-3: 0.5 0.18 280;
+    --chart-4: 0.65 0.15 200;
+    --chart-5: 0.58 0.22 340;
+    --sidebar: 0.16 0 0;
+    --sidebar-foreground: 0.98 0 0;
+    --sidebar-primary: 0.65 0.18 220;
+    --sidebar-primary-foreground: 0.12 0 0;
+    --sidebar-accent: 0.22 0 0;
+    --sidebar-accent-foreground: 0.98 0 0;
+    --sidebar-border: 0.28 0.02 220;
+    --sidebar-ring: 0.65 0.18 220;
+  }
 
-    * {
-        @apply border-border;
-    }
-    body {
-        @apply bg-background text-foreground;
-        font-feature-settings: "rlig" 1, "calt" 1;
-    }
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
 }
 
 @layer components {
-    /* Hero Image Glow Effect */
-    .hero-image-glow {
-        position: relative;
-        display: inline-block;
-    }
+  /* Hero Image Glow Effect */
+  .hero-image-glow {
+    position: relative;
+    display: inline-block;
+  }
 
+  .hero-image-glow::before {
+    content: "";
+    position: absolute;
+    inset: -8px;
+    border-radius: 1.25rem;
+    background: linear-gradient(
+      45deg,
+      oklch(var(--primary)),
+      oklch(var(--secondary)),
+      oklch(var(--accent)),
+      oklch(var(--primary))
+    );
+    opacity: 0;
+    z-index: 0;
+    transition: opacity 400ms ease-in-out;
+    filter: blur(16px);
+    pointer-events: none;
+  }
+
+  .hero-image-glow img {
+    display: block;
+    transition: transform 300ms ease-in-out;
+  }
+
+  .hero-image-glow:hover::before {
+    opacity: 0.7;
+    animation: hero-glow-pulse 2.5s ease-in-out infinite;
+  }
+
+  .hero-image-glow:hover img {
+    transform: translateY(-4px) scale(1.01);
+  }
+
+  .dark .hero-image-glow:hover::before {
+    opacity: 0.9;
+    filter: blur(20px);
+    animation: hero-glow-pulse-dark 2.5s ease-in-out infinite;
+  }
+
+  @keyframes hero-glow-pulse {
+    0%,
+    100% {
+      opacity: 0.7;
+      filter: blur(16px);
+    }
+    50% {
+      opacity: 0.85;
+      filter: blur(18px);
+    }
+  }
+
+  @keyframes hero-glow-pulse-dark {
+    0%,
+    100% {
+      opacity: 0.9;
+      filter: blur(20px);
+    }
+    50% {
+      opacity: 1;
+      filter: blur(24px);
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
     .hero-image-glow::before {
-        content: '';
-        position: absolute;
-        inset: -8px;
-        border-radius: 1.25rem;
-        background: linear-gradient(
-            45deg,
-            oklch(var(--primary)),
-            oklch(var(--secondary)),
-            oklch(var(--accent)),
-            oklch(var(--primary))
-        );
-        opacity: 0;
-        z-index: 0;
-        transition: opacity 400ms ease-in-out;
-        filter: blur(16px);
-        pointer-events: none;
+      animation: none !important;
+      transition: opacity 200ms ease-in-out;
     }
 
     .hero-image-glow img {
-        display: block;
-        transition: transform 300ms ease-in-out;
+      transition: none;
     }
 
     .hero-image-glow:hover::before {
-        opacity: 0.7;
-        animation: hero-glow-pulse 2.5s ease-in-out infinite;
+      opacity: 0.5;
     }
 
     .hero-image-glow:hover img {
-        transform: translateY(-4px) scale(1.01);
+      transform: none;
     }
 
     .dark .hero-image-glow:hover::before {
-        opacity: 0.9;
-        filter: blur(20px);
-        animation: hero-glow-pulse-dark 2.5s ease-in-out infinite;
+      opacity: 0.6;
     }
-
-    @keyframes hero-glow-pulse {
-        0%, 100% {
-            opacity: 0.7;
-            filter: blur(16px);
-        }
-        50% {
-            opacity: 0.85;
-            filter: blur(18px);
-        }
-    }
-
-    @keyframes hero-glow-pulse-dark {
-        0%, 100% {
-            opacity: 0.9;
-            filter: blur(20px);
-        }
-        50% {
-            opacity: 1;
-            filter: blur(24px);
-        }
-    }
-
-    /* Reduced motion support */
-    @media (prefers-reduced-motion: reduce) {
-        .hero-image-glow::before {
-            animation: none !important;
-            transition: opacity 200ms ease-in-out;
-        }
-        
-        .hero-image-glow img {
-            transition: none;
-        }
-        
-        .hero-image-glow:hover::before {
-            opacity: 0.5;
-        }
-        
-        .hero-image-glow:hover img {
-            transform: none;
-        }
-        
-        .dark .hero-image-glow:hover::before {
-            opacity: 0.6;
-        }
-    }
+  }
 }

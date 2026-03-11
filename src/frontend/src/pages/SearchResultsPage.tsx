@@ -1,22 +1,33 @@
-import { useSearch } from '@tanstack/react-router';
-import { useGetAllWorkers } from '../hooks/useQueries';
-import { Button } from '../components/ui/button';
-import { X, Loader2, AlertCircle } from 'lucide-react';
-import { Badge } from '../components/ui/badge';
-import WorkerCard from '../components/workers/WorkerCard';
-import { useNavigate } from '@tanstack/react-router';
+import { useSearch } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
+import { AlertCircle, Loader2, X } from "lucide-react";
+import { Badge } from "../components/ui/badge";
+import { Button } from "../components/ui/button";
+import WorkerCard from "../components/workers/WorkerCard";
+import { useGetAllWorkers } from "../hooks/useQueries";
 
-function EmptyState({ title, description, action }: { title: string; description?: string; action?: React.ReactNode }) {
+function EmptyState({
+  title,
+  description,
+  action,
+}: { title: string; description?: string; action?: React.ReactNode }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <h3 className="text-lg font-semibold mb-2">{title}</h3>
-      {description && <p className="text-sm text-muted-foreground mb-6 max-w-md">{description}</p>}
+      {description && (
+        <p className="text-sm text-muted-foreground mb-6 max-w-md">
+          {description}
+        </p>
+      )}
       {action && <div>{action}</div>}
     </div>
   );
 }
 
-function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
+function ErrorState({
+  message,
+  onRetry,
+}: { message: string; onRetry: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <AlertCircle className="h-12 w-12 text-destructive mb-4" />
@@ -28,9 +39,14 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
 }
 
 export default function SearchResultsPage() {
-  const search = useSearch({ from: '/search' }) as any;
+  const search = useSearch({ from: "/search" }) as any;
   const navigate = useNavigate();
-  const { data: allWorkers = [], isLoading, isError, error, refetch } = useGetAllWorkers();
+  const {
+    data: allWorkers = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useGetAllWorkers();
 
   const { category, location, availability } = search;
 
@@ -38,20 +54,24 @@ export default function SearchResultsPage() {
     if (category && worker.category_id !== category) return false;
     if (location) {
       const locationLower = location.toLowerCase();
-      const cityMatch = worker.location.city?.toLowerCase().includes(locationLower);
-      const districtMatch = worker.location.district?.toLowerCase().includes(locationLower);
+      const cityMatch = worker.location.city
+        ?.toLowerCase()
+        .includes(locationLower);
+      const districtMatch = worker.location.district
+        ?.toLowerCase()
+        .includes(locationLower);
       if (!cityMatch && !districtMatch) return false;
     }
     if (availability) {
       const isFullTime = worker.availability.available_days.length === 7;
-      const workerAvailability = isFullTime ? 'full-time' : 'part-time';
+      const workerAvailability = isFullTime ? "full-time" : "part-time";
       if (workerAvailability !== availability) return false;
     }
     return true;
   });
 
   const handleClearFilters = () => {
-    navigate({ to: '/search', search: {} });
+    navigate({ to: "/search", search: {} });
   };
 
   const hasFilters = category || location || availability;
@@ -71,7 +91,7 @@ export default function SearchResultsPage() {
           <div className="space-y-4">
             <h1 className="text-4xl font-bold">Search Results</h1>
           </div>
-          <ErrorState 
+          <ErrorState
             message="Unable to load workers. Please check your connection and try again."
             onRetry={() => refetch()}
           />
@@ -85,13 +105,21 @@ export default function SearchResultsPage() {
       <div className="space-y-8">
         <div className="space-y-4">
           <h1 className="text-4xl font-bold">Search Results</h1>
-          
+
           {hasFilters && (
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-sm text-muted-foreground">Active filters:</span>
-              {category && <Badge variant="secondary">Category: {category}</Badge>}
-              {location && <Badge variant="secondary">Location: {location}</Badge>}
-              {availability && <Badge variant="secondary">Availability: {availability}</Badge>}
+              <span className="text-sm text-muted-foreground">
+                Active filters:
+              </span>
+              {category && (
+                <Badge variant="secondary">Category: {category}</Badge>
+              )}
+              {location && (
+                <Badge variant="secondary">Location: {location}</Badge>
+              )}
+              {availability && (
+                <Badge variant="secondary">Availability: {availability}</Badge>
+              )}
               <Button variant="ghost" size="sm" onClick={handleClearFilters}>
                 <X className="mr-2 h-4 w-4" />
                 Clear all
@@ -100,7 +128,8 @@ export default function SearchResultsPage() {
           )}
 
           <p className="text-lg text-muted-foreground">
-            {filteredWorkers.length} published {filteredWorkers.length === 1 ? 'worker' : 'workers'} found
+            {filteredWorkers.length} published{" "}
+            {filteredWorkers.length === 1 ? "worker" : "workers"} found
           </p>
         </div>
 

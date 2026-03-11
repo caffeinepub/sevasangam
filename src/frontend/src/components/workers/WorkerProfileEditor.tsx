@@ -1,14 +1,20 @@
-import { useState } from 'react';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Alert, AlertDescription } from '../ui/alert';
-import { AlertCircle, Loader2 } from 'lucide-react';
-import PhotoPicker from './PhotoPicker';
-import { CATEGORY_NAMES } from '../../utils/categories';
-import type { WorkerProfile } from '../../backend';
-import { ExternalBlob } from '../../backend';
+import { AlertCircle, Loader2 } from "lucide-react";
+import { useState } from "react";
+import type { WorkerProfile } from "../../backend";
+import type { ExternalBlob } from "../../backend";
+import { CATEGORY_NAMES } from "../../utils/categories";
+import { Alert, AlertDescription } from "../ui/alert";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import PhotoPicker from "./PhotoPicker";
 
 interface WorkerProfileEditorProps {
   profile: WorkerProfile;
@@ -16,16 +22,25 @@ interface WorkerProfileEditorProps {
   isSubmitting: boolean;
 }
 
-export default function WorkerProfileEditor({ profile, onSubmit, isSubmitting }: WorkerProfileEditorProps) {
+export default function WorkerProfileEditor({
+  profile,
+  onSubmit,
+  isSubmitting,
+}: WorkerProfileEditorProps) {
   const [formData, setFormData] = useState({
     fullName: profile.full_name,
     phoneNumber: profile.phone_number,
     yearsExperience: String(profile.years_experience),
-    city: profile.location.city || '',
-    district: profile.location.district || '',
-    ratePerHour: profile.pricing.rate_per_hour ? String(profile.pricing.rate_per_hour) : '',
-    availability: profile.availability.available_days.length === 7 ? 'full-time' : 'part-time',
-    whatsappNumber: profile.integrations.whatsapp_number || '',
+    city: profile.location.city || "",
+    district: profile.location.district || "",
+    ratePerHour: profile.pricing.rate_per_hour
+      ? String(profile.pricing.rate_per_hour)
+      : "",
+    availability:
+      profile.availability.available_days.length === 7
+        ? "full-time"
+        : "part-time",
+    whatsappNumber: profile.integrations.whatsapp_number || "",
   });
   const [photo, setPhoto] = useState<ExternalBlob | undefined>(profile.photo);
 
@@ -46,12 +61,17 @@ export default function WorkerProfileEditor({ profile, onSubmit, isSubmitting }:
       years_experience: BigInt(formData.yearsExperience || 0),
       pricing: {
         ...profile.pricing,
-        rate_per_hour: formData.ratePerHour ? BigInt(formData.ratePerHour) : undefined,
-        currency: formData.ratePerHour ? 'INR' : undefined,
+        rate_per_hour: formData.ratePerHour
+          ? BigInt(formData.ratePerHour)
+          : undefined,
+        currency: formData.ratePerHour ? "INR" : undefined,
       },
       availability: {
         ...profile.availability,
-        available_days: formData.availability === 'full-time' ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+        available_days:
+          formData.availability === "full-time"
+            ? ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+            : ["Mon", "Tue", "Wed", "Thu", "Fri"],
       },
       integrations: {
         ...profile.integrations,
@@ -67,7 +87,9 @@ export default function WorkerProfileEditor({ profile, onSubmit, isSubmitting }:
       <Alert>
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          Major edits (name, phone, location, pricing, availability) will trigger re-approval and temporarily hide your profile from public view.
+          Major edits (name, phone, location, pricing, availability) will
+          trigger re-approval and temporarily hide your profile from public
+          view.
         </AlertDescription>
       </Alert>
 
@@ -77,7 +99,9 @@ export default function WorkerProfileEditor({ profile, onSubmit, isSubmitting }:
           id="fullName"
           required
           value={formData.fullName}
-          onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, fullName: e.target.value })
+          }
         />
       </div>
 
@@ -88,7 +112,9 @@ export default function WorkerProfileEditor({ profile, onSubmit, isSubmitting }:
           type="tel"
           required
           value={formData.phoneNumber}
-          onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, phoneNumber: e.target.value })
+          }
         />
       </div>
 
@@ -98,17 +124,21 @@ export default function WorkerProfileEditor({ profile, onSubmit, isSubmitting }:
           id="whatsappNumber"
           type="tel"
           value={formData.whatsappNumber}
-          onChange={(e) => setFormData({ ...formData, whatsappNumber: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, whatsappNumber: e.target.value })
+          }
         />
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="categoryId">Service Category</Label>
         <div className="px-3 py-2 border rounded-xl bg-muted text-muted-foreground">
-          {CATEGORY_NAMES[profile.category_id as keyof typeof CATEGORY_NAMES] || profile.category_id}
+          {CATEGORY_NAMES[profile.category_id as keyof typeof CATEGORY_NAMES] ||
+            profile.category_id}
         </div>
         <p className="text-xs text-muted-foreground">
-          Service category cannot be changed. Contact admin if you need to change your service category.
+          Service category cannot be changed. Contact admin if you need to
+          change your service category.
         </p>
       </div>
 
@@ -120,7 +150,9 @@ export default function WorkerProfileEditor({ profile, onSubmit, isSubmitting }:
           min="0"
           required
           value={formData.yearsExperience}
-          onChange={(e) => setFormData({ ...formData, yearsExperience: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, yearsExperience: e.target.value })
+          }
         />
       </div>
 
@@ -141,7 +173,9 @@ export default function WorkerProfileEditor({ profile, onSubmit, isSubmitting }:
             id="district"
             required
             value={formData.district}
-            onChange={(e) => setFormData({ ...formData, district: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, district: e.target.value })
+            }
           />
         </div>
       </div>
@@ -153,13 +187,20 @@ export default function WorkerProfileEditor({ profile, onSubmit, isSubmitting }:
           type="number"
           min="0"
           value={formData.ratePerHour}
-          onChange={(e) => setFormData({ ...formData, ratePerHour: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, ratePerHour: e.target.value })
+          }
         />
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="availability">Availability</Label>
-        <Select value={formData.availability} onValueChange={(value) => setFormData({ ...formData, availability: value })}>
+        <Select
+          value={formData.availability}
+          onValueChange={(value) =>
+            setFormData({ ...formData, availability: value })
+          }
+        >
           <SelectTrigger id="availability">
             <SelectValue />
           </SelectTrigger>
@@ -175,14 +216,19 @@ export default function WorkerProfileEditor({ profile, onSubmit, isSubmitting }:
         <PhotoPicker value={photo} onChange={setPhoto} />
       </div>
 
-      <Button type="submit" disabled={isSubmitting} size="lg" className="w-full">
+      <Button
+        type="submit"
+        disabled={isSubmitting}
+        size="lg"
+        className="w-full"
+      >
         {isSubmitting ? (
           <>
             <Loader2 className="mr-2 h-5 w-5 animate-spin" />
             Saving...
           </>
         ) : (
-          'Save Changes'
+          "Save Changes"
         )}
       </Button>
     </form>

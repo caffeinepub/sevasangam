@@ -1,7 +1,7 @@
-import { useState, useRef } from 'react';
-import { Button } from '../ui/button';
-import { Upload, X } from 'lucide-react';
-import { ExternalBlob } from '../../backend';
+import { Upload, X } from "lucide-react";
+import { useRef, useState } from "react";
+import { ExternalBlob } from "../../backend";
+import { Button } from "../ui/button";
 
 interface PhotoPickerProps {
   value?: ExternalBlob;
@@ -9,7 +9,9 @@ interface PhotoPickerProps {
 }
 
 export default function PhotoPicker({ value, onChange }: PhotoPickerProps) {
-  const [preview, setPreview] = useState<string | undefined>(value?.getDirectURL());
+  const [preview, setPreview] = useState<string | undefined>(
+    value?.getDirectURL(),
+  );
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -22,11 +24,11 @@ export default function PhotoPicker({ value, onChange }: PhotoPickerProps) {
       const arrayBuffer = await file.arrayBuffer();
       const uint8Array = new Uint8Array(arrayBuffer);
       const blob = ExternalBlob.fromBytes(uint8Array);
-      
+
       onChange(blob);
       setPreview(URL.createObjectURL(file));
     } catch (error) {
-      console.error('Error uploading photo:', error);
+      console.error("Error uploading photo:", error);
     } finally {
       setUploading(false);
     }
@@ -36,7 +38,7 @@ export default function PhotoPicker({ value, onChange }: PhotoPickerProps) {
     onChange(undefined);
     setPreview(undefined);
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
@@ -44,7 +46,11 @@ export default function PhotoPicker({ value, onChange }: PhotoPickerProps) {
     <div className="space-y-4">
       {preview ? (
         <div className="relative inline-block">
-          <img src={preview} alt="Profile preview" className="w-32 h-32 rounded-lg object-cover border" />
+          <img
+            src={preview}
+            alt="Profile preview"
+            className="w-32 h-32 rounded-lg object-cover border"
+          />
           <Button
             type="button"
             variant="destructive"
@@ -58,7 +64,9 @@ export default function PhotoPicker({ value, onChange }: PhotoPickerProps) {
       ) : (
         <div className="border-2 border-dashed rounded-lg p-8 text-center">
           <Upload className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-          <p className="text-sm text-muted-foreground mb-4">Upload a profile photo (optional)</p>
+          <p className="text-sm text-muted-foreground mb-4">
+            Upload a profile photo
+          </p>
           <input
             ref={fileInputRef}
             type="file"
@@ -67,8 +75,13 @@ export default function PhotoPicker({ value, onChange }: PhotoPickerProps) {
             className="hidden"
             id="photo-upload"
           />
-          <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
-            {uploading ? 'Uploading...' : 'Choose Photo'}
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+          >
+            {uploading ? "Uploading..." : "Choose Photo"}
           </Button>
         </div>
       )}

@@ -1,11 +1,11 @@
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from "react";
 
 interface CallMarker {
   timestamp: number;
   triggered: boolean;
 }
 
-const CALL_MARKER_KEY = 'seva_sangam_call_marker';
+const CALL_MARKER_KEY = "seva_sangam_call_marker";
 const CALL_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes - after this, marker is considered stale
 
 export function usePostCallAlarm() {
@@ -33,7 +33,7 @@ export function usePostCallAlarm() {
 
     try {
       const marker: CallMarker = JSON.parse(markerStr);
-      
+
       // Check if marker is stale
       if (Date.now() - marker.timestamp > CALL_TIMEOUT_MS) {
         sessionStorage.removeItem(CALL_MARKER_KEY);
@@ -47,7 +47,7 @@ export function usePostCallAlarm() {
         setShowAlarm(true);
       }
     } catch (error) {
-      console.error('Error parsing call marker:', error);
+      console.error("Error parsing call marker:", error);
       sessionStorage.removeItem(CALL_MARKER_KEY);
     }
   }, []);

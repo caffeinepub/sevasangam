@@ -1,36 +1,65 @@
-import { useNavigate } from '@tanstack/react-router';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { useGetMyWorkerProfile, useRegisterWorker, useGetCallerUserProfile, useSaveCallerUserProfile } from '../hooks/useQueries';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
-import { LogIn, Loader2 } from 'lucide-react';
-import WorkerRegistrationForm from '../components/workers/WorkerRegistrationForm';
-import { toast } from 'sonner';
-import { useState, useEffect } from 'react';
-import { logLoginAttempt, logLoginSuccess, logLoginFailure } from '../utils/authDiagnostics';
-import InternetIdentityErrorNotice from '../components/auth/InternetIdentityErrorNotice';
-import ConnectionErrorNotice from '../components/errors/ConnectionErrorNotice';
+import { useNavigate } from "@tanstack/react-router";
+import { Loader2, LogIn } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import InternetIdentityErrorNotice from "../components/auth/InternetIdentityErrorNotice";
+import ConnectionErrorNotice from "../components/errors/ConnectionErrorNotice";
+import { Button } from "../components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import WorkerRegistrationForm from "../components/workers/WorkerRegistrationForm";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
+import {
+  useGetCallerUserProfile,
+  useGetMyWorkerProfile,
+  useRegisterWorker,
+  useSaveCallerUserProfile,
+} from "../hooks/useQueries";
+import {
+  logLoginAttempt,
+  logLoginFailure,
+  logLoginSuccess,
+} from "../utils/authDiagnostics";
 
 export default function WorkerOnboardingPage() {
   const navigate = useNavigate();
   const { identity, login, loginStatus, loginError } = useInternetIdentity();
-  const { data: workerProfile, isLoading: workerLoading, error: workerError, refetch: refetchWorker } = useGetMyWorkerProfile();
-  const { data: userProfile, isLoading: profileLoading, isFetched, error: profileError, refetch: refetchProfile } = useGetCallerUserProfile();
+  const {
+    data: workerProfile,
+    isLoading: workerLoading,
+    error: workerError,
+    refetch: refetchWorker,
+  } = useGetMyWorkerProfile();
+  const {
+    data: userProfile,
+    isLoading: profileLoading,
+    isFetched,
+    error: profileError,
+    refetch: refetchProfile,
+  } = useGetCallerUserProfile();
   const saveProfile = useSaveCallerUserProfile();
   const registerWorker = useRegisterWorker();
-  const [userName, setUserName] = useState('');
-  const [retryAttempt, setRetryAttempt] = useState(0);
+  const [userName, setUserName] = useState("");
+  const [_retryAttempt, setRetryAttempt] = useState(0);
 
   const isAuthenticated = !!identity;
-  const showProfileSetup = isAuthenticated && !profileLoading && isFetched && userProfile === null;
-  const showWorkerRegistration = isAuthenticated && userProfile !== null && !workerProfile && !workerLoading;
-  const showLoginError = loginStatus === 'loginError' && !isAuthenticated && loginError;
+  const showProfileSetup =
+    isAuthenticated && !profileLoading && isFetched && userProfile === null;
+  const showWorkerRegistration =
+    isAuthenticated && userProfile !== null && !workerProfile && !workerLoading;
+  const showLoginError =
+    loginStatus === "loginError" && !isAuthenticated && loginError;
 
   // Log login status changes
   useEffect(() => {
-    if (loginStatus === 'success' && identity) {
+    if (loginStatus === "success" && identity) {
       logLoginSuccess();
     }
   }, [loginStatus, identity]);
@@ -38,7 +67,7 @@ export default function WorkerOnboardingPage() {
   const handleLogin = async () => {
     const hadIdentityBefore = !!identity;
     logLoginAttempt(hadIdentityBefore);
-    
+
     try {
       await login();
     } catch (error: any) {
@@ -54,30 +83,32 @@ export default function WorkerOnboardingPage() {
   const handleProfileSetup = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await saveProfile.mutateAsync({ name: userName, role: 'worker' });
-      toast.success('Profile created successfully');
-    } catch (error) {
-      toast.error('Failed to create profile');
+      await saveProfile.mutateAsync({ name: userName, role: "worker" });
+      toast.success("Profile created successfully");
+    } catch (_error) {
+      toast.error("Failed to create profile");
     }
   };
 
   const handleWorkerRegistration = async (profile: any) => {
     try {
       await registerWorker.mutateAsync(profile);
-      toast.success('Registration submitted! Your profile is pending admin approval.');
-      navigate({ to: '/dashboard' });
-    } catch (error) {
-      toast.error('Failed to submit registration');
+      toast.success(
+        "Registration submitted! Your profile is pending admin approval.",
+      );
+      navigate({ to: "/dashboard" });
+    } catch (_error) {
+      toast.error("Failed to submit registration");
     }
   };
 
   // Handle connection errors after login
   if (isAuthenticated && (profileError || workerError)) {
-    const isConnectionError = 
-      profileError?.message?.includes('Actor not available') ||
-      profileError?.message?.includes('network') ||
-      workerError?.message?.includes('Actor not available') ||
-      workerError?.message?.includes('network');
+    const isConnectionError =
+      profileError?.message?.includes("Actor not available") ||
+      profileError?.message?.includes("network") ||
+      workerError?.message?.includes("Actor not available") ||
+      workerError?.message?.includes("network");
 
     if (isConnectionError) {
       return (
@@ -99,23 +130,27 @@ export default function WorkerOnboardingPage() {
     return (
       <div className="container max-w-md mx-auto px-4 py-16">
         {showLoginError ? (
-          <InternetIdentityErrorNotice error={loginError} onRetry={handleRetryLogin} />
+          <InternetIdentityErrorNotice
+            error={loginError}
+            onRetry={handleRetryLogin}
+          />
         ) : (
           <Card>
             <CardHeader className="text-center">
               <CardTitle className="text-2xl">Join as a Worker</CardTitle>
               <CardDescription>
-                Sign in with Internet Identity to register as a service worker on SevaSangam
+                Sign in with Internet Identity to register as a service worker
+                on SevaSangam
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Button
                 onClick={handleLogin}
-                disabled={loginStatus === 'logging-in'}
+                disabled={loginStatus === "logging-in"}
                 size="lg"
                 className="w-full"
               >
-                {loginStatus === 'logging-in' ? (
+                {loginStatus === "logging-in" ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                     Logging in...
@@ -148,7 +183,9 @@ export default function WorkerOnboardingPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl">Welcome!</CardTitle>
-            <CardDescription>Please tell us your name to get started</CardDescription>
+            <CardDescription>
+              Please tell us your name to get started
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleProfileSetup} className="space-y-4">
@@ -162,14 +199,19 @@ export default function WorkerOnboardingPage() {
                   placeholder="Enter your full name"
                 />
               </div>
-              <Button type="submit" disabled={saveProfile.isPending} size="lg" className="w-full">
+              <Button
+                type="submit"
+                disabled={saveProfile.isPending}
+                size="lg"
+                className="w-full"
+              >
                 {saveProfile.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                     Saving...
                   </>
                 ) : (
-                  'Continue'
+                  "Continue"
                 )}
               </Button>
             </form>
@@ -188,7 +230,11 @@ export default function WorkerOnboardingPage() {
             <CardDescription>You already have a worker profile</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button onClick={() => navigate({ to: '/dashboard' })} size="lg" className="w-full">
+            <Button
+              onClick={() => navigate({ to: "/dashboard" })}
+              size="lg"
+              className="w-full"
+            >
               Go to Dashboard
             </Button>
           </CardContent>

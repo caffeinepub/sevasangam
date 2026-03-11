@@ -1,14 +1,17 @@
-import { Button } from '../ui/button';
-import { Phone, MessageCircle } from 'lucide-react';
-import { createTelLink, createWhatsAppLink } from '../../utils/contactLinks';
-import { usePostCallAlarm } from '../../hooks/usePostCallAlarm';
+import { MessageCircle, Phone } from "lucide-react";
+import { usePostCallAlarm } from "../../hooks/usePostCallAlarm";
+import { createTelLink, createWhatsAppLink } from "../../utils/contactLinks";
+import { Button } from "../ui/button";
 
 interface WorkerContactActionsProps {
   phoneNumber: string;
   workerName: string;
 }
 
-export default function WorkerContactActions({ phoneNumber, workerName }: WorkerContactActionsProps) {
+export default function WorkerContactActions({
+  phoneNumber,
+  workerName,
+}: WorkerContactActionsProps) {
   const { markCallStarted } = usePostCallAlarm();
 
   const handleCallClick = () => {
@@ -24,7 +27,14 @@ export default function WorkerContactActions({ phoneNumber, workerName }: Worker
         </a>
       </Button>
       <Button asChild variant="outline" size="lg" className="flex-1">
-        <a href={createWhatsAppLink(phoneNumber, `Hi ${workerName}, I found you on SevaSangam.`)} target="_blank" rel="noopener noreferrer">
+        <a
+          href={createWhatsAppLink(
+            phoneNumber,
+            `Hi ${workerName}, I found you on SevaSangam.`,
+          )}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           <MessageCircle className="mr-2 h-5 w-5" />
           WhatsApp
         </a>

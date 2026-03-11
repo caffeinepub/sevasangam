@@ -1,25 +1,31 @@
-import { useState } from 'react';
-import { useNavigate } from '@tanstack/react-router';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Search } from 'lucide-react';
-import { CATEGORY_IDS, CATEGORY_NAMES } from '../../utils/categories';
+import { useNavigate } from "@tanstack/react-router";
+import { Search } from "lucide-react";
+import { useState } from "react";
+import { CATEGORY_IDS, CATEGORY_NAMES } from "../../utils/categories";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 export default function HomeSearchPanel() {
   const navigate = useNavigate();
-  const [category, setCategory] = useState('');
-  const [location, setLocation] = useState('');
-  const [availability, setAvailability] = useState('');
+  const [category, setCategory] = useState("");
+  const [location, setLocation] = useState("");
+  const [availability, setAvailability] = useState("");
 
   const handleSearch = () => {
     const params = new URLSearchParams();
-    if (category) params.set('category', category);
-    if (location) params.set('location', location);
-    if (availability) params.set('availability', availability);
+    if (category) params.set("category", category);
+    if (location) params.set("location", location);
+    if (availability) params.set("availability", availability);
 
-    navigate({ to: '/search', search: Object.fromEntries(params) });
+    navigate({ to: "/search", search: Object.fromEntries(params) });
   };
 
   return (

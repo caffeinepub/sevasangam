@@ -1,9 +1,9 @@
-import { useNavigate } from '@tanstack/react-router';
-import { Button } from '../components/ui/button';
-import { ArrowRight } from 'lucide-react';
-import HomeSearchPanel from '../components/search/HomeSearchPanel';
-import CategoryCardGrid from '../components/categories/CategoryCardGrid';
-import { useI18n } from '../hooks/useI18n';
+import { useNavigate } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
+import CategoryCardGrid from "../components/categories/CategoryCardGrid";
+import HomeSearchPanel from "../components/search/HomeSearchPanel";
+import { Button } from "../components/ui/button";
+import { useI18n } from "../hooks/useI18n";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -18,20 +18,29 @@ export default function HomePage() {
             <div className="space-y-8">
               <div className="space-y-6">
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight">
-                  {t('home.heroTitle')}
+                  {t("home.heroTitle")}
                 </h1>
                 <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
-                  {t('home.heroSubtitle')}
+                  {t("home.heroSubtitle")}
                 </p>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" onClick={() => navigate({ to: '/search' })} className="text-base">
-                  {t('home.findWorkerCta')}
+                <Button
+                  size="lg"
+                  onClick={() => navigate({ to: "/search" })}
+                  className="text-base"
+                >
+                  {t("home.findWorkerCta")}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
-                <Button size="lg" variant="outline" onClick={() => navigate({ to: '/join' })} className="text-base">
-                  {t('home.joinWorkerCta')}
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onClick={() => navigate({ to: "/join" })}
+                  className="text-base"
+                >
+                  {t("home.joinWorkerCta")}
                 </Button>
               </div>
             </div>
@@ -40,7 +49,7 @@ export default function HomePage() {
               <div className="hero-image-glow relative">
                 <img
                   src="/assets/generated/sevasangam-hero-illustration.dim_1600x800.png"
-                  alt={t('home.heroImageAlt')}
+                  alt={t("home.heroImageAlt")}
                   className="w-full h-auto rounded-2xl relative z-10"
                 />
               </div>
@@ -53,8 +62,12 @@ export default function HomePage() {
       <section className="container px-4">
         <div className="max-w-3xl mx-auto space-y-8">
           <div className="text-center space-y-3">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">{t('home.searchTitle')}</h2>
-            <p className="text-lg text-muted-foreground">{t('home.searchSubtitle')}</p>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
+              {t("home.searchTitle")}
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              {t("home.searchSubtitle")}
+            </p>
           </div>
           <HomeSearchPanel />
         </div>
@@ -64,8 +77,12 @@ export default function HomePage() {
       <section className="container px-4">
         <div className="space-y-10">
           <div className="text-center space-y-3">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">{t('home.categoriesTitle')}</h2>
-            <p className="text-lg text-muted-foreground">{t('home.categoriesSubtitle')}</p>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
+              {t("home.categoriesTitle")}
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              {t("home.categoriesSubtitle")}
+            </p>
           </div>
           <CategoryCardGrid />
         </div>

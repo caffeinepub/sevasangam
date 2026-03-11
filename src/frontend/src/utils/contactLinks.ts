@@ -1,5 +1,5 @@
 export function normalizePhoneNumber(phone: string): string {
-  return phone.replace(/\D/g, '');
+  return phone.replace(/\D/g, "");
 }
 
 export function createTelLink(phone: string): string {

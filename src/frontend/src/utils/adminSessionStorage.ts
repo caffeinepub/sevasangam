@@ -1,4 +1,4 @@
-const ADMIN_SESSION_KEY = 'sevasangam_admin_session';
+const ADMIN_SESSION_KEY = "sevasangam_admin_session";
 
 export interface AdminSession {
   username: string;

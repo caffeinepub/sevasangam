@@ -1,5 +1,10 @@
-import React, { createContext, useState, useEffect, ReactNode } from 'react';
-import { Language, translate } from './index';
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  type ReactNode,
+} from "react";
+import { type Language, translate } from "./index";
 
 interface I18nContextType {
   language: Language;
@@ -9,12 +14,14 @@ interface I18nContextType {
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
-const STORAGE_KEY = 'sevasangam_language';
+const STORAGE_KEY = "sevasangam_language";
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
-    return (stored === 'en' || stored === 'hi' || stored === 'as') ? stored : 'en';
+    return stored === "en" || stored === "hi" || stored === "as"
+      ? stored
+      : "en";
   });
 
   useEffect(() => {
@@ -39,7 +46,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 export function useI18nContext() {
   const context = React.useContext(I18nContext);
   if (!context) {
-    throw new Error('useI18nContext must be used within I18nProvider');
+    throw new Error("useI18nContext must be used within I18nProvider");
   }
   return context;
 }

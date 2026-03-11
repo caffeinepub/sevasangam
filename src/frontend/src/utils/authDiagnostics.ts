@@ -13,7 +13,10 @@ interface AuthDiagnosticContext {
   error?: any;
 }
 
-export function logAuthEvent(event: string, context?: Partial<AuthDiagnosticContext>) {
+export function logAuthEvent(
+  event: string,
+  context?: Partial<AuthDiagnosticContext>,
+) {
   const diagnosticEntry: AuthDiagnosticContext = {
     timestamp: new Date().toISOString(),
     event,
@@ -25,27 +28,27 @@ export function logAuthEvent(event: string, context?: Partial<AuthDiagnosticCont
   // Filter out any potential secrets
   const safeEntry = {
     ...diagnosticEntry,
-    currentUrl: diagnosticEntry.currentUrl?.split('?')[0], // Remove query params that might contain tokens
+    currentUrl: diagnosticEntry.currentUrl?.split("?")[0], // Remove query params that might contain tokens
   };
 
-  console.log('[Auth Diagnostic]', safeEntry);
+  console.log("[Auth Diagnostic]", safeEntry);
 }
 
 export function logLoginAttempt(hadIdentityBefore: boolean) {
-  logAuthEvent('login_attempt_start', {
+  logAuthEvent("login_attempt_start", {
     hadIdentityBefore,
   });
 }
 
 export function logLoginSuccess() {
-  logAuthEvent('login_success');
+  logAuthEvent("login_success");
 }
 
 export function logLoginFailure(error: any, hadIdentityBefore: boolean) {
-  logAuthEvent('login_failure', {
+  logAuthEvent("login_failure", {
     hadIdentityBefore,
     error: {
-      message: error?.message || 'Unknown error',
+      message: error?.message || "Unknown error",
       name: error?.name,
       // Include stack only in development
       ...(import.meta.env.DEV && { stack: error?.stack }),

@@ -1,20 +1,20 @@
-import { Link, useNavigate } from '@tanstack/react-router';
-import { Menu, X, LogOut, Globe } from 'lucide-react';
-import { useState } from 'react';
-import { Button } from '../ui/button';
-import { useAuthz } from '../../hooks/useAuthz';
-import { useAdminSession } from '../../hooks/useAdminSession';
-import LoginButton from '../auth/LoginButton';
-import { useQueryClient } from '@tanstack/react-query';
-import { useI18n } from '../../hooks/useI18n';
-import { Language } from '../../i18n';
+import { useQueryClient } from "@tanstack/react-query";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Globe, LogOut, Menu, X } from "lucide-react";
+import { useState } from "react";
+import { useAdminSession } from "../../hooks/useAdminSession";
+import { useAuthz } from "../../hooks/useAuthz";
+import { useI18n } from "../../hooks/useI18n";
+import type { Language } from "../../i18n";
+import LoginButton from "../auth/LoginButton";
+import { Button } from "../ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../ui/select';
+} from "../ui/select";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -27,11 +27,11 @@ export default function Header() {
   const handleAdminLogout = () => {
     logout();
     queryClient.clear();
-    navigate({ to: '/' });
+    navigate({ to: "/" });
   };
 
   const handleAdminLoginClick = () => {
-    navigate({ to: '/admin-login' });
+    navigate({ to: "/admin-login" });
   };
 
   return (
@@ -45,54 +45,83 @@ export default function Header() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6">
-          <Link to="/" className="text-sm font-medium hover:text-primary transition-colors">
-            {t('header.home')}
+          <Link
+            to="/"
+            className="text-sm font-medium hover:text-primary transition-colors"
+          >
+            {t("header.home")}
           </Link>
-          <Link to="/categories" className="text-sm font-medium hover:text-primary transition-colors">
-            {t('header.categories')}
+          <Link
+            to="/categories"
+            className="text-sm font-medium hover:text-primary transition-colors"
+          >
+            {t("header.categories")}
           </Link>
-          <Link to="/search" className="text-sm font-medium hover:text-primary transition-colors">
-            {t('header.findWorkers')}
+          <Link
+            to="/search"
+            className="text-sm font-medium hover:text-primary transition-colors"
+          >
+            {t("header.findWorkers")}
           </Link>
           {isWorkerAuthenticated && !isAdminSessionAuthenticated && (
-            <Link to="/dashboard" className="text-sm font-medium hover:text-primary transition-colors">
-              {t('header.myDashboard')}
+            <Link
+              to="/dashboard"
+              className="text-sm font-medium hover:text-primary transition-colors"
+            >
+              {t("header.myDashboard")}
             </Link>
           )}
           {isAdminSessionAuthenticated && (
-            <Link to="/admin" className="text-sm font-medium hover:text-primary transition-colors">
-              {t('header.admin')}
+            <Link
+              to="/admin"
+              className="text-sm font-medium hover:text-primary transition-colors"
+            >
+              {t("header.admin")}
             </Link>
           )}
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
-          <Select value={language} onValueChange={(val) => setLanguage(val as Language)}>
-            <SelectTrigger className="w-[140px]" aria-label={t('language.label')}>
+          <Select
+            value={language}
+            onValueChange={(val) => setLanguage(val as Language)}
+          >
+            <SelectTrigger
+              className="w-[140px]"
+              aria-label={t("language.label")}
+            >
               <Globe className="mr-2 h-4 w-4" />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="en">{t('language.english')}</SelectItem>
-              <SelectItem value="hi">{t('language.hindi')}</SelectItem>
-              <SelectItem value="as">{t('language.assamese')}</SelectItem>
+              <SelectItem value="en">{t("language.english")}</SelectItem>
+              <SelectItem value="hi">{t("language.hindi")}</SelectItem>
+              <SelectItem value="as">{t("language.assamese")}</SelectItem>
             </SelectContent>
           </Select>
           {!isWorkerAuthenticated && !isAdminSessionAuthenticated && (
-            <Button onClick={() => navigate({ to: '/join' })} variant="outline" size="sm">
-              {t('header.joinAsWorker')}
+            <Button
+              onClick={() => navigate({ to: "/join" })}
+              variant="outline"
+              size="sm"
+            >
+              {t("header.joinAsWorker")}
             </Button>
           )}
           {isAdminSessionAuthenticated ? (
             <Button onClick={handleAdminLogout} variant="outline" size="sm">
               <LogOut className="mr-2 h-4 w-4" />
-              {t('header.adminLogout')}
+              {t("header.adminLogout")}
             </Button>
           ) : (
             <>
               <LoginButton />
-              <Button onClick={handleAdminLoginClick} variant="outline" size="sm">
-                {t('header.adminLogin')}
+              <Button
+                onClick={handleAdminLoginClick}
+                variant="outline"
+                size="sm"
+              >
+                {t("header.adminLogin")}
               </Button>
             </>
           )}
@@ -100,11 +129,16 @@ export default function Header() {
 
         {/* Mobile Menu Button */}
         <button
+          type="button"
           className="md:hidden p-2"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label="Toggle menu"
         >
-          {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          {mobileMenuOpen ? (
+            <X className="h-6 w-6" />
+          ) : (
+            <Menu className="h-6 w-6" />
+          )}
         </button>
       </div>
 
@@ -117,21 +151,21 @@ export default function Header() {
               className="text-sm font-medium hover:text-primary transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
-              {t('header.home')}
+              {t("header.home")}
             </Link>
             <Link
               to="/categories"
               className="text-sm font-medium hover:text-primary transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
-              {t('header.categories')}
+              {t("header.categories")}
             </Link>
             <Link
               to="/search"
               className="text-sm font-medium hover:text-primary transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
-              {t('header.findWorkers')}
+              {t("header.findWorkers")}
             </Link>
             {isWorkerAuthenticated && !isAdminSessionAuthenticated && (
               <Link
@@ -139,7 +173,7 @@ export default function Header() {
                 className="text-sm font-medium hover:text-primary transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                {t('header.myDashboard')}
+                {t("header.myDashboard")}
               </Link>
             )}
             {isAdminSessionAuthenticated && (
@@ -148,32 +182,38 @@ export default function Header() {
                 className="text-sm font-medium hover:text-primary transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                {t('header.admin')}
+                {t("header.admin")}
               </Link>
             )}
             <div className="pt-2 border-t space-y-2">
-              <Select value={language} onValueChange={(val) => setLanguage(val as Language)}>
-                <SelectTrigger className="w-full" aria-label={t('language.label')}>
+              <Select
+                value={language}
+                onValueChange={(val) => setLanguage(val as Language)}
+              >
+                <SelectTrigger
+                  className="w-full"
+                  aria-label={t("language.label")}
+                >
                   <Globe className="mr-2 h-4 w-4" />
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="en">{t('language.english')}</SelectItem>
-                  <SelectItem value="hi">{t('language.hindi')}</SelectItem>
-                  <SelectItem value="as">{t('language.assamese')}</SelectItem>
+                  <SelectItem value="en">{t("language.english")}</SelectItem>
+                  <SelectItem value="hi">{t("language.hindi")}</SelectItem>
+                  <SelectItem value="as">{t("language.assamese")}</SelectItem>
                 </SelectContent>
               </Select>
               {!isWorkerAuthenticated && !isAdminSessionAuthenticated && (
                 <Button
                   onClick={() => {
                     setMobileMenuOpen(false);
-                    navigate({ to: '/join' });
+                    navigate({ to: "/join" });
                   }}
                   variant="outline"
                   size="sm"
                   className="w-full"
                 >
-                  {t('header.joinAsWorker')}
+                  {t("header.joinAsWorker")}
                 </Button>
               )}
               {isAdminSessionAuthenticated ? (
@@ -187,7 +227,7 @@ export default function Header() {
                   className="w-full"
                 >
                   <LogOut className="mr-2 h-4 w-4" />
-                  {t('header.adminLogout')}
+                  {t("header.adminLogout")}
                 </Button>
               ) : (
                 <>
@@ -201,7 +241,7 @@ export default function Header() {
                     size="sm"
                     className="w-full"
                   >
-                    {t('header.adminLogin')}
+                    {t("header.adminLogin")}
                   </Button>
                 </>
               )}

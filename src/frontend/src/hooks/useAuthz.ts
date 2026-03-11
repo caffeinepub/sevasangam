@@ -1,5 +1,5 @@
-import { useInternetIdentity } from './useInternetIdentity';
-import { useAdminSession } from './useAdminSession';
+import { useAdminSession } from "./useAdminSession";
+import { useInternetIdentity } from "./useInternetIdentity";
 
 export function useAuthz() {
   const { identity } = useInternetIdentity();

@@ -1,8 +1,8 @@
-import { ReactNode, useEffect } from 'react';
-import { useNavigate } from '@tanstack/react-router';
-import { useAdminSession } from '../../hooks/useAdminSession';
-import { AlertCircle, Loader2 } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
+import { useNavigate } from "@tanstack/react-router";
+import { AlertCircle, Loader2 } from "lucide-react";
+import { type ReactNode, useEffect } from "react";
+import { useAdminSession } from "../../hooks/useAdminSession";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 
 export default function RequireAdmin({ children }: { children: ReactNode }) {
   const { isAdminAuthenticated, isLoading } = useAdminSession();
@@ -10,7 +10,7 @@ export default function RequireAdmin({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!isLoading && !isAdminAuthenticated) {
-      navigate({ to: '/admin-login' });
+      navigate({ to: "/admin-login" });
     }
   }, [isAdminAuthenticated, isLoading, navigate]);
 
@@ -30,7 +30,8 @@ export default function RequireAdmin({ children }: { children: ReactNode }) {
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Access Denied</AlertTitle>
           <AlertDescription>
-            You must be logged in as an admin to access this page. Redirecting to login...
+            You must be logged in as an admin to access this page. Redirecting
+            to login...
           </AlertDescription>
         </Alert>
       </div>

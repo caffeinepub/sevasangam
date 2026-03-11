@@ -1,19 +1,37 @@
-import { useState } from 'react';
-import { useGetAllCategories, useCreateCategory, useUpdateCategory, useDeleteCategory } from '../../hooks/useQueries';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
-import { Plus, Edit, Trash2, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
-import type { Category } from '../../backend';
+import { Edit, Loader2, Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import type { Category } from "../../backend";
+import {
+  useCreateCategory,
+  useDeleteCategory,
+  useGetAllCategories,
+  useUpdateCategory,
+} from "../../hooks/useQueries";
+import { Button } from "../ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 
-function EmptyState({ title, description }: { title: string; description?: string }) {
+function EmptyState({
+  title,
+  description,
+}: { title: string; description?: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <h3 className="text-lg font-semibold mb-2">{title}</h3>
-      {description && <p className="text-sm text-muted-foreground mb-6 max-w-md">{description}</p>}
+      {description && (
+        <p className="text-sm text-muted-foreground mb-6 max-w-md">
+          {description}
+        </p>
+      )}
     </div>
   );
 }
@@ -25,7 +43,11 @@ export default function CategoriesAdminPanel() {
   const deleteCategory = useDeleteCategory();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const [formData, setFormData] = useState({ id: '', name: '', description: '' });
+  const [formData, setFormData] = useState({
+    id: "",
+    name: "",
+    description: "",
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,22 +56,25 @@ export default function CategoriesAdminPanel() {
         id: formData.id,
         name: formData.name,
         description: formData.description || undefined,
-        status: 'active' as any,
+        status: "active" as any,
       };
 
       if (editingCategory) {
-        await updateCategory.mutateAsync({ categoryId: editingCategory.id, category });
-        toast.success('Category updated');
+        await updateCategory.mutateAsync({
+          categoryId: editingCategory.id,
+          category,
+        });
+        toast.success("Category updated");
       } else {
         await createCategory.mutateAsync(category);
-        toast.success('Category created');
+        toast.success("Category created");
       }
 
       setDialogOpen(false);
       setEditingCategory(null);
-      setFormData({ id: '', name: '', description: '' });
-    } catch (error) {
-      toast.error('Failed to save category');
+      setFormData({ id: "", name: "", description: "" });
+    } catch (_error) {
+      toast.error("Failed to save category");
     }
   };
 
@@ -58,18 +83,18 @@ export default function CategoriesAdminPanel() {
     setFormData({
       id: category.id,
       name: category.name,
-      description: category.description || '',
+      description: category.description || "",
     });
     setDialogOpen(true);
   };
 
   const handleDelete = async (categoryId: string) => {
-    if (!confirm('Are you sure you want to delete this category?')) return;
+    if (!confirm("Are you sure you want to delete this category?")) return;
     try {
       await deleteCategory.mutateAsync(categoryId);
-      toast.success('Category deleted');
-    } catch (error) {
-      toast.error('Failed to delete category');
+      toast.success("Category deleted");
+    } catch (_error) {
+      toast.error("Failed to delete category");
     }
   };
 
@@ -87,14 +112,21 @@ export default function CategoriesAdminPanel() {
         <h2 className="text-2xl font-bold">Category Management</h2>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => { setEditingCategory(null); setFormData({ id: '', name: '', description: '' }); }}>
+            <Button
+              onClick={() => {
+                setEditingCategory(null);
+                setFormData({ id: "", name: "", description: "" });
+              }}
+            >
               <Plus className="mr-2 h-4 w-4" />
               Add Category
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>{editingCategory ? 'Edit Category' : 'Add Category'}</DialogTitle>
+              <DialogTitle>
+                {editingCategory ? "Edit Category" : "Add Category"}
+              </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
@@ -104,7 +136,9 @@ export default function CategoriesAdminPanel() {
                   required
                   disabled={!!editingCategory}
                   value={formData.id}
-                  onChange={(e) => setFormData({ ...formData, id: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, id: e.target.value })
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -113,7 +147,9 @@ export default function CategoriesAdminPanel() {
                   id="name"
                   required
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -121,11 +157,16 @@ export default function CategoriesAdminPanel() {
                 <Input
                   id="description"
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
                 />
               </div>
-              <Button type="submit" disabled={createCategory.isPending || updateCategory.isPending}>
-                {editingCategory ? 'Update' : 'Create'}
+              <Button
+                type="submit"
+                disabled={createCategory.isPending || updateCategory.isPending}
+              >
+                {editingCategory ? "Update" : "Create"}
               </Button>
             </form>
           </DialogContent>
@@ -133,7 +174,10 @@ export default function CategoriesAdminPanel() {
       </div>
 
       {categories.length === 0 ? (
-        <EmptyState title="No categories" description="Create your first category to get started." />
+        <EmptyState
+          title="No categories"
+          description="Create your first category to get started."
+        />
       ) : (
         <div className="grid gap-4">
           {categories.map((category) => (
@@ -143,11 +187,17 @@ export default function CategoriesAdminPanel() {
                   <div>
                     <CardTitle>{category.name}</CardTitle>
                     {category.description && (
-                      <p className="text-sm text-muted-foreground mt-1">{category.description}</p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {category.description}
+                      </p>
                     )}
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" onClick={() => handleEdit(category)}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleEdit(category)}
+                    >
                       <Edit className="h-4 w-4" />
                     </Button>
                     <Button

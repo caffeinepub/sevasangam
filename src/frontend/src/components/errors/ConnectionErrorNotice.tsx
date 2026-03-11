@@ -1,6 +1,6 @@
-import { AlertCircle, RefreshCw } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
-import { Button } from '../ui/button';
+import { AlertCircle, RefreshCw } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { Button } from "../ui/button";
 
 interface ConnectionErrorNoticeProps {
   onRetry: () => void;
@@ -10,8 +10,8 @@ interface ConnectionErrorNoticeProps {
 
 export default function ConnectionErrorNotice({
   onRetry,
-  title = 'Connection Problem',
-  message = 'We couldn\'t connect to the server. Please check your internet connection and try again.',
+  title = "Connection Problem",
+  message = "We couldn't connect to the server. Please check your internet connection and try again.",
 }: ConnectionErrorNoticeProps) {
   return (
     <Alert variant="destructive" className="max-w-2xl mx-auto">

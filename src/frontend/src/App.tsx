@@ -1,17 +1,23 @@
-import { createRouter, RouterProvider, createRoute, createRootRoute, Outlet } from '@tanstack/react-router';
-import { ThemeProvider } from 'next-themes';
-import HomePage from './pages/HomePage';
-import CategoryPage from './pages/CategoryPage';
-import WorkerProfilePage from './pages/WorkerProfilePage';
-import WorkerOnboardingPage from './pages/WorkerOnboardingPage';
-import WorkerDashboardPage from './pages/WorkerDashboardPage';
-import AdminDashboardPage from './pages/AdminDashboardPage';
-import AdminLoginPage from './pages/AdminLoginPage';
-import SearchResultsPage from './pages/SearchResultsPage';
-import CategoriesIndexPage from './pages/CategoriesIndexPage';
-import AppLayout from './components/layout/AppLayout';
-import { Toaster } from './components/ui/sonner';
-import { I18nProvider } from './i18n/I18nProvider';
+import {
+  Outlet,
+  RouterProvider,
+  createRootRoute,
+  createRoute,
+  createRouter,
+} from "@tanstack/react-router";
+import { ThemeProvider } from "next-themes";
+import AppLayout from "./components/layout/AppLayout";
+import { Toaster } from "./components/ui/sonner";
+import { I18nProvider } from "./i18n/I18nProvider";
+import AdminDashboardPage from "./pages/AdminDashboardPage";
+import AdminLoginPage from "./pages/AdminLoginPage";
+import CategoriesIndexPage from "./pages/CategoriesIndexPage";
+import CategoryPage from "./pages/CategoryPage";
+import HomePage from "./pages/HomePage";
+import SearchResultsPage from "./pages/SearchResultsPage";
+import WorkerDashboardPage from "./pages/WorkerDashboardPage";
+import WorkerOnboardingPage from "./pages/WorkerOnboardingPage";
+import WorkerProfilePage from "./pages/WorkerProfilePage";
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -23,55 +29,55 @@ const rootRoute = createRootRoute({
 
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/',
+  path: "/",
   component: HomePage,
 });
 
 const categoriesRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/categories',
+  path: "/categories",
   component: CategoriesIndexPage,
 });
 
 const categoryRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/category/$categoryId',
+  path: "/category/$categoryId",
   component: CategoryPage,
 });
 
 const workerProfileRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/worker/$workerId',
+  path: "/worker/$workerId",
   component: WorkerProfilePage,
 });
 
 const searchRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/search',
+  path: "/search",
   component: SearchResultsPage,
 });
 
 const workerOnboardingRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/join',
+  path: "/join",
   component: WorkerOnboardingPage,
 });
 
 const workerDashboardRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/dashboard',
+  path: "/dashboard",
   component: WorkerDashboardPage,
 });
 
 const adminLoginRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/admin-login',
+  path: "/admin-login",
   component: AdminLoginPage,
 });
 
 const adminDashboardRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/admin',
+  path: "/admin",
   component: AdminDashboardPage,
 });
 
@@ -89,7 +95,7 @@ const routeTree = rootRoute.addChildren([
 
 const router = createRouter({ routeTree });
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface Register {
     router: typeof router;
   }

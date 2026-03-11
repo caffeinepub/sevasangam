@@ -1,22 +1,39 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from '@tanstack/react-router';
-import { useGetAllInquiriesAdmin, useUpdateInquiry, useDeleteInquiry } from '../../hooks/useQueries';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Trash2, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { toast } from 'sonner';
-import { Alert, AlertDescription } from '../ui/alert';
-import type { Inquiry } from '../../backend';
-import { InquiryStatus } from '../../backend';
-import { handleAdminApiError } from '../../utils/adminApiErrorHandling';
+import { useNavigate } from "@tanstack/react-router";
+import { AlertCircle, CheckCircle2, Loader2, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import type { Inquiry } from "../../backend";
+import { InquiryStatus } from "../../backend";
+import {
+  useDeleteInquiry,
+  useGetAllInquiriesAdmin,
+  useUpdateInquiry,
+} from "../../hooks/useQueries";
+import { handleAdminApiError } from "../../utils/adminApiErrorHandling";
+import { Alert, AlertDescription } from "../ui/alert";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
-function EmptyState({ title, description }: { title: string; description?: string }) {
+function EmptyState({
+  title,
+  description,
+}: { title: string; description?: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <h3 className="text-lg font-semibold mb-2">{title}</h3>
-      {description && <p className="text-sm text-muted-foreground mb-6 max-w-md">{description}</p>}
+      {description && (
+        <p className="text-sm text-muted-foreground mb-6 max-w-md">
+          {description}
+        </p>
+      )}
     </div>
   );
 }
@@ -25,8 +42,10 @@ export default function InquiriesAdminPanel() {
   const { data: inquiries = [], isLoading, error } = useGetAllInquiriesAdmin();
   const updateInquiry = useUpdateInquiry();
   const deleteInquiry = useDeleteInquiry();
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [markingCompletedId, setMarkingCompletedId] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [markingCompletedId, setMarkingCompletedId] = useState<string | null>(
+    null,
+  );
   const navigate = useNavigate();
 
   // Handle query errors
@@ -34,16 +53,18 @@ export default function InquiriesAdminPanel() {
     if (error) {
       const message = handleAdminApiError(error);
       toast.error(message);
-      if (message.includes('session has expired')) {
-        navigate({ to: '/admin-login' });
+      if (message.includes("session has expired")) {
+        navigate({ to: "/admin-login" });
       }
     }
   }, [error, navigate]);
 
-  const filteredInquiries = Array.isArray(inquiries) ? inquiries.filter((inq) => {
-    if (statusFilter === 'all') return true;
-    return inq.status === statusFilter;
-  }) : [];
+  const filteredInquiries = Array.isArray(inquiries)
+    ? inquiries.filter((inq) => {
+        if (statusFilter === "all") return true;
+        return inq.status === statusFilter;
+      })
+    : [];
 
   const handleStatusChange = async (inquiry: Inquiry, newStatus: string) => {
     try {
@@ -51,9 +72,9 @@ export default function InquiriesAdminPanel() {
         inquiryId: inquiry.id,
         inquiry: { ...inquiry, status: newStatus as any },
       });
-      toast.success('Inquiry status updated');
-    } catch (error) {
-      toast.error('Failed to update inquiry');
+      toast.success("Inquiry status updated");
+    } catch (_error) {
+      toast.error("Failed to update inquiry");
     }
   };
 
@@ -64,21 +85,21 @@ export default function InquiriesAdminPanel() {
         inquiryId: inquiry.id,
         inquiry: { ...inquiry, status: InquiryStatus.completed },
       });
-      toast.success('Job marked as completed');
-    } catch (error) {
-      toast.error('Failed to mark job as completed');
+      toast.success("Job marked as completed");
+    } catch (_error) {
+      toast.error("Failed to mark job as completed");
     } finally {
       setMarkingCompletedId(null);
     }
   };
 
   const handleDelete = async (inquiryId: string) => {
-    if (!confirm('Are you sure you want to delete this inquiry?')) return;
+    if (!confirm("Are you sure you want to delete this inquiry?")) return;
     try {
       await deleteInquiry.mutateAsync(inquiryId);
-      toast.success('Inquiry deleted');
-    } catch (error) {
-      toast.error('Failed to delete inquiry');
+      toast.success("Inquiry deleted");
+    } catch (_error) {
+      toast.error("Failed to delete inquiry");
     }
   };
 
@@ -95,7 +116,8 @@ export default function InquiriesAdminPanel() {
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          Failed to load inquiries. Please check your admin session and try again.
+          Failed to load inquiries. Please check your admin session and try
+          again.
         </AlertDescription>
       </Alert>
     );
@@ -119,7 +141,10 @@ export default function InquiriesAdminPanel() {
       </div>
 
       {filteredInquiries.length === 0 ? (
-        <EmptyState title="No inquiries found" description="No inquiries match the selected filter." />
+        <EmptyState
+          title="No inquiries found"
+          description="No inquiries match the selected filter."
+        />
       ) : (
         <div className="grid gap-4">
           {filteredInquiries.map((inquiry) => {
@@ -132,7 +157,8 @@ export default function InquiriesAdminPanel() {
                   <div className="flex items-start justify-between">
                     <div>
                       <CardTitle className="text-base">
-                        {inquiry.customer_name || 'Anonymous'} - {inquiry.inquiry_type}
+                        {inquiry.customer_name || "Anonymous"} -{" "}
+                        {inquiry.inquiry_type}
                       </CardTitle>
                       <p className="text-sm text-muted-foreground mt-1">
                         Worker ID: {inquiry.worker_id}
@@ -152,7 +178,9 @@ export default function InquiriesAdminPanel() {
                     <div className="flex gap-2 flex-wrap">
                       <Select
                         value={inquiry.status}
-                        onValueChange={(value) => handleStatusChange(inquiry, value)}
+                        onValueChange={(value) =>
+                          handleStatusChange(inquiry, value)
+                        }
                       >
                         <SelectTrigger className="w-[150px]">
                           <SelectValue />
@@ -167,7 +195,9 @@ export default function InquiriesAdminPanel() {
                         <Button
                           size="sm"
                           onClick={() => handleMarkCompleted(inquiry)}
-                          disabled={isMarkingThisInquiry || markingCompletedId !== null}
+                          disabled={
+                            isMarkingThisInquiry || markingCompletedId !== null
+                          }
                           className="bg-green-600 hover:bg-green-700 text-white"
                         >
                           {isMarkingThisInquiry ? (

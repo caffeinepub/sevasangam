@@ -1,21 +1,32 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useActor } from './useActor';
-import { useAdminSession } from './useAdminSession';
-import type { WorkerProfile, Category, Inquiry, UserProfile, ApprovalStatus, UserApprovalInfo, Status } from '../backend';
-import { Principal } from '@dfinity/principal';
-import { toast } from 'sonner';
-import { handleAdminApiErrorWithRedirect, isUnauthorizedError } from '../utils/adminApiErrorHandling';
-import { useNavigate } from '@tanstack/react-router';
-import { clearAdminSession } from '../utils/adminSessionStorage';
+import type { Principal } from "@dfinity/principal";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
+import type {
+  ApprovalStatus,
+  Category,
+  Inquiry,
+  Status,
+  UserApprovalInfo,
+  UserProfile,
+  WorkerProfile,
+} from "../backend";
+import {
+  handleAdminApiErrorWithRedirect,
+  isUnauthorizedError,
+} from "../utils/adminApiErrorHandling";
+import { clearAdminSession } from "../utils/adminSessionStorage";
+import { useActor } from "./useActor";
+import { useAdminSession } from "./useAdminSession";
 
 // User Profile Queries
 export function useGetCallerUserProfile() {
   const { actor, isFetching: actorFetching } = useActor();
 
   const query = useQuery<UserProfile | null>({
-    queryKey: ['currentUserProfile'],
+    queryKey: ["currentUserProfile"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.getCallerUserProfile();
     },
     enabled: !!actor && !actorFetching,
@@ -35,11 +46,11 @@ export function useSaveCallerUserProfile() {
 
   return useMutation({
     mutationFn: async (profile: UserProfile) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.saveCallerUserProfile(profile);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
+      queryClient.invalidateQueries({ queryKey: ["currentUserProfile"] });
     },
   });
 }
@@ -49,9 +60,9 @@ export function useGetAllCategories() {
   const { actor, isFetching } = useActor();
 
   return useQuery<Category[]>({
-    queryKey: ['categories'],
+    queryKey: ["categories"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.getAllCategories();
     },
     enabled: !!actor && !isFetching,
@@ -62,7 +73,7 @@ export function useGetCategory(categoryId: string | undefined) {
   const { actor, isFetching } = useActor();
 
   return useQuery<Category | null>({
-    queryKey: ['category', categoryId],
+    queryKey: ["category", categoryId],
     queryFn: async () => {
       if (!actor || !categoryId) return null;
       return actor.getCategory(categoryId);
@@ -79,13 +90,13 @@ export function useCreateCategory() {
 
   return useMutation({
     mutationFn: async (category: Category) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       const session = getCredentials();
-      if (!session) throw new Error('Admin session not found');
+      if (!session) throw new Error("Admin session not found");
       return actor.createCategory(session.username, session.password, category);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
     onError: (error: any) => {
       const message = handleAdminApiErrorWithRedirect(error, navigate);
@@ -101,14 +112,22 @@ export function useUpdateCategory() {
   const navigate = useNavigate();
 
   return useMutation({
-    mutationFn: async ({ categoryId, category }: { categoryId: string; category: Category }) => {
-      if (!actor) throw new Error('Actor not available');
+    mutationFn: async ({
+      categoryId,
+      category,
+    }: { categoryId: string; category: Category }) => {
+      if (!actor) throw new Error("Actor not available");
       const session = getCredentials();
-      if (!session) throw new Error('Admin session not found');
-      return actor.updateCategory(session.username, session.password, categoryId, category);
+      if (!session) throw new Error("Admin session not found");
+      return actor.updateCategory(
+        session.username,
+        session.password,
+        categoryId,
+        category,
+      );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
     onError: (error: any) => {
       const message = handleAdminApiErrorWithRedirect(error, navigate);
@@ -125,13 +144,17 @@ export function useDeleteCategory() {
 
   return useMutation({
     mutationFn: async (categoryId: string) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       const session = getCredentials();
-      if (!session) throw new Error('Admin session not found');
-      return actor.deleteCategory(session.username, session.password, categoryId);
+      if (!session) throw new Error("Admin session not found");
+      return actor.deleteCategory(
+        session.username,
+        session.password,
+        categoryId,
+      );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
     onError: (error: any) => {
       const message = handleAdminApiErrorWithRedirect(error, navigate);
@@ -145,9 +168,9 @@ export function useGetAllWorkers() {
   const { actor, isFetching } = useActor();
 
   return useQuery<WorkerProfile[]>({
-    queryKey: ['workers'],
+    queryKey: ["workers"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.getAllWorkers();
     },
     enabled: !!actor && !isFetching,
@@ -158,9 +181,10 @@ export function useGetWorkersByCategory(categoryId: string | undefined) {
   const { actor, isFetching } = useActor();
 
   return useQuery<WorkerProfile[]>({
-    queryKey: ['workers', 'category', categoryId],
+    queryKey: ["workers", "category", categoryId],
     queryFn: async () => {
-      if (!actor || !categoryId) throw new Error('Actor or category not available');
+      if (!actor || !categoryId)
+        throw new Error("Actor or category not available");
       return actor.getWorkersByCategory(categoryId);
     },
     enabled: !!actor && !isFetching && !!categoryId,
@@ -171,7 +195,7 @@ export function useGetWorkerProfile(workerId: string | undefined) {
   const { actor, isFetching } = useActor();
 
   return useQuery<WorkerProfile | null>({
-    queryKey: ['worker', workerId],
+    queryKey: ["worker", workerId],
     queryFn: async () => {
       if (!actor || !workerId) return null;
       return actor.getWorkerProfile(workerId);
@@ -185,9 +209,9 @@ export function useGetMyWorkerProfile() {
   const { actor, isFetching } = useActor();
 
   return useQuery<WorkerProfile | null>({
-    queryKey: ['myWorkerProfile'],
+    queryKey: ["myWorkerProfile"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.getMyWorkerProfile();
     },
     enabled: !!actor && !isFetching,
@@ -201,12 +225,12 @@ export function useRegisterWorker() {
 
   return useMutation({
     mutationFn: async (profile: WorkerProfile) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.registerWorker(profile);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['myWorkerProfile'] });
-      queryClient.invalidateQueries({ queryKey: ['workers'] });
+      queryClient.invalidateQueries({ queryKey: ["myWorkerProfile"] });
+      queryClient.invalidateQueries({ queryKey: ["workers"] });
     },
   });
 }
@@ -216,13 +240,16 @@ export function useUpdateWorkerProfile() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ workerId, profile }: { workerId: string; profile: WorkerProfile }) => {
-      if (!actor) throw new Error('Actor not available');
+    mutationFn: async ({
+      workerId,
+      profile,
+    }: { workerId: string; profile: WorkerProfile }) => {
+      if (!actor) throw new Error("Actor not available");
       return actor.updateWorkerProfile(workerId, profile);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['myWorkerProfile'] });
-      queryClient.invalidateQueries({ queryKey: ['workers'] });
+      queryClient.invalidateQueries({ queryKey: ["myWorkerProfile"] });
+      queryClient.invalidateQueries({ queryKey: ["workers"] });
     },
   });
 }
@@ -233,11 +260,11 @@ export function useGetAllWorkersAdmin() {
   const { getCredentials } = useAdminSession();
 
   return useQuery<WorkerProfile[]>({
-    queryKey: ['workersAdmin'],
+    queryKey: ["workersAdmin"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       const session = getCredentials();
-      if (!session) throw new Error('Admin session not found');
+      if (!session) throw new Error("Admin session not found");
       return actor.getAllWorkersAdmin(session.username, session.password);
     },
     enabled: !!actor && !isFetching,
@@ -252,14 +279,14 @@ export function useApproveWorker() {
 
   return useMutation({
     mutationFn: async (workerId: string) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       const session = getCredentials();
-      if (!session) throw new Error('Admin session not found');
+      if (!session) throw new Error("Admin session not found");
       return actor.approveWorker(session.username, session.password, workerId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['workersAdmin'] });
-      queryClient.invalidateQueries({ queryKey: ['workers'] });
+      queryClient.invalidateQueries({ queryKey: ["workersAdmin"] });
+      queryClient.invalidateQueries({ queryKey: ["workers"] });
     },
     onError: (error: any) => {
       const message = handleAdminApiErrorWithRedirect(error, navigate);
@@ -276,14 +303,14 @@ export function useRejectWorker() {
 
   return useMutation({
     mutationFn: async (workerId: string) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       const session = getCredentials();
-      if (!session) throw new Error('Admin session not found');
+      if (!session) throw new Error("Admin session not found");
       return actor.rejectWorker(session.username, session.password, workerId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['workersAdmin'] });
-      queryClient.invalidateQueries({ queryKey: ['workers'] });
+      queryClient.invalidateQueries({ queryKey: ["workersAdmin"] });
+      queryClient.invalidateQueries({ queryKey: ["workers"] });
     },
     onError: (error: any) => {
       const message = handleAdminApiErrorWithRedirect(error, navigate);
@@ -300,14 +327,14 @@ export function usePublishWorker() {
 
   return useMutation({
     mutationFn: async (workerId: string) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       const session = getCredentials();
-      if (!session) throw new Error('Admin session not found');
+      if (!session) throw new Error("Admin session not found");
       return actor.publishWorker(session.username, session.password, workerId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['workersAdmin'] });
-      queryClient.invalidateQueries({ queryKey: ['workers'] });
+      queryClient.invalidateQueries({ queryKey: ["workersAdmin"] });
+      queryClient.invalidateQueries({ queryKey: ["workers"] });
     },
     onError: (error: any) => {
       const message = handleAdminApiErrorWithRedirect(error, navigate);
@@ -324,14 +351,18 @@ export function useUnpublishWorker() {
 
   return useMutation({
     mutationFn: async (workerId: string) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       const session = getCredentials();
-      if (!session) throw new Error('Admin session not found');
-      return actor.unpublishWorker(session.username, session.password, workerId);
+      if (!session) throw new Error("Admin session not found");
+      return actor.unpublishWorker(
+        session.username,
+        session.password,
+        workerId,
+      );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['workersAdmin'] });
-      queryClient.invalidateQueries({ queryKey: ['workers'] });
+      queryClient.invalidateQueries({ queryKey: ["workersAdmin"] });
+      queryClient.invalidateQueries({ queryKey: ["workers"] });
     },
     onError: (error: any) => {
       const message = handleAdminApiErrorWithRedirect(error, navigate);
@@ -348,14 +379,14 @@ export function useRemoveWorker() {
 
   return useMutation({
     mutationFn: async (workerId: string) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       const session = getCredentials();
-      if (!session) throw new Error('Admin session not found');
+      if (!session) throw new Error("Admin session not found");
       return actor.removeWorker(session.username, session.password, workerId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['workersAdmin'] });
-      queryClient.invalidateQueries({ queryKey: ['workers'] });
+      queryClient.invalidateQueries({ queryKey: ["workersAdmin"] });
+      queryClient.invalidateQueries({ queryKey: ["workers"] });
     },
     onError: (error: any) => {
       const message = handleAdminApiErrorWithRedirect(error, navigate);
@@ -371,15 +402,23 @@ export function useUpdateWorkerCategoryAdmin() {
   const navigate = useNavigate();
 
   return useMutation({
-    mutationFn: async ({ workerId, newCategoryId }: { workerId: string; newCategoryId: string }) => {
-      if (!actor) throw new Error('Actor not available');
+    mutationFn: async ({
+      workerId,
+      newCategoryId,
+    }: { workerId: string; newCategoryId: string }) => {
+      if (!actor) throw new Error("Actor not available");
       const session = getCredentials();
-      if (!session) throw new Error('Admin session not found');
-      return actor.updateWorkerCategoryAdmin(session.username, session.password, workerId, newCategoryId);
+      if (!session) throw new Error("Admin session not found");
+      return actor.updateWorkerCategoryAdmin(
+        session.username,
+        session.password,
+        workerId,
+        newCategoryId,
+      );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['workersAdmin'] });
-      queryClient.invalidateQueries({ queryKey: ['workers'] });
+      queryClient.invalidateQueries({ queryKey: ["workersAdmin"] });
+      queryClient.invalidateQueries({ queryKey: ["workers"] });
     },
     onError: (error: any) => {
       const message = handleAdminApiErrorWithRedirect(error, navigate);
@@ -395,11 +434,11 @@ export function useCreateInquiry() {
 
   return useMutation({
     mutationFn: async (inquiry: Inquiry) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.createInquiry(inquiry);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['inquiries'] });
+      queryClient.invalidateQueries({ queryKey: ["inquiries"] });
     },
   });
 }
@@ -409,11 +448,11 @@ export function useGetAllInquiriesAdmin() {
   const { getCredentials } = useAdminSession();
 
   return useQuery<Inquiry[]>({
-    queryKey: ['inquiriesAdmin'],
+    queryKey: ["inquiriesAdmin"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       const session = getCredentials();
-      if (!session) throw new Error('Admin session not found');
+      if (!session) throw new Error("Admin session not found");
       return actor.getAllInquiries(session.username, session.password);
     },
     enabled: !!actor && !isFetching,
@@ -427,16 +466,24 @@ export function useUpdateInquiry() {
   const navigate = useNavigate();
 
   return useMutation({
-    mutationFn: async ({ inquiryId, inquiry }: { inquiryId: string; inquiry: Inquiry }) => {
-      if (!actor) throw new Error('Actor not available');
+    mutationFn: async ({
+      inquiryId,
+      inquiry,
+    }: { inquiryId: string; inquiry: Inquiry }) => {
+      if (!actor) throw new Error("Actor not available");
       const session = getCredentials();
-      if (!session) throw new Error('Admin session not found');
-      return actor.updateInquiry(session.username, session.password, inquiryId, inquiry);
+      if (!session) throw new Error("Admin session not found");
+      return actor.updateInquiry(
+        session.username,
+        session.password,
+        inquiryId,
+        inquiry,
+      );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['inquiriesAdmin'] });
-      queryClient.invalidateQueries({ queryKey: ['workerJobs'] });
-      queryClient.invalidateQueries({ queryKey: ['workerJobs', 'me'] });
+      queryClient.invalidateQueries({ queryKey: ["inquiriesAdmin"] });
+      queryClient.invalidateQueries({ queryKey: ["workerJobs"] });
+      queryClient.invalidateQueries({ queryKey: ["workerJobs", "me"] });
     },
     onError: (error: any) => {
       const message = handleAdminApiErrorWithRedirect(error, navigate);
@@ -453,15 +500,15 @@ export function useDeleteInquiry() {
 
   return useMutation({
     mutationFn: async (inquiryId: string) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       const session = getCredentials();
-      if (!session) throw new Error('Admin session not found');
+      if (!session) throw new Error("Admin session not found");
       return actor.deleteInquiry(session.username, session.password, inquiryId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['inquiriesAdmin'] });
-      queryClient.invalidateQueries({ queryKey: ['workerJobs'] });
-      queryClient.invalidateQueries({ queryKey: ['workerJobs', 'me'] });
+      queryClient.invalidateQueries({ queryKey: ["inquiriesAdmin"] });
+      queryClient.invalidateQueries({ queryKey: ["workerJobs"] });
+      queryClient.invalidateQueries({ queryKey: ["workerJobs", "me"] });
     },
     onError: (error: any) => {
       const message = handleAdminApiErrorWithRedirect(error, navigate);
@@ -475,9 +522,9 @@ export function useGetMyWorkItems() {
   const { actor, isFetching } = useActor();
 
   return useQuery<Inquiry[]>({
-    queryKey: ['workerJobs', 'me'],
+    queryKey: ["workerJobs", "me"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.getMyWorkItems();
     },
     enabled: !!actor && !isFetching,
@@ -491,10 +538,14 @@ export function useGetWorkerInquiriesAdmin() {
 
   return useMutation({
     mutationFn: async (workerId: string) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       const session = getCredentials();
-      if (!session) throw new Error('Admin session not found');
-      return actor.getWorkerInquiriesAdmin(session.username, session.password, workerId);
+      if (!session) throw new Error("Admin session not found");
+      return actor.getWorkerInquiriesAdmin(
+        session.username,
+        session.password,
+        workerId,
+      );
     },
   });
 }
@@ -504,9 +555,9 @@ export function useIsCallerApproved() {
   const { actor, isFetching } = useActor();
 
   return useQuery<boolean>({
-    queryKey: ['isApproved'],
+    queryKey: ["isApproved"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.isCallerApproved();
     },
     enabled: !!actor && !isFetching,
@@ -519,11 +570,11 @@ export function useRequestApproval() {
 
   return useMutation({
     mutationFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.requestApproval();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['isApproved'] });
+      queryClient.invalidateQueries({ queryKey: ["isApproved"] });
     },
   });
 }
@@ -532,9 +583,9 @@ export function useListApprovals() {
   const { actor, isFetching } = useActor();
 
   return useQuery<UserApprovalInfo[]>({
-    queryKey: ['approvals'],
+    queryKey: ["approvals"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.listApprovals();
     },
     enabled: !!actor && !isFetching,
@@ -546,12 +597,15 @@ export function useSetApproval() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ user, status }: { user: Principal; status: ApprovalStatus }) => {
-      if (!actor) throw new Error('Actor not available');
+    mutationFn: async ({
+      user,
+      status,
+    }: { user: Principal; status: ApprovalStatus }) => {
+      if (!actor) throw new Error("Actor not available");
       return actor.setApproval(user, status);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['approvals'] });
+      queryClient.invalidateQueries({ queryKey: ["approvals"] });
     },
   });
 }

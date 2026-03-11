@@ -1,5 +1,9 @@
-import { Link } from '@tanstack/react-router';
-import { CATEGORY_IDS, CATEGORY_NAMES, getCategoryImagePath } from '../../utils/categories';
+import { Link } from "@tanstack/react-router";
+import {
+  CATEGORY_IDS,
+  CATEGORY_NAMES,
+  getCategoryImagePath,
+} from "../../utils/categories";
 
 export default function CategoryCardGrid() {
   const categories = Object.entries(CATEGORY_NAMES).map(([id, name]) => ({
